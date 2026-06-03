@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>OSO MATES - Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Montserrat,sans-serif;background:#f0f0ee;color:#0a0a0a;}
+.login-screen{display:flex;align-items:center;justify-content:center;min-height:100vh;background:#0a0a0a;}
+.login-box{background:#f8f8f6;padding:3rem;max-width:380px;width:100%;text-align:center;}
+.login-logo{font-size:1.8rem;font-weight:300;letter-spacing:.3em;text-transform:uppercase;margin-bottom:.5rem;}
+.login-sub{font-size:.6rem;letter-spacing:.2em;text-transform:uppercase;color:#888;margin-bottom:2.5rem;}
+.login-input{width:100%;padding:.9rem;border:1.5px solid #ebebeb;font-family:Montserrat,sans-serif;font-size:.85rem;outline:none;margin-bottom:1rem;}
+.login-input:focus{border-color:#0a0a0a}
+.login-btn{width:100%;padding:1rem;background:#0a0a0a;color:#f8f8f6;border:none;font-family:Montserrat,sans-serif;font-size:.65rem;letter-spacing:.2em;text-transform:uppercase;cursor:pointer;}
+.login-error{font-size:.72rem;color:#e74c3c;margin-top:.8rem;display:none;}
+.dashboard{display:none;}
+.dash-nav{background:#0a0a0a;padding:1.2rem 2.5rem;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:100;}
+.dash-logo{font-size:1rem;font-weight:300;letter-spacing:.3em;text-transform:uppercase;color:#f8f8f6;}
+.dash-nav-links{display:flex;gap:1rem;flex-wrap:wrap;}
+.dash-nav-btn{background:none;border:1px solid rgba(255,255,255,.2);color:rgba(255,255,255,.7);font-family:Montserrat,sans-serif;font-size:.6rem;letter-spacing:.15em;text-transform:uppercase;padding:.5rem 1rem;cursor:pointer;}
+.dash-nav-btn.active{background:#f8f8f6;color:#0a0a0a;}
+.dash-nav-logout{background:none;border:none;color:rgba(255,255,255,.4);font-family:Montserrat,sans-serif;font-size:.6rem;cursor:pointer;}
+.dash-content{padding:2.5rem;max-width:1200px;margin:0 auto;}
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1.5rem;margin-bottom:2.5rem;}
+.stat-card{background:#f8f8f6;padding:1.8rem;border:1px solid #ebebeb;}
+.stat-label{font-size:.6rem;letter-spacing:.18em;text-transform:uppercase;color:#888;margin-bottom:.8rem;}
+.stat-value{font-size:2.5rem;font-weight:300;line-height:1;}
+.section-bar{display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem;}
+.section-bar h2{font-size:1.8rem;font-weight:300;}
+.data-table{background:#f8f8f6;border:1px solid #ebebeb;overflow-x:auto;}
+.t-head{display:grid;padding:1rem 1.5rem;border-bottom:2px solid #0a0a0a;background:#0a0a0a;gap:1rem;}
+.t-head-sales{grid-template-columns:1fr 1fr 2fr 140px 100px 120px;}
+.t-head-prod{grid-template-columns:60px 1fr 1fr 100px 120px 80px 120px;}
+.th{font-size:.58rem;letter-spacing:.15em;text-transform:uppercase;color:rgba(255,255,255,.6);font-weight:600;}
+.t-row{display:grid;padding:1rem 1.5rem;border-bottom:1px solid #ebebeb;align-items:center;gap:1rem;}
+.t-row-sales{grid-template-columns:1fr 1fr 2fr 140px 100px 120px;}
+.t-row-prod{grid-template-columns:60px 1fr 1fr 100px 120px 80px 120px;}
+.t-row:hover{background:#fafafa}
+.prod-img{width:50px;height:50px;object-fit:cover;background:#ebebeb;}
+.badge-active{font-size:.55rem;letter-spacing:.1em;text-transform:uppercase;padding:.3rem .6rem;background:#e8f5e9;color:#2e7d32;}
+.badge-inactive{font-size:.55rem;letter-spacing:.1em;text-transform:uppercase;padding:.3rem .6rem;background:#fce4ec;color:#c62828;}
+.btn-sm{font-family:Montserrat,sans-serif;font-size:.55rem;letter-spacing:.1em;text-transform:uppercase;padding:.4rem .7rem;cursor:pointer;border:1px solid #0a0a0a;background:none;color:#0a0a0a;}
+.btn-sm:hover{background:#0a0a0a;color:#f8f8f6;}
+.btn-sm-g{border-color:#888;color:#888;}
+.btn-sm-g:hover{background:#888;color:#f8f8f6;}
+.row-actions{display:flex;gap:.4rem;}
+.sale-select{font-size:.6rem;padding:.4rem .6rem;border:1px solid #ebebeb;font-family:Montserrat,sans-serif;cursor:pointer;outline:none;}
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(10,10,10,.8);z-index:5000;align-items:center;justify-content:center;padding:2rem;}
+.modal-overlay.open{display:flex;}
+.modal{background:#f8f8f6;max-width:560px;width:100%;max-height:90vh;overflow-y:auto;}
+.modal-header{padding:1.5rem 2rem;border-bottom:1px solid #ebebeb;display:flex;justify-content:space-between;align-items:center;}
+.modal-title{font-size:1.6rem;font-weight:300;}
+.modal-close{background:none;border:none;cursor:pointer;color:#888;font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;}
+.modal-body{padding:2rem;}
+.fg{margin-bottom:1.2rem;}
+.fl{font-size:.6rem;letter-spacing:.15em;text-transform:uppercase;color:#888;display:block;margin-bottom:.4rem;}
+.fi{width:100%;padding:.8rem;border:1.5px solid #ebebeb;font-family:Montserrat,sans-serif;font-size:.82rem;outline:none;}
+.fi:focus{border-color:#0a0a0a}
+.fg2{display:grid;grid-template-columns:1fr 1fr;gap:1rem;}
+.form-actions{display:flex;gap:1rem;margin-top:1.5rem;}
+.btn-save{flex:1;padding:.9rem;background:#0a0a0a;color:#f8f8f6;border:none;font-family:Montserrat,sans-serif;font-size:.62rem;letter-spacing:.18em;text-transform:uppercase;cursor:pointer;}
+.btn-cancel{flex:1;padding:.9rem;background:none;border:1px solid #0a0a0a;color:#0a0a0a;font-family:Montserrat,sans-serif;font-size:.62rem;letter-spacing:.18em;text-transform:uppercase;cursor:pointer;}
+.tab-content{display:none;}
+.tab-content.active{display:block;}
+.toast{position:fixed;bottom:2rem;right:2rem;background:#0a0a0a;color:#f8f8f6;padding:1rem 2rem;font-size:.68rem;letter-spacing:.12em;text-transform:uppercase;z-index:9999;transform:translateY(80px);opacity:0;transition:all .4s;pointer-events:none;}
+.toast.show{transform:translateY(0);opacity:1}
+.loading{text-align:center;padding:3rem;font-size:.78rem;letter-spacing:.1em;text-transform:uppercase;color:#888;}
+.add-btn{background:#0a0a0a;color:#f8f8f6;border:none;padding:.7rem 1.5rem;font-family:Montserrat,sans-serif;font-size:.62rem;letter-spacing:.15em;text-transform:uppercase;cursor:pointer;}
+/* UPLOAD */
+.upload-zone{border:2px dashed #ebebeb;padding:2rem;text-align:center;cursor:pointer;transition:border .2s;margin-bottom:1rem;}
+.upload-zone:hover{border-color:#0a0a0a;}
+.upload-zone input{display:none;}
+.upload-preview{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-bottom:1.5rem;}
+.upload-thumb{position:relative;}
+.upload-thumb img{width:100%;height:80px;object-fit:cover;}
+.upload-thumb-del{position:absolute;top:0;right:0;background:#e74c3c;color:white;border:none;width:20px;height:20px;font-size:.7rem;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+.img-gallery{display:grid;grid-template-columns:repeat(5,1fr);gap:1rem;}
+.img-item{position:relative;}
+.img-item img{width:100%;height:80px;object-fit:cover;display:block;}
+.img-item-name{font-size:.55rem;color:#888;margin-top:.3rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.img-copy-btn{position:absolute;top:0;left:0;background:rgba(0,0,0,.7);color:white;border:none;width:100%;font-size:.55rem;letter-spacing:.08em;text-transform:uppercase;padding:.3rem;cursor:pointer;opacity:0;transition:opacity .2s;}
+.img-item:hover .img-copy-btn{opacity:1;}
+/* PAGINA */
+.page-section{background:#f8f8f6;border:1px solid #ebebeb;padding:2rem;margin-bottom:1.5rem;}
+.page-section-title{font-size:.65rem;letter-spacing:.2em;text-transform:uppercase;color:#888;margin-bottom:1.2rem;padding-bottom:.8rem;border-bottom:1px solid #ebebeb;}
+.fi-textarea{width:100%;padding:.8rem;border:1.5px solid #ebebeb;font-family:Montserrat,sans-serif;font-size:.82rem;outline:none;resize:vertical;min-height:80px;}
+.fi-textarea:focus{border-color:#0a0a0a}
+.save-page-btn{background:#0a0a0a;color:#f8f8f6;border:none;padding:.9rem 2rem;font-family:Montserrat,sans-serif;font-size:.62rem;letter-spacing:.18em;text-transform:uppercase;cursor:pointer;margin-top:1rem;}
+
+.img-selector{display:grid;grid-template-columns:repeat(4,1fr);gap:.5rem;margin-bottom:1rem;max-height:200px;overflow-y:auto;border:1px solid #ebebeb;padding:.5rem;}
+.img-sel-item{cursor:pointer;position:relative;border:2px solid transparent;}
+.img-sel-item.selected{border-color:#0a0a0a;}
+.img-sel-item img{width:100%;height:60px;object-fit:cover;display:block;}
+.img-sel-check{position:absolute;top:2px;right:2px;background:#0a0a0a;color:white;width:16px;height:16px;border-radius:50%;font-size:.6rem;display:none;align-items:center;justify-content:center;}
+.img-sel-item.selected .img-sel-check{display:flex;}
+.selected-imgs{display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:.5rem;}
+.selected-img-thumb{position:relative;width:60px;}
+.selected-img-thumb img{width:60px;height:60px;object-fit:cover;}
+.selected-img-thumb button{position:absolute;top:0;right:0;background:#e74c3c;color:white;border:none;width:16px;height:16px;font-size:.6rem;cursor:pointer;}
+</style>
+</head>
+<body>
+<div class="login-screen" id="login-screen">
+  <div class="login-box">
+    <div class="login-logo">Oso Mates</div>
+    <div class="login-sub">Panel de administracion</div>
+    <input class="login-input" type="password" id="login-pass" placeholder="Contrasena"/>
+    <button class="login-btn" id="login-btn">Ingresar</button>
+    <div class="login-error" id="login-error">Contrasena incorrecta</div>
+  </div>
+</div>
+<div class="dashboard" id="dashboard">
+  <div class="dash-nav">
+    <div class="dash-logo">Oso Mates Admin</div>
+    <div class="dash-nav-links">
+      <button class="dash-nav-btn active" id="tab-btn-ventas">Ventas</button>
+      <button class="dash-nav-btn" id="tab-btn-productos">Productos</button>
+      <button class="dash-nav-btn" id="tab-btn-imagenes">Imagenes</button>
+      <button class="dash-nav-btn" id="tab-btn-pagina">Pagina</button>
+    </div>
+    <button class="dash-nav-logout" id="logout-btn">Salir</button>
+  </div>
+  <div class="dash-content">
+    <div class="stats-grid">
+      <div class="stat-card"><div class="stat-label">Ventas totales</div><div class="stat-value" id="stat-total">-</div></div>
+      <div class="stat-card"><div class="stat-label">Pedidos</div><div class="stat-value" id="stat-orders">-</div></div>
+      <div class="stat-card"><div class="stat-label">Pendientes</div><div class="stat-value" id="stat-pending">-</div></div>
+      <div class="stat-card"><div class="stat-label">Productos activos</div><div class="stat-value" id="stat-prods">-</div></div>
+    </div>
+
+    <!-- VENTAS -->
+    <div class="tab-content active" id="tab-ventas">
+      <div class="section-bar"><h2>Pedidos</h2><button class="add-btn" id="refresh-btn">Actualizar</button></div>
+      <div class="data-table">
+        <div class="t-head t-head-sales">
+          <div class="th">Cliente</div><div class="th">Email</div><div class="th">Detalle</div>
+          <div class="th">Metodo</div><div class="th">Total</div><div class="th">Estado</div>
+        </div>
+        <div id="sales-body"><div class="loading">Cargando...</div></div>
+      </div>
+    </div>
+
+    <!-- PRODUCTOS -->
+    <div class="tab-content" id="tab-productos">
+      <div class="section-bar"><h2>Catalogo</h2><button class="add-btn" id="new-prod-btn">+ Nuevo</button></div>
+      <div class="data-table">
+        <div class="t-head t-head-prod">
+          <div class="th">Foto</div><div class="th">Nombre</div><div class="th">Material</div>
+          <div class="th">Precio</div><div class="th">Transf.</div><div class="th">Estado</div><div class="th">Acciones</div>
+        </div>
+        <div id="products-body"><div class="loading">Cargando...</div></div>
+      </div>
+    </div>
+
+    <!-- IMAGENES -->
+    <div class="tab-content" id="tab-imagenes">
+      <div class="section-bar"><h2>Imagenes</h2></div>
+      <div class="page-section">
+        <div class="page-section-title">Subir nuevas imagenes</div>
+        <div class="upload-zone" id="upload-zone">
+          <input type="file" id="file-input" accept="image/*" multiple/>
+          <p style="font-size:.78rem;color:#888;margin-bottom:.5rem">Arrastra fotos aqui o hace click para seleccionar</p>
+          <p style="font-size:.65rem;color:#aaa">JPG, PNG — max 5MB por imagen</p>
+        </div>
+        <div class="upload-preview" id="upload-preview"></div>
+        <button class="add-btn" id="upload-btn" style="display:none">Subir imagenes</button>
+      </div>
+      <div class="page-section">
+        <div class="page-section-title">Imagenes subidas — hace click en una para copiar el nombre</div>
+        <div class="img-gallery" id="img-gallery"><div class="loading">Cargando...</div></div>
+      </div>
+    </div>
+
+    <!-- PAGINA -->
+    <div class="tab-content" id="tab-pagina">
+      <div class="section-bar"><h2>Editar pagina</h2></div>
+      <div class="page-section">
+        <div class="page-section-title">Banner de promocion</div>
+        <div class="fg"><label class="fl">Texto del banner</label><input class="fi" id="pg-banner" placeholder="Envio gratis en compras mayores a $60.000 | 10% OFF por transferencia"/></div>
+        <button class="save-page-btn" id="save-banner-btn">Guardar banner</button>
+      </div>
+      <div class="page-section">
+        <div class="page-section-title">Hero principal</div>
+        <div class="fg"><label class="fl">Titulo (linea 1)</label><input class="fi" id="pg-h1" placeholder="Mates"/></div>
+        <div class="fg"><label class="fl">Titulo (linea 2 - italica)</label><input class="fi" id="pg-h2" placeholder="que se recuerdan"/></div>
+        <div class="fg"><label class="fl">Descripcion</label><textarea class="fi-textarea" id="pg-desc" placeholder="Cada pieza tallada a mano..."></textarea></div>
+        <button class="save-page-btn" id="save-hero-btn">Guardar hero</button>
+      </div>
+      <div class="page-section">
+        <div class="page-section-title">Seccion Nosotros</div>
+        <div class="fg"><label class="fl">Texto principal</label><textarea class="fi-textarea" id="pg-nosotros"></textarea></div>
+        <button class="save-page-btn" id="save-nosotros-btn">Guardar nosotros</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL PRODUCTO -->
+<div class="modal-overlay" id="prod-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="modal-title">Producto</div>
+      <button class="modal-close" id="modal-close-btn">X Cerrar</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="f-id"/>
+      <div class="fg2">
+        <div class="fg"><label class="fl">Nombre</label><input class="fi" id="f-nombre"/></div>
+        <div class="fg"><label class="fl">Material</label><input class="fi" id="f-material"/></div>
+      </div>
+      <div class="fg"><label class="fl">Descripcion</label><input class="fi" id="f-desc"/></div>
+      <div class="fg2">
+        <div class="fg"><label class="fl">Precio</label><input class="fi" type="number" id="f-precio"/></div>
+        <div class="fg"><label class="fl">Precio transferencia</label><input class="fi" type="number" id="f-transf"/></div>
+      </div>
+      <div class="fg"><label class="fl">Link Mercado Pago</label><input class="fi" id="f-mp"/></div>
+      <div class="fg">
+        <label class="fl">Imagen principal</label>
+        <input class="fi" id="f-img" placeholder="camionero.jpg"/>
+        <p style="font-size:.62rem;color:#888;margin-top:.4rem">Nombre de la imagen principal</p>
+      </div>
+      <div class="fg">
+        <label class="fl">Galeria de imagenes (selecciona varias)</label>
+        <div class="selected-imgs" id="selected-imgs-preview"></div>
+        <div class="img-selector" id="img-selector-grid"><div style="font-size:.7rem;color:#888;padding:.5rem">Cargando imagenes...</div></div>
+        <p style="font-size:.62rem;color:#888;margin-top:.4rem">Hace click en las imagenes para agregarlas a la galeria</p>
+      </div>
+      <div class="fg2">
+        <div class="fg"><label class="fl">Categoria</label>
+          <select class="fi" id="f-cat"><option value="madera">Madera</option><option value="calabaza">Calabaza</option></select>
+        </div>
+        <div class="fg"><label class="fl">Badge</label><input class="fi" id="f-badge" placeholder="Popular, Nuevo..."/></div>
+      </div>
+      <div class="form-actions">
+        <button class="btn-cancel" id="cancel-btn">Cancelar</button>
+        <button class="btn-save" id="save-btn">Guardar</button>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+(function() {
+  var PASS = 'osomates2025';
+  var prodCache = [];
+  var filesToUpload = [];
+  var selectedImages = [];
+  var sbClient = supabase.createClient('https://dkyfaeqcbeyhibqjztwa.supabase.co', 'sb_publishable_zzsZ-7Upi-SAUD78wx0CJQ_skroMzF4');
+
+  function fmt(n) { return '$' + parseInt(n).toLocaleString('es-AR'); }
+
+  function showToast(msg) {
+    var t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(function() { t.classList.remove('show'); }, 3000);
+  }
+
+  function showTab(tab) {
+    ['ventas','productos','imagenes','pagina'].forEach(function(t) {
+      document.getElementById('tab-' + t).classList.remove('active');
+      document.getElementById('tab-btn-' + t).classList.remove('active');
+    });
+    document.getElementById('tab-' + tab).classList.add('active');
+    document.getElementById('tab-btn-' + tab).classList.add('active');
+    if (tab === 'imagenes') loadGallery();
+    if (tab === 'pagina') loadPageSettings();
+  }
+
+  function loadStats() {
+    sbClient.from('ventas').select('total,estado').then(function(res) {
+      var v = res.data || [];
+      document.getElementById('stat-total').textContent = fmt(v.reduce(function(s,x){return s+(x.total||0);},0));
+      document.getElementById('stat-orders').textContent = v.length;
+      document.getElementById('stat-pending').textContent = v.filter(function(x){return x.estado==='pendiente';}).length;
+    });
+    sbClient.from('productos').select('activo').then(function(res) {
+      var p = res.data || [];
+      document.getElementById('stat-prods').textContent = p.filter(function(x){return x.activo;}).length;
+    });
+  }
+
+  function loadSales() {
+    sbClient.from('ventas').select('*').order('created_at',{ascending:false}).then(function(res) {
+      var body = document.getElementById('sales-body');
+      var data = res.data || [];
+      if (!data.length) { body.innerHTML = '<div class="loading">Sin ventas aun</div>'; return; }
+      var rows = '';
+      for (var i = 0; i < data.length; i++) {
+        var v = data[i];
+        rows += '<div class="t-row t-row-sales">';
+        rows += '<div style="font-size:.9rem">' + (v.cliente_nombre||'-') + '</div>';
+        rows += '<div style="font-size:.7rem;color:#888">' + (v.cliente_email||'-') + '</div>';
+        rows += '<div style="font-size:.68rem;color:#444">' + ((v.detalle||'').substring(0,50)) + '...</div>';
+        rows += '<div style="font-size:.7rem">' + (v.metodo_pago||'-') + '</div>';
+        rows += '<div style="font-size:1rem">' + fmt(v.total||0) + '</div>';
+        rows += '<div><select class="sale-select" data-id="' + v.id + '">';
+        rows += '<option value="pendiente"' + (v.estado==='pendiente'?' selected':'') + '>Pendiente</option>';
+        rows += '<option value="confirmado"' + (v.estado==='confirmado'?' selected':'') + '>Confirmado</option>';
+        rows += '<option value="enviado"' + (v.estado==='enviado'?' selected':'') + '>Enviado</option>';
+        rows += '</select></div></div>';
+      }
+      body.innerHTML = rows;
+      body.querySelectorAll('.sale-select').forEach(function(sel) {
+        sel.addEventListener('change', function() {
+          sbClient.from('ventas').update({estado:this.value}).eq('id',this.dataset.id).then(function(){
+            showToast('Estado actualizado');loadStats();
+          });
+        });
+      });
+    });
+  }
+
+  function loadProducts() {
+    sbClient.from('productos').select('*').order('created_at').then(function(res) {
+      var body = document.getElementById('products-body');
+      var data = res.data || [];
+      if (!data.length) { body.innerHTML = '<div class="loading">Sin productos</div>'; return; }
+      prodCache = data;
+      var rows = '';
+      for (var i = 0; i < data.length; i++) {
+        var p = data[i];
+        var imgUrl = p.imagen ? (p.imagen.startsWith('http') ? p.imagen : 'https://dkyfaeqcbeyhibqjztwa.supabase.co/storage/v1/object/public/imagenes/' + p.imagen) : '';
+        rows += '<div class="t-row t-row-prod">';
+        rows += '<img src="' + imgUrl + '" alt="" class="prod-img"/>';
+        rows += '<div><div style="font-size:1rem">' + p.nombre + '</div><div style="font-size:.6rem;color:#888">' + (p.badge||'') + '</div></div>';
+        rows += '<div style="font-size:.65rem;color:#888">' + p.material + '</div>';
+        rows += '<div style="font-size:1rem">' + fmt(p.precio) + '</div>';
+        rows += '<div style="font-size:1rem">' + fmt(p.precio_transferencia) + '</div>';
+        rows += '<div><span class="' + (p.activo?'badge-active':'badge-inactive') + '">' + (p.activo?'Activo':'Inactivo') + '</span></div>';
+        rows += '<div class="row-actions">';
+        rows += '<button class="btn-sm" data-idx="' + i + '">Editar</button>';
+        rows += '<button class="btn-sm btn-sm-g" data-id="' + p.id + '" data-activo="' + p.activo + '">' + (p.activo?'Ocultar':'Activar') + '</button>';
+        rows += '</div></div>';
+      }
+      body.innerHTML = rows;
+      body.querySelectorAll('.btn-sm[data-idx]').forEach(function(btn) {
+        btn.addEventListener('click', function() { openEdit(parseInt(this.dataset.idx)); });
+      });
+      body.querySelectorAll('.btn-sm-g[data-id]').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+          var id = this.dataset.id;
+          var activo = this.dataset.activo === 'true';
+          sbClient.from('productos').update({activo:!activo}).eq('id',id).then(function(){
+            showToast(activo?'Ocultado':'Activado');loadProducts();loadStats();
+          });
+        });
+      });
+    });
+  }
+
+  function loadGallery() {
+    sbClient.storage.from('imagenes').list('', {limit:100}).then(function(res) {
+      var gallery = document.getElementById('img-gallery');
+      var files = res.data || [];
+      if (!files.length) { gallery.innerHTML = '<div class="loading">No hay imagenes aun</div>'; return; }
+      gallery.innerHTML = files.map(function(f) {
+        var url = 'https://dkyfaeqcbeyhibqjztwa.supabase.co/storage/v1/object/public/imagenes/' + f.name;
+        return '<div class="img-item">' +
+          '<button class="img-copy-btn" data-name="' + f.name + '">Copiar nombre</button>' +
+          '<img src="' + url + '" alt="' + f.name + '"/>' +
+          '<div class="img-item-name">' + f.name + '</div>' +
+          '</div>';
+      }).join('');
+      gallery.querySelectorAll('.img-copy-btn').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+          navigator.clipboard.writeText(this.dataset.name);
+          showToast('Nombre copiado: ' + this.dataset.name);
+        });
+      });
+    });
+  }
+
+
+  function loadImageSelector() {
+    sbClient.storage.from('imagenes').list('', {limit:100}).then(function(res) {
+      var grid = document.getElementById('img-selector-grid');
+      var files = res.data || [];
+      if (!files.length) { grid.innerHTML = '<div style="font-size:.7rem;color:#888;padding:.5rem">No hay imagenes subidas</div>'; return; }
+      grid.innerHTML = files.map(function(f) {
+        var url = 'https://dkyfaeqcbeyhibqjztwa.supabase.co/storage/v1/object/public/imagenes/' + f.name;
+        var isSelected = selectedImages.indexOf(f.name) > -1;
+        return '<div class="img-sel-item' + (isSelected?' selected':'') + '" data-name="' + f.name + '">' +
+          '<img src="' + url + '" alt="' + f.name + '"/>' +
+          '<div class="img-sel-check">&#x2713;</div>' +
+          '</div>';
+      }).join('');
+      grid.querySelectorAll('.img-sel-item').forEach(function(item) {
+        item.addEventListener('click', function() {
+          var name = this.dataset.name;
+          var idx = selectedImages.indexOf(name);
+          if (idx > -1) {
+            selectedImages.splice(idx, 1);
+            this.classList.remove('selected');
+          } else {
+            selectedImages.push(name);
+            this.classList.add('selected');
+          }
+          renderSelectedImgs();
+        });
+      });
+    });
+  }
+
+  function renderSelectedImgs() {
+    var preview = document.getElementById('selected-imgs-preview');
+    if (!preview) return;
+    preview.innerHTML = selectedImages.map(function(name, i) {
+      var url = 'https://dkyfaeqcbeyhibqjztwa.supabase.co/storage/v1/object/public/imagenes/' + name;
+      return '<div class="selected-img-thumb">' +
+        '<img src="' + url + '" alt="' + name + '"/>' +
+        '<button data-idx="' + i + '">x</button>' +
+        '</div>';
+    }).join('');
+    preview.querySelectorAll('button').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        var idx = parseInt(this.dataset.idx);
+        selectedImages.splice(idx, 1);
+        renderSelectedImgs();
+        loadImageSelector();
+      });
+    });
+  }
+
+  // File upload
+  var uploadZone = document.getElementById('upload-zone');
+  var fileInput = document.getElementById('file-input');
+
+  uploadZone.addEventListener('click', function() { fileInput.click(); });
+  uploadZone.addEventListener('dragover', function(e) { e.preventDefault(); this.style.borderColor='#0a0a0a'; });
+  uploadZone.addEventListener('dragleave', function() { this.style.borderColor='#ebebeb'; });
+  uploadZone.addEventListener('drop', function(e) {
+    e.preventDefault();
+    this.style.borderColor='#ebebeb';
+    handleFiles(e.dataTransfer.files);
+  });
+  fileInput.addEventListener('change', function() { handleFiles(this.files); });
+
+  function handleFiles(files) {
+    for (var i = 0; i < files.length; i++) {
+      filesToUpload.push(files[i]);
+    }
+    renderPreviews();
+    document.getElementById('upload-btn').style.display = 'block';
+  }
+
+  function renderPreviews() {
+    var preview = document.getElementById('upload-preview');
+    preview.innerHTML = filesToUpload.map(function(f, i) {
+      var url = URL.createObjectURL(f);
+      return '<div class="upload-thumb">' +
+        '<img src="' + url + '"/>' +
+        '<button class="upload-thumb-del" data-idx="' + i + '">x</button>' +
+        '</div>';
+    }).join('');
+    preview.querySelectorAll('.upload-thumb-del').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        filesToUpload.splice(parseInt(this.dataset.idx), 1);
+        renderPreviews();
+        if (!filesToUpload.length) document.getElementById('upload-btn').style.display = 'none';
+      });
+    });
+  }
+
+  document.getElementById('upload-btn').addEventListener('click', function() {
+    if (!filesToUpload.length) return;
+    var btn = this;
+    btn.textContent = 'Subiendo...';
+    btn.disabled = true;
+    var promises = filesToUpload.map(function(file) {
+      return sbClient.storage.from('imagenes').upload(file.name, file, {upsert: true});
+    });
+    Promise.all(promises).then(function(results) {
+      var errors = results.filter(function(r) { return r.error; });
+      if (errors.length) {
+        showToast('Error al subir algunas imagenes');
+      } else {
+        showToast('Imagenes subidas correctamente');
+        filesToUpload = [];
+        document.getElementById('upload-preview').innerHTML = '';
+        document.getElementById('upload-btn').style.display = 'none';
+        loadGallery();
+      }
+      btn.textContent = 'Subir imagenes';
+      btn.disabled = false;
+    });
+  });
+
+  // Page settings
+  function loadPageSettings() {
+    sbClient.from('config').select('*').then(function(res) {
+      var data = res.data || [];
+      data.forEach(function(item) {
+        var el = document.getElementById('pg-' + item.clave);
+        if (el) el.value = item.valor;
+      });
+    });
+  }
+
+  function saveSetting(clave, valor) {
+    sbClient.from('config').upsert({clave: clave, valor: valor}, {onConflict: 'clave'}).then(function(res) {
+      if (res.error) { showToast('Error al guardar'); return; }
+      showToast('Guardado correctamente');
+    });
+  }
+
+  document.getElementById('save-banner-btn').addEventListener('click', function() {
+    saveSetting('banner', document.getElementById('pg-banner').value);
+  });
+  document.getElementById('save-hero-btn').addEventListener('click', function() {
+    saveSetting('hero_h1', document.getElementById('pg-h1').value);
+    saveSetting('hero_h2', document.getElementById('pg-h2').value);
+    saveSetting('hero_desc', document.getElementById('pg-desc').value);
+    showToast('Hero guardado');
+  });
+  document.getElementById('save-nosotros-btn').addEventListener('click', function() {
+    saveSetting('nosotros_texto', document.getElementById('pg-nosotros').value);
+  });
+
+  function openEdit(idx) {
+    var p = prodCache[idx];
+    if (!p) return;
+    document.getElementById('modal-title').textContent = 'Editar producto';
+    document.getElementById('f-id').value = p.id;
+    document.getElementById('f-nombre').value = p.nombre || '';
+    document.getElementById('f-material').value = p.material || '';
+    document.getElementById('f-desc').value = p.descripcion || '';
+    document.getElementById('f-precio').value = p.precio || '';
+    document.getElementById('f-transf').value = p.precio_transferencia || '';
+    document.getElementById('f-mp').value = p.link_mp || '';
+    document.getElementById('f-img').value = p.imagen || '';
+    document.getElementById('f-cat').value = p.categoria || 'madera';
+    document.getElementById('f-badge').value = p.badge || '';
+    selectedImages = p.imagenes || [];
+    renderSelectedImgs();
+    loadImageSelector();
+    document.getElementById('prod-modal').classList.add('open');
+  }
+
+  function openNew() {
+    document.getElementById('modal-title').textContent = 'Nuevo producto';
+    document.getElementById('f-id').value = '';
+    ['nombre','material','desc','mp','img','badge'].forEach(function(f) { document.getElementById('f-'+f).value=''; });
+    document.getElementById('f-precio').value = '';
+    document.getElementById('f-transf').value = '';
+    document.getElementById('f-cat').value = 'madera';
+    selectedImages = [];
+    renderSelectedImgs();
+    loadImageSelector();
+    document.getElementById('prod-modal').classList.add('open');
+  }
+
+  function closeModal() { document.getElementById('prod-modal').classList.remove('open'); }
+
+  function saveProduct() {
+    var id = document.getElementById('f-id').value;
+    var imgVal = document.getElementById('f-img').value;
+    var data = {
+      nombre: document.getElementById('f-nombre').value,
+      material: document.getElementById('f-material').value,
+      descripcion: document.getElementById('f-desc').value,
+      precio: parseInt(document.getElementById('f-precio').value) || 0,
+      precio_transferencia: parseInt(document.getElementById('f-transf').value) || 0,
+      link_mp: document.getElementById('f-mp').value,
+      imagen: imgVal,
+      imagenes: selectedImages.length > 0 ? selectedImages : [imgVal],
+      categoria: document.getElementById('f-cat').value,
+      badge: document.getElementById('f-badge').value || null,
+      activo: true
+    };
+    if (!data.nombre || !data.precio) { showToast('Nombre y precio obligatorios'); return; }
+    var promise = id ? sbClient.from('productos').update(data).eq('id',id) : sbClient.from('productos').insert(data);
+    promise.then(function(res) {
+      if (res.error) { showToast('Error: ' + res.error.message); return; }
+      showToast(id ? 'Producto actualizado' : 'Producto creado');
+      closeModal(); loadProducts(); loadStats();
+    });
+  }
+
+  // Events
+  document.getElementById('login-btn').addEventListener('click', function() {
+    if (document.getElementById('login-pass').value === PASS) {
+      document.getElementById('login-screen').style.display = 'none';
+      document.getElementById('dashboard').style.display = 'block';
+      loadStats(); loadSales(); loadProducts();
+    } else {
+      document.getElementById('login-error').style.display = 'block';
+    }
+  });
+  document.getElementById('login-pass').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') document.getElementById('login-btn').click();
+  });
+  document.getElementById('logout-btn').addEventListener('click', function() {
+    document.getElementById('login-screen').style.display = 'flex';
+    document.getElementById('dashboard').style.display = 'none';
+    document.getElementById('login-pass').value = '';
+  });
+  document.getElementById('tab-btn-ventas').addEventListener('click', function() { showTab('ventas'); });
+  document.getElementById('tab-btn-productos').addEventListener('click', function() { showTab('productos'); });
+  document.getElementById('tab-btn-imagenes').addEventListener('click', function() { showTab('imagenes'); });
+  document.getElementById('tab-btn-pagina').addEventListener('click', function() { showTab('pagina'); });
+  document.getElementById('refresh-btn').addEventListener('click', function() { loadSales(); });
+  document.getElementById('new-prod-btn').addEventListener('click', openNew);
+  document.getElementById('modal-close-btn').addEventListener('click', closeModal);
+  document.getElementById('cancel-btn').addEventListener('click', closeModal);
+  document.getElementById('save-btn').addEventListener('click', saveProduct);
+})();
+</script>
+</body>
+</html>
