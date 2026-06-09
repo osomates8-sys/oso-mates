@@ -10,17 +10,23 @@
 <meta property="og:description" content="Mates tallados a mano con maderas nobles. Cada pieza es unica. Envios a todo Argentina."/>
 <meta property="og:url" content="https://osomates8-sys.github.io/oso-mates"/>
 <meta property="og:type" content="website"/>
+<meta property="og:image" content="https://osomates8-sys.github.io/oso-mates/imperial_algarrobo.jpg"/>
+<meta property="og:image:width" content="1200"/>
+<meta property="og:image:height" content="630"/>
 <meta name="geo.region" content="AR-B"/>
 <meta name="geo.placename" content="Mar del Plata"/>
 <link rel="canonical" href="https://osomates8-sys.github.io/oso-mates"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧉</text></svg>"/>
 <title>OSO MATES</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet"/>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-:root{--black:#0a0a0a;--white:#f8f8f6;--gray:#888;--light:#ebebeb;--mid:#444;--blue:#009ee3;--green:#2a9d5c;}
+:root{--black:#0a0a0a;--white:#f8f8f6;--gray:#888;--light:#ebebeb;--mid:#444;--blue:#009ee3;--green:#2a9d5c;--warm:#c8956c;}
 html{scroll-behavior:smooth}
 body{font-family:'Montserrat',sans-serif;background:var(--white);color:var(--black);overflow-x:hidden;}
 .cursor{position:fixed;width:10px;height:10px;background:var(--black);border-radius:50%;pointer-events:none;z-index:99999;transform:translate(-50%,-50%);mix-blend-mode:difference;}
@@ -30,12 +36,23 @@ nav{position:fixed;top:0;left:0;right:0;z-index:500;display:flex;justify-content
 .nav-links{display:flex;gap:3rem;list-style:none;}
 .nav-links a{font-size:.65rem;letter-spacing:.2em;text-transform:uppercase;color:var(--black);text-decoration:none;font-weight:500;opacity:.6;transition:opacity .2s;}
 .nav-links a:hover{opacity:1}
+.hamburger{display:none;flex-direction:column;gap:5px;cursor:pointer;padding:.4rem;background:none;border:none;}
+.hamburger span{display:block;width:22px;height:1.5px;background:var(--black);transition:all .3s;}
+.hamburger.open span:nth-child(1){transform:translateY(6.5px) rotate(45deg);}
+.hamburger.open span:nth-child(2){opacity:0;transform:scaleX(0);}
+.hamburger.open span:nth-child(3){transform:translateY(-6.5px) rotate(-45deg);}
+.mobile-nav{display:none;position:fixed;inset:0;background:var(--white);z-index:490;flex-direction:column;justify-content:center;align-items:center;gap:2.5rem;}
+.mobile-nav.open{display:flex;}
+.mobile-nav a{font-size:1.8rem;letter-spacing:.15em;text-transform:uppercase;color:var(--black);text-decoration:none;font-family:'Cormorant Garamond',serif;font-weight:300;opacity:0;transform:translateY(20px);transition:opacity .4s,transform .4s;}
+.mobile-nav.open a{opacity:1;transform:translateY(0);}
+.mobile-nav a:nth-child(1){transition-delay:.06s;}.mobile-nav a:nth-child(2){transition-delay:.12s;}.mobile-nav a:nth-child(3){transition-delay:.18s;}.mobile-nav a:nth-child(4){transition-delay:.24s;}
+.mobile-nav-sub{font-size:.6rem;letter-spacing:.25em;text-transform:uppercase;color:var(--warm);margin-bottom:3rem;font-family:'Montserrat',sans-serif;}
 .cart-btn{background:var(--black);color:var(--white);border:none;padding:.6rem 1.4rem;font-family:'Montserrat',sans-serif;font-size:.62rem;letter-spacing:.18em;text-transform:uppercase;cursor:pointer;display:flex;align-items:center;gap:.6rem;transition:background .2s;}
 .cart-btn:hover{background:#333}
 .cart-count{background:var(--blue);color:white;border-radius:50%;width:18px;height:18px;font-size:.6rem;display:flex;align-items:center;justify-content:center;font-weight:700;}
 #hero{min-height:100vh;display:grid;grid-template-columns:1fr 1fr;padding-top:80px;}
 .hero-left{background:var(--black);display:flex;flex-direction:column;justify-content:flex-end;padding:5rem 4rem;position:relative;overflow:hidden;}
-.hero-eyebrow{font-size:.62rem;letter-spacing:.28em;text-transform:uppercase;color:var(--gray);margin-bottom:1.5rem;position:relative;z-index:1;}
+.hero-eyebrow{font-size:.62rem;letter-spacing:.28em;text-transform:uppercase;color:var(--warm);margin-bottom:1.5rem;position:relative;z-index:1;}
 .hero-title{font-family:'Cormorant Garamond',serif;font-size:clamp(3.5rem,6vw,7rem);font-weight:300;color:var(--white);line-height:.95;letter-spacing:-.02em;position:relative;z-index:1;margin-bottom:2rem;}
 .hero-title em{font-style:italic;}
 .hero-desc{font-size:.78rem;font-weight:300;color:rgba(248,248,246,.5);line-height:1.9;max-width:300px;letter-spacing:.04em;position:relative;z-index:1;margin-bottom:3rem;}
@@ -56,7 +73,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:500;display:flex;justify-content
 @keyframes marquee{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
 section{padding:8rem 4rem}
 .section-header{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:5rem;padding-bottom:2rem;border-bottom:1px solid var(--light);}
-.section-num{font-family:'Cormorant Garamond',serif;font-size:.7rem;letter-spacing:.2em;color:var(--gray);}
+.section-num{font-family:'Cormorant Garamond',serif;font-size:.7rem;letter-spacing:.2em;color:var(--warm);}
 .section-title{font-family:'Cormorant Garamond',serif;font-size:clamp(2.5rem,4vw,4.5rem);font-weight:300;line-height:1;letter-spacing:-.02em;}
 .section-title em{font-style:italic}
 .filter-row{display:flex;gap:.25rem;margin-bottom:4rem;}
@@ -227,7 +244,7 @@ footer{background:var(--black);padding:3rem 4rem;display:flex;justify-content:sp
 .reveal{opacity:0;transform:translateY(40px);transition:opacity .8s,transform .8s;}
 .reveal.in{opacity:1;transform:translateY(0)}
 @media(max-width:900px){
-  nav{padding:1.2rem 1.5rem;}.nav-links{display:none;}
+  nav{padding:1.2rem 1.5rem;}.nav-links{display:none;}.hamburger{display:flex;}
   #hero{grid-template-columns:1fr;min-height:auto;}.hero-right{display:none;}.hero-left{padding:6rem 2rem 4rem;}
   section{padding:4rem 1.5rem;}
   .catalog-grid{grid-template-columns:1fr 1fr;}
@@ -368,8 +385,16 @@ fbq('track', 'PageView');
     <li><a href="#nosotros">Nosotros</a></li>
     <li><a href="#contacto">Contacto</a></li>
   </ul>
+  <button class="hamburger" id="hamburger" onclick="toggleMobileNav()" aria-label="Menú"><span></span><span></span><span></span></button>
   <button class="cart-btn" onclick="toggleCart()">Carrito <span class="cart-count" id="cart-count">0</span></button>
 </nav>
+<div class="mobile-nav" id="mobile-nav">
+  <div class="mobile-nav-sub">Oso Mates</div>
+  <a href="#catalogo" onclick="toggleMobileNav()">Catálogo</a>
+  <a href="#precios" onclick="toggleMobileNav()">Precios</a>
+  <a href="#nosotros" onclick="toggleMobileNav()">Nosotros</a>
+  <a href="#contacto" onclick="toggleMobileNav()">Contacto</a>
+</div>
 <section id="hero">
   <div class="hero-left">
     <div>
@@ -560,6 +585,14 @@ fbq('track', 'PageView');
 </div>
 <div class="toast" id="toast"></div>
 <script>
+
+function saveCart(){try{localStorage.setItem('om_cart',JSON.stringify(cart));}catch(e){}}
+function loadCart(){try{var d=localStorage.getItem('om_cart');if(d)cart=JSON.parse(d);}catch(e){}}
+function toggleMobileNav(){
+  var h=document.getElementById('hamburger'),m=document.getElementById('mobile-nav');
+  h.classList.toggle('open');m.classList.toggle('open');
+  document.body.style.overflow=m.classList.contains('open')?'hidden':'';
+}
 const {createClient} = supabase;
 const sb = createClient('https://dkyfaeqcbeyhibqjztwa.supabase.co','sb_publishable_zzsZ-7Upi-SAUD78wx0CJQ_skroMzF4');
 emailjs.init('pr1E8ccHpaDtcv1Ml');
@@ -584,7 +617,8 @@ async function loadBestsellers() {
   grid.innerHTML = data.map(function(p) {
     return '<div class="bs-card" onclick="viewProduct(\'' + p.id + '\')">'+
       '<div class="bs-badge">Popular</div>'+
-      '<img src="' + getImg(p.imagen) + '" alt="' + p.nombre + '" class="bs-img"/>'+
+      '<img src="' + getImg(p.imagen) + '" alt="' + p.nombre + '" class="bs-img" loading="lazy"/>'+
+      
       '<div class="bs-info">'+
         '<div class="bs-name">' + p.nombre + '</div>'+
         '<div class="bs-mat">' + p.material + '</div>'+
@@ -624,12 +658,12 @@ document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;cur.style.le
 
 let allProds=[],cart=[],payMethod='mp';
 
+const GHBASE='https://osomates8-sys.github.io/oso-mates/';
 function getImg(img){
   if(!img) return '';
   if(img.startsWith('http')) return img;
-  if(IMG_MAP[img]) return IMG_MAP[img];
-  // New images uploaded via admin use Supabase Storage
-  return 'https://dkyfaeqcbeyhibqjztwa.supabase.co/storage/v1/object/public/imagenes/' + img;
+  if(IMG_MAP[img]) return GHBASE+IMG_MAP[img];
+  return 'https://dkyfaeqcbeyhibqjztwa.supabase.co/storage/v1/object/public/imagenes/'+img;
 }
 function fmt(n){return '$'+parseInt(n).toLocaleString('es-AR');}
 
@@ -645,7 +679,7 @@ function renderGrid(f){
   const g=document.getElementById('grid');
   const list=f==='todos'?allProds:allProds.filter(p=>p.categoria===f);
   if(!list.length){g.innerHTML='<div class="loading">No hay productos</div>';return;}
-  g.innerHTML=list.map((p,i)=>`<div class="product-card"><div class="p-img-wrap" onclick="viewProduct('${p.id}')"><img src="${getImg(p.imagen)}" alt="${p.nombre}" class="p-img" crossorigin="anonymous"/></div><div class="p-body"><div class="p-num">N\u00b000${i+1}</div>${p.badge?`<div class="p-badge">${p.badge}</div>`:''}<div class="p-name" onclick="viewProduct('${p.id}')">${p.nombre}</div><div class="p-mat">${p.material}</div><div class="p-footer"><div><div class="p-price">${fmt(p.precio)}</div><div class="p-transfer">Transf. <strong>${fmt(p.precio_transferencia)}</strong> (\u221210%)</div></div><div class="p-btns"><button class="p-view-btn" onclick="viewProduct('${p.id}')">Ver</button><button class="p-add-btn" onclick="addToCart('${p.id}')">+ Agregar</button></div></div></div></div>`).join('');
+  g.innerHTML=list.map((p,i)=>`<div class="product-card"><div class="p-img-wrap" onclick="viewProduct('${p.id}')"><img src="${getImg(p.imagen)}" alt="${p.nombre}" class="p-img" loading="lazy" crossorigin="anonymous"/></div><div class="p-body"><div class="p-num">N\u00b000${i+1}</div>${p.badge?`<div class="p-badge">${p.badge}</div>`:''}<div class="p-name" onclick="viewProduct('${p.id}')">${p.nombre}</div><div class="p-mat">${p.material}</div><div class="p-footer"><div><div class="p-price">${fmt(p.precio)}</div><div class="p-transfer">Transf. <strong>${fmt(p.precio_transferencia)}</strong> (\u221210%)</div></div><div class="p-btns"><button class="p-view-btn" onclick="viewProduct('${p.id}')">Ver</button><button class="p-add-btn" onclick="addToCart('${p.id}')">+ Agregar</button></div></div></div></div>`).join('');
 }
 
 function renderPrices(){
@@ -670,7 +704,7 @@ function changeQty(id,d){const item=cart.find(x=>x.id===id);if(item){item.qty+=d
 function cartTotal(){return cart.reduce((s,i)=>s+i.precio*i.qty,0);}
 function cartTransferTotal(){return cart.reduce((s,i)=>s+i.precio_transferencia*i.qty,0);}
 
-function updateCartUI(){
+function updateCartUI(){saveCart();
   const count=cart.reduce((s,i)=>s+i.qty,0);
   document.getElementById('cart-count').textContent=count;
   const el=document.getElementById('cart-items');
@@ -743,7 +777,7 @@ function showToast(msg){const t=document.getElementById('toast');t.textContent=m
 const obs=new IntersectionObserver(entries=>{entries.forEach((e,i)=>{if(e.isIntersecting)setTimeout(()=>e.target.classList.add('in'),i*80);});},{threshold:.1});
 document.querySelectorAll('.reveal').forEach(el=>obs.observe(el));
 
-loadProducts();loadBestsellers();updateCartUI();
+loadCart();loadProducts();loadBestsellers();updateCartUI();
 
 </script>
 
@@ -762,5 +796,8 @@ loadProducts();loadBestsellers();updateCartUI();
     <button class="confirm-close" onclick="document.getElementById('confirm-page').classList.remove('show')">Volver a la tienda</button>
   </div>
 </div>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"Store","name":"Oso Mates","description":"Mates artesanales tallados a mano en Mar del Plata. Algarrobo, calabaza, cuero. Envíos a todo el país.","url":"https://osomates8-sys.github.io/oso-mates/","telephone":"+542233061168","email":"osomates8@gmail.com","address":{"@type":"PostalAddress","addressLocality":"Mar del Plata","addressRegion":"Buenos Aires","addressCountry":"AR"},"sameAs":["https://www.instagram.com/oso_mates"],"priceRange":"$$","image":"https://osomates8-sys.github.io/oso-mates/imperial_algarrobo.jpg","currenciesAccepted":"ARS","paymentAccepted":"Cash, Credit Card, Transfer"}
+</script>
 </body>
 </html>

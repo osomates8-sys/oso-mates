@@ -3,13 +3,16 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧉</text></svg>"/>
 <title>OSO MATES — Producto</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet"/>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-:root{--black:#0a0a0a;--white:#f8f8f6;--gray:#888;--light:#ebebeb;--mid:#444;--blue:#009ee3;--green:#2a9d5c;}
+:root{--black:#0a0a0a;--white:#f8f8f6;--gray:#888;--light:#ebebeb;--mid:#444;--blue:#009ee3;--green:#2a9d5c;--warm:#c8956c;}
 body{font-family:'Montserrat',sans-serif;background:var(--white);color:var(--black);}
 nav{position:fixed;top:0;left:0;right:0;z-index:500;display:flex;justify-content:space-between;align-items:center;padding:1.5rem 4rem;background:rgba(248,248,246,0.97);backdrop-filter:blur(8px);border-bottom:1px solid var(--light);}
 .logo{font-family:'Cormorant Garamond',serif;font-size:1.3rem;font-weight:300;letter-spacing:.35em;text-transform:uppercase;color:var(--black);text-decoration:none;}
@@ -202,18 +205,30 @@ nav{position:fixed;top:0;left:0;right:0;z-index:500;display:flex;justify-content
 </div>
 <div class="toast" id="toast"></div>
 <script>
+
+function saveCart(){try{localStorage.setItem('om_cart',JSON.stringify(cart));}catch(e){}}
+function loadCart(){try{var d=localStorage.getItem('om_cart');if(d)cart=JSON.parse(d);}catch(e){}}
 const {createClient} = supabase;
 const sb = createClient('https://dkyfaeqcbeyhibqjztwa.supabase.co','sb_publishable_zzsZ-7Upi-SAUD78wx0CJQ_skroMzF4');
 emailjs.init('pr1E8ccHpaDtcv1Ml');
 const IMG_MAP = {
-  "foto_camionero_v2.jpg": "imagenes/foto_camionero_v2.jpg",
-  "foto_imperial_v2.jpg": "imagenes/foto_imperial_v2.jpg",
-  "imperial_calabaza.jpg": "imagenes/imperial_calabaza.jpg",
-  "criollo.jpg": "imagenes/criollo.jpg",
-  "ranchero.jpg": "imagenes/ranchero.jpg",
-  "galleta.jpg": "imagenes/galleta.jpg"
+  "camionero.jpg": "camionero.jpg",
+  "foto_camionero_v2.jpg": "camionero.jpg",
+  "imperial_algarrobo.jpg": "imperial_algarrobo.jpg",
+  "imperial_algarrobo2.jpg": "imperial_algarrobo2.jpg",
+  "foto_imperial_v2.jpg": "imperial_algarrobo.jpg",
+  "imperial_calabaza.jpg": "imperial_calabaza.jpg",
+  "criollo.jpg": "criollo.jpg",
+  "ranchero.jpg": "ranchero.jpg",
+  "galleta.jpg": "galleta.jpg"
 };
-function getImg(img){return IMG_MAP[img]||img;}
+const GHBASE='https://osomates8-sys.github.io/oso-mates/';
+function getImg(img){
+  if(!img) return '';
+  if(img.startsWith('http')) return img;
+  if(IMG_MAP[img]) return GHBASE+IMG_MAP[img];
+  return 'https://dkyfaeqcbeyhibqjztwa.supabase.co/storage/v1/object/public/imagenes/'+img;
+}
 let allProds=[], currentProd=null, cart=[], payMethod='mp';
 function fmt(n){return '$'+parseInt(n).toLocaleString('es-AR');}
 const params = new URLSearchParams(window.location.search);
@@ -240,13 +255,27 @@ function galleryNext() {
 }
 
 async function loadProduct(){
-  const {data,error} = await sb.from('productos').select('*').eq('id',prodId).single();
-  if(error||!data){document.getElementById('product-content').innerHTML='<div class="loading">Producto no encontrado</div>';return;}
-  currentProd = data;
-  document.title = 'OSO MATES — '+data.nombre;
-  const {data:related} = await sb.from('productos').select('*').eq('activo',true).neq('id',prodId).limit(3);
-  allProds = [data,...(related||[])];
-  renderProduct(data, related||[]);
+  if(!prodId){
+    document.getElementById('product-content').innerHTML='<div class="loading" style="padding:6rem 2rem">No se especificó un producto. <a href="index.html" style="color:var(--black)">Ver catálogo →</a></div>';
+    return;
+  }
+  try{
+    const {data:rows,error} = await sb.from('productos').select('*').eq('id',prodId).limit(1);
+    const data = (rows && rows.length > 0) ? rows[0] : null;
+    if(error||!data){
+      console.error('loadProduct error:', error, 'rows:', rows);
+      document.getElementById('product-content').innerHTML='<div class="loading" style="padding:6rem 2rem">Producto no encontrado. <a href="index.html" style="color:var(--black)">← Volver al catálogo</a></div>';
+      return;
+    }
+    currentProd = data;
+    document.title = 'OSO MATES — '+data.nombre;
+    const {data:related} = await sb.from('productos').select('*').eq('activo',true).neq('id',prodId).limit(3);
+    allProds = [data,...(related||[])];
+    renderProduct(data, related||[]);
+  }catch(e){
+    console.error('loadProduct exception:', e);
+    document.getElementById('product-content').innerHTML='<div class="loading" style="padding:6rem 2rem">Error al cargar el producto. <a href="index.html" style="color:var(--black)">← Volver al catálogo</a></div>';
+  }
 }
 function renderProduct(p, related){
   var imgs = (p.imagenes && p.imagenes.length > 0) ? p.imagenes : [p.imagen];
@@ -259,7 +288,7 @@ function renderProduct(p, related){
           <img src="${getImg(imgs[0])}" alt="${p.nombre}" class="product-img-main" id="gallery-main-img" style="width:100%;height:100%;object-fit:cover;display:block;"/>
           ${imgs.length>1?'<button class="gallery-nav gallery-nav-prev" onclick="galleryPrev()">&#x2039;</button><button class="gallery-nav gallery-nav-next" onclick="galleryNext()">&#x203a;</button>':''}
         </div>
-        ${imgs.length>1?'<div class="gallery-thumbs" id="gallery-thumbs">' + imgs.map(function(img,i){return '<img src="'+getImg(img)+'" class="gallery-thumb'+(i===0?' active':'')+'" data-idx="'+i+'" onclick="gallerySet('+i+')" alt="foto '+i+'"/>';}).join('') + '</div>':''}
+        ${imgs.length>1?'<div class="gallery-thumbs" id="gallery-thumbs">' + imgs.map(function(img,i){return '<img src="'+getImg(img)+'" loading="lazy" class="gallery-thumb'+(i===0?' active':'')+'" data-idx="'+i+'" onclick="gallerySet('+i+')" alt="foto '+i+'"/>';}).join('') + '</div>':''}
       </div>
       <div class="product-info-section">
         ${p.badge?`<div class="product-badge">${p.badge}</div>`:''}
@@ -282,7 +311,7 @@ function renderProduct(p, related){
         </div>
       </div>
     </div>
-    ${related.length?`<div class="related-section"><div class="related-title">También te puede gustar</div><div class="related-grid">${related.map(r=>`<div class="related-card" onclick="window.location.href='producto.html?id=${r.id}'"><img src="${getImg(r.imagen)}" alt="${r.nombre}" class="related-img"/><div class="related-name">${r.nombre}</div><div class="related-price">${fmt(r.precio)}</div></div>`).join('')}</div></div>`:''}
+    ${related.length?`<div class="related-section"><div class="related-title">También te puede gustar</div><div class="related-grid">${related.map(r=>`<div class="related-card" onclick="window.location.href='producto.html?id=${r.id}'"><img src="${getImg(r.imagen)}" alt="${r.nombre}" class="related-img" loading="lazy"/><div class="related-name">${r.nombre}</div><div class="related-price">${fmt(r.precio)}</div></div>`).join('')}</div></div>`:''}
   `;
 }
 function addToCartAndOpen(){
@@ -301,7 +330,7 @@ function removeFromCart(id){cart=cart.filter(x=>x.id!==id);updateCartUI();}
 function changeQty(id,d){const item=cart.find(x=>x.id===id);if(item){item.qty+=d;if(item.qty<=0)removeFromCart(id);}updateCartUI();}
 function cartTotal(){return cart.reduce((s,i)=>s+i.precio*i.qty,0);}
 function cartTransferTotal(){return cart.reduce((s,i)=>s+i.precio_transferencia*i.qty,0);}
-function updateCartUI(){
+function updateCartUI(){saveCart();
   const count=cart.reduce((s,i)=>s+i.qty,0);
   document.getElementById('cart-count').textContent=count;
   const el=document.getElementById('cart-items');
@@ -358,7 +387,7 @@ async function confirmOrder(){
 }
 function copyCBU(){navigator.clipboard.writeText('0170090940000048482721');showToast('CBU copiado ✓');}
 function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3000);}
-loadProduct();updateCartUI();
+loadCart();loadProduct();updateCartUI();
 </script>
 </body>
 </html>
