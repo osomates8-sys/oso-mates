@@ -659,7 +659,7 @@ async function loadBestsellers() {
   grid.innerHTML = data.map(function(p) {
     return '<div class="bs-card" onclick="viewProduct(\'' + p.id + '\')">'+
       '<div class="bs-badge">Popular</div>'+
-      '<img src="' + getImg(p.imagen) + '" alt="' + p.nombre + '" class="bs-img" loading="lazy" onerror="this.style.opacity='0'"/>'+
+      '<img src="' + getImg(p.imagen) + '" alt="' + p.nombre + '" class="bs-img" loading="lazy"/>'+
       '<div class="bs-info">'+
         '<div class="bs-name">' + p.nombre + '</div>'+
         '<div class="bs-mat">' + p.material + '</div>'+
