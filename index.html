@@ -41,15 +41,15 @@ nav{position:fixed;top:0;left:0;right:0;z-index:500;display:flex;justify-content
 .hamburger.open span:nth-child(1){transform:translateY(6.5px) rotate(45deg);}
 .hamburger.open span:nth-child(2){opacity:0;transform:scaleX(0);}
 .hamburger.open span:nth-child(3){transform:translateY(-6.5px) rotate(-45deg);}
-.mobile-nav{display:none;position:fixed;inset:0;background:var(--white);z-index:490;flex-direction:column;justify-content:center;align-items:center;gap:2.5rem;}
+.mobile-nav{display:none;position:fixed;inset:0;background:var(--white);z-index:490;flex-direction:column;justify-content:center;align-items:center;gap:2.5rem;padding-top:80px;}
 .mobile-nav.open{display:flex;}
 .mobile-nav a{font-size:1.8rem;letter-spacing:.15em;text-transform:uppercase;color:var(--black);text-decoration:none;font-family:'Cormorant Garamond',serif;font-weight:300;opacity:0;transform:translateY(20px);transition:opacity .4s,transform .4s;}
 .mobile-nav.open a{opacity:1;transform:translateY(0);}
-.mobile-nav a:nth-child(1){transition-delay:.06s;}.mobile-nav a:nth-child(2){transition-delay:.12s;}.mobile-nav a:nth-child(3){transition-delay:.18s;}.mobile-nav a:nth-child(4){transition-delay:.24s;}
+.mobile-nav a:nth-child(2){transition-delay:.06s;}.mobile-nav a:nth-child(3){transition-delay:.12s;}.mobile-nav a:nth-child(4){transition-delay:.18s;}.mobile-nav a:nth-child(5){transition-delay:.24s;}.mobile-nav a:nth-child(6){transition-delay:.30s;}
 .mobile-nav-sub{font-size:.6rem;letter-spacing:.25em;text-transform:uppercase;color:var(--warm);margin-bottom:3rem;font-family:'Montserrat',sans-serif;}
 .cart-btn{background:var(--black);color:var(--white);border:none;padding:.6rem 1.4rem;font-family:'Montserrat',sans-serif;font-size:.62rem;letter-spacing:.18em;text-transform:uppercase;cursor:pointer;display:flex;align-items:center;gap:.6rem;transition:background .2s;}
 .cart-btn:hover{background:#333}
-.cart-count{background:var(--blue);color:white;border-radius:50%;width:18px;height:18px;font-size:.6rem;display:flex;align-items:center;justify-content:center;font-weight:700;}
+.cart-count{background:var(--warm);color:white;border-radius:50%;width:18px;height:18px;font-size:.6rem;display:flex;align-items:center;justify-content:center;font-weight:700;}
 #hero{min-height:100vh;display:grid;grid-template-columns:1fr 1fr;padding-top:80px;}
 .hero-left{background:var(--black);display:flex;flex-direction:column;justify-content:flex-end;padding:5rem 4rem;position:relative;overflow:hidden;}
 .hero-eyebrow{font-size:.62rem;letter-spacing:.28em;text-transform:uppercase;color:var(--warm);margin-bottom:1.5rem;position:relative;z-index:1;}
@@ -99,7 +99,7 @@ section{padding:8rem 4rem}
 .p-view-btn{background:none;border:1px solid var(--black);color:var(--black);font-family:'Montserrat',sans-serif;font-size:.55rem;letter-spacing:.12em;text-transform:uppercase;padding:.5rem .9rem;cursor:pointer;transition:all .2s;}
 .p-view-btn:hover{background:var(--black);color:var(--white);}
 .p-add-btn{background:var(--black);color:var(--white);border:none;font-family:'Montserrat',sans-serif;font-size:.55rem;letter-spacing:.12em;text-transform:uppercase;padding:.5rem .9rem;cursor:pointer;transition:all .2s;}
-.p-add-btn:hover{background:var(--blue);}
+.p-add-btn:hover{background:var(--warm);}
 #precios{background:var(--black);color:var(--white);}
 #precios .section-title{color:var(--white)}
 #precios .section-num{color:#444}
@@ -243,6 +243,7 @@ footer{background:var(--black);padding:3rem 4rem;display:flex;justify-content:sp
 .loading{text-align:center;padding:4rem;font-size:.78rem;letter-spacing:.1em;text-transform:uppercase;color:var(--gray);}
 .reveal{opacity:0;transform:translateY(40px);transition:opacity .8s,transform .8s;}
 .reveal.in{opacity:1;transform:translateY(0)}
+@media(hover:none),(pointer:coarse){.cursor,.cursor-ring{display:none!important;}}
 @media(max-width:900px){
   nav{padding:1.2rem 1.5rem;}.nav-links{display:none;}.hamburger{display:flex;}
   #hero{grid-template-columns:1fr;min-height:auto;}.hero-right{display:none;}.hero-left{padding:6rem 2rem 4rem;}
@@ -354,7 +355,7 @@ footer{background:var(--black);padding:3rem 4rem;display:flex;justify-content:sp
 .bs-footer{display:flex;justify-content:space-between;align-items:center;}
 .bs-price{font-family:'Cormorant Garamond',serif;font-size:1.3rem;}
 .bs-btn{background:var(--black);color:var(--white);border:none;font-family:'Montserrat',sans-serif;font-size:.55rem;letter-spacing:.12em;text-transform:uppercase;padding:.5rem 1rem;cursor:pointer;transition:background .2s;}
-.bs-btn:hover{background:var(--blue);}
+.bs-btn:hover{background:var(--warm);}
 </style>
 <!-- Meta Pixel -->
 <script>
@@ -381,6 +382,7 @@ fbq('track', 'PageView');
   <a href="#hero" class="logo">Oso <em style="font-style:italic">Mates</em></a>
   <ul class="nav-links">
     <li><a href="#catalogo">Catálogo</a></li>
+    <li><a href="#bombillas-section">Bombillas</a></li>
     <li><a href="#precios">Precios</a></li>
     <li><a href="#nosotros">Nosotros</a></li>
     <li><a href="#contacto">Contacto</a></li>
@@ -391,6 +393,7 @@ fbq('track', 'PageView');
 <div class="mobile-nav" id="mobile-nav">
   <div class="mobile-nav-sub">Oso Mates</div>
   <a href="#catalogo" onclick="toggleMobileNav()">Catálogo</a>
+  <a href="#bombillas-section" onclick="toggleMobileNav()">Bombillas</a>
   <a href="#precios" onclick="toggleMobileNav()">Precios</a>
   <a href="#nosotros" onclick="toggleMobileNav()">Nosotros</a>
   <a href="#contacto" onclick="toggleMobileNav()">Contacto</a>
@@ -409,7 +412,7 @@ fbq('track', 'PageView');
     <div class="hero-name">Oso<em>Mates</em><small>Mates y Bombillas</small></div>
   </div>
 </section>
-<div class="marquee-strip"><div class="marquee-inner"><span>Tallado a mano</span><span class="dot">—</span><span>Madera noble</span><span class="dot">—</span><span>Curado incluido</span><span class="dot">—</span><span>Envíos a todo el país</span><span class="dot">—</span><span>Piezas únicas</span><span class="dot">—</span><span>@oso_mates</span><span class="dot">—</span><span>Tallado a mano</span><span class="dot">—</span><span>Madera noble</span><span class="dot">—</span><span>Curado incluido</span><span class="dot">—</span><span>Envíos a todo el país</span><span class="dot">—</span><span>Piezas únicas</span><span class="dot">—</span><span>@oso_mates</span><span class="dot">—</span></div></div>
+<div class="marquee-strip"><div class="marquee-inner"><span>Tallado a mano</span><span class="dot">—</span><span>Madera noble</span><span class="dot">—</span><span>Curado incluido</span><span class="dot">—</span><span>Envíos a todo el país</span><span class="dot">—</span><span>Piezas únicas</span><span class="dot">—</span><span>@oso_mates</span><span class="dot">—</span><span>Bombillas artesanales</span><span class="dot">—</span><span>Tallado a mano</span><span class="dot">—</span><span>Madera noble</span><span class="dot">—</span><span>Curado incluido</span><span class="dot">—</span><span>Envíos a todo el país</span><span class="dot">—</span><span>Piezas únicas</span><span class="dot">—</span><span>@oso_mates</span><span class="dot">—</span></div></div>
 <!-- MAS VENDIDOS -->
 <section id="bestsellers">
   <div class="section-header reveal">
@@ -423,17 +426,33 @@ fbq('track', 'PageView');
     <div class="loading">Cargando...</div>
   </div>
 </section>
+
+<!-- SECCIÓN BOMBILLAS -->
+<section id="bombillas-section" style="display:none;background:#f0f0ee;padding:6rem 4rem;">
+  <div class="section-header reveal">
+    <div>
+      <div class="section-num">★ Bombillas</div>
+      <h2 class="section-title">Nuestras <em>bombillas</em></h2>
+    </div>
+    <a href="#catalogo" onclick="filterP('bombillas',document.querySelector('[data-filter=bombillas]'))" style="font-size:.62rem;letter-spacing:.2em;text-transform:uppercase;color:var(--gray);text-decoration:none;display:flex;align-items:center;gap:1rem;">Ver todas &#x2192;</a>
+  </div>
+  <div class="bestsellers-grid" id="bombillas-grid">
+    <div class="loading">Cargando...</div>
+  </div>
+</section>
+
 <section id="catalogo">
   <div class="section-header reveal"><div><div class="section-num">01 — Catálogo</div><h2 class="section-title">La <em>colección</em></h2></div></div>
   <div class="filter-row">
-    <button class="ftab active" onclick="filterP('todos',this)">Todos</button>
-    <button class="ftab" onclick="filterP('madera',this)">Madera</button>
-    <button class="ftab" onclick="filterP('calabaza',this)">Calabaza</button>
+    <button class="ftab active" data-filter="todos" onclick="filterP('todos',this)">Todos</button>
+    <button class="ftab" data-filter="madera" onclick="filterP('madera',this)">Madera</button>
+    <button class="ftab" data-filter="calabaza" onclick="filterP('calabaza',this)">Calabaza</button>
+    <button class="ftab" data-filter="bombillas" onclick="filterP('bombillas',this)">Bombillas</button>
   </div>
   <div class="catalog-grid" id="grid"><div class="loading">Cargando productos...</div></div>
 </section>
 <section id="precios">
-  <div class="section-header reveal"><div><div class="section-num" style="color:#444">02 — Precios</div><h2 class="section-title">Sin <em>sorpresas</em></h2></div></div>
+  <div class="section-header reveal"><div><div class="section-num" style="color:var(--warm)">02 — Precios</div><h2 class="section-title">Sin <em>sorpresas</em></h2></div></div>
   <div class="price-grid" id="price-grid"><div class="loading" style="color:#888;grid-column:1/-1">Cargando...</div></div>
 </section>
 
@@ -441,7 +460,7 @@ fbq('track', 'PageView');
 <section id="faq">
   <div class="section-header reveal">
     <div>
-      <div class="section-num">05 — Preguntas frecuentes</div>
+      <div class="section-num">03 — Preguntas frecuentes</div>
       <h2 class="section-title">Todo lo que <em>necesitas saber</em></h2>
     </div>
   </div>
@@ -498,7 +517,7 @@ fbq('track', 'PageView');
     <div><div class="stat-big">&#x221E;</div><div class="stat-lab">Piezas únicas</div></div>
   </div>
   <div class="nos-right reveal">
-    <div class="nos-tag">03 — Nosotros</div>
+    <div class="nos-tag">04 — Nosotros</div>
     <h2 class="nos-title">Un oficio que<br/><em>se hereda</em></h2>
     <p class="nos-body">Empezamos tallando en un galpón familiar y hoy llegamos a cada rincón de Argentina. Cada mate lleva el mismo cuidado del primer día. Sin máquinas, sin moldes, sin atajos.</p>
     <div class="values-list">
@@ -510,7 +529,7 @@ fbq('track', 'PageView');
   </div>
 </section>
 <section id="contacto">
-  <div class="section-header reveal"><div><div class="section-num">04 — Contacto</div><h2 class="section-title">Habla<em>mos</em></h2></div></div>
+  <div class="section-header reveal"><div><div class="section-num">05 — Contacto</div><h2 class="section-title">Habla<em>mos</em></h2></div></div>
   <div class="contact-layout">
     <div class="reveal">
       <p class="contact-sub">Estamos para ayudarte a elegir el mate perfecto. Respondemos todos los mensajes en el día.</p>
@@ -535,7 +554,7 @@ fbq('track', 'PageView');
 </section>
 <footer>
   <div class="footer-logo">Oso Mates</div>
-  <div class="footer-copy">&#169; 2025 &#8212; Hecho en Argentina</div>
+  <div class="footer-copy">&#169; 2026 &#8212; Hecho en Argentina</div>
   <div class="footer-copy">Todos los derechos reservados</div>
 </footer>
 <div class="cart-overlay" id="cart-overlay" onclick="toggleCart()"></div>
@@ -586,6 +605,30 @@ fbq('track', 'PageView');
 <div class="toast" id="toast"></div>
 <script>
 
+
+async function loadBombillas(){
+  var res=await sb.from('productos').select('*').eq('activo',true).eq('categoria','bombillas');
+  var data=res.data||[];
+  var sec=document.getElementById('bombillas-section');
+  var grid=document.getElementById('bombillas-grid');
+  if(!data.length){sec.style.display='none';return;}
+  sec.style.display='block';
+  grid.innerHTML=data.map(function(p){
+    return '<div class="bs-card" onclick="viewProduct(''+p.id+'')">'+
+      '<div class="bs-badge" style="background:var(--warm)">Bombilla</div>'+
+      '<img src="'+getImg(p.imagen)+'" alt="'+p.nombre+'" class="bs-img" loading="lazy" onerror="this.style.opacity='0'"/>'+
+      '<div class="bs-info">'+
+        '<div class="bs-name">'+p.nombre+'</div>'+
+        '<div class="bs-mat">'+p.material+'</div>'+
+        '<div class="bs-footer">'+
+          '<div class="bs-price">'+fmt(p.precio)+'</div>'+
+          '<button class="bs-btn" onclick="event.stopPropagation();addToCart(''+p.id+'')">+ Agregar</button>'+
+        '</div>'+
+      '</div>'+
+    '</div>';
+  }).join('');
+}
+
 function saveCart(){try{localStorage.setItem('om_cart',JSON.stringify(cart));}catch(e){}}
 function loadCart(){try{var d=localStorage.getItem('om_cart');if(d)cart=JSON.parse(d);}catch(e){}}
 function toggleMobileNav(){
@@ -617,8 +660,7 @@ async function loadBestsellers() {
   grid.innerHTML = data.map(function(p) {
     return '<div class="bs-card" onclick="viewProduct(\'' + p.id + '\')">'+
       '<div class="bs-badge">Popular</div>'+
-      '<img src="' + getImg(p.imagen) + '" alt="' + p.nombre + '" class="bs-img" loading="lazy"/>'+
-      
+      '<img src="' + getImg(p.imagen) + '" alt="' + p.nombre + '" class="bs-img" loading="lazy" onerror="this.style.opacity='0'"/>'+
       '<div class="bs-info">'+
         '<div class="bs-name">' + p.nombre + '</div>'+
         '<div class="bs-mat">' + p.material + '</div>'+
@@ -679,11 +721,13 @@ function renderGrid(f){
   const g=document.getElementById('grid');
   const list=f==='todos'?allProds:allProds.filter(p=>p.categoria===f);
   if(!list.length){g.innerHTML='<div class="loading">No hay productos</div>';return;}
-  g.innerHTML=list.map((p,i)=>`<div class="product-card"><div class="p-img-wrap" onclick="viewProduct('${p.id}')"><img src="${getImg(p.imagen)}" alt="${p.nombre}" class="p-img" loading="lazy" crossorigin="anonymous"/></div><div class="p-body"><div class="p-num">N\u00b000${i+1}</div>${p.badge?`<div class="p-badge">${p.badge}</div>`:''}<div class="p-name" onclick="viewProduct('${p.id}')">${p.nombre}</div><div class="p-mat">${p.material}</div><div class="p-footer"><div><div class="p-price">${fmt(p.precio)}</div><div class="p-transfer">Transf. <strong>${fmt(p.precio_transferencia)}</strong> (\u221210%)</div></div><div class="p-btns"><button class="p-view-btn" onclick="viewProduct('${p.id}')">Ver</button><button class="p-add-btn" onclick="addToCart('${p.id}')">+ Agregar</button></div></div></div></div>`).join('');
+  g.innerHTML=list.map((p,i)=>`<div class="product-card"><div class="p-img-wrap" onclick="viewProduct('${p.id}')"><img src="${getImg(p.imagen)}" alt="${p.nombre}" class="p-img" loading="lazy" onerror="this.style.opacity='0'" crossorigin="anonymous"/></div><div class="p-body"><div class="p-num">N\u00b000${i+1}</div>${p.badge?`<div class="p-badge">${p.badge}</div>`:''}<div class="p-name" onclick="viewProduct('${p.id}')">${p.nombre}</div><div class="p-mat">${p.material}</div><div class="p-footer"><div><div class="p-price">${fmt(p.precio)}</div><div class="p-transfer">Transf. <strong>${fmt(p.precio_transferencia)}</strong> (\u221210%)</div></div><div class="p-btns"><button class="p-view-btn" onclick="viewProduct('${p.id}')">Ver</button><button class="p-add-btn" onclick="addToCart('${p.id}')">+ Agregar</button></div></div></div></div>`).join('');
 }
 
 function renderPrices(){
-  const sorted=[...allProds].sort((a,b)=>a.precio-b.precio);
+  const mates=allProds.filter(p=>p.categoria!=='bombillas');
+  if(!mates.length){document.getElementById('price-grid').innerHTML='';return;}
+  const sorted=[...mates].sort((a,b)=>a.precio-b.precio);
   const picks=[sorted[0],sorted[Math.floor(sorted.length/2)],sorted[sorted.length-1]];
   const labels=['Entrada','\u2014 M\u00e1s vendido \u2014','Premium'];
   document.getElementById('price-grid').innerHTML=picks.map((p,i)=>`<div class="price-col ${i===1?'featured':''}"><span class="price-tag-label">${labels[i]}</span><div class="price-amount">${fmt(p.precio)}</div><span class="price-ars">Pesos argentinos</span><div class="price-name">${p.nombre}</div><div class="price-desc">${p.descripcion}</div><ul class="price-list"><li class="inc">Artesanal</li><li class="inc">Curado incluido</li><li class="inc">Env\u00edo a todo el pa\u00eds</li><li ${i>0?'class="inc"':''}>Bombilla artesanal</li></ul><button class="price-cta" onclick="addToCart('${p.id}');showToast('Agregado \ud83d\uded2')">Comprar</button></div>`).join('');
@@ -777,7 +821,7 @@ function showToast(msg){const t=document.getElementById('toast');t.textContent=m
 const obs=new IntersectionObserver(entries=>{entries.forEach((e,i)=>{if(e.isIntersecting)setTimeout(()=>e.target.classList.add('in'),i*80);});},{threshold:.1});
 document.querySelectorAll('.reveal').forEach(el=>obs.observe(el));
 
-loadCart();loadProducts();loadBestsellers();updateCartUI();
+loadCart();loadProducts();loadBestsellers();loadBombillas();updateCartUI();
 
 </script>
 
