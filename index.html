@@ -952,8 +952,23 @@ function applyFilters(){
 }
 
 // ── GALERÍA ───────────────────────────────────────────────────────────────────
-function loadGallery(){
+// ── GALERÍA: las fotos se eligen desde Admin → Pagina → Galeria del sitio ────
+async function loadGallery(){
   const grid=document.getElementById('gallery-grid');
+  let galImgs=[];
+  try{
+    const {data}=await sb.from('config').select('*').eq('clave','galeria_imgs').limit(1);
+    if(data&&data[0]&&data[0].valor){galImgs=JSON.parse(data[0].valor)||[];}
+  }catch(e){}
+  if(galImgs.length){
+    grid.innerHTML=galImgs.slice(0,8).map(name=>`
+      <div class="gallery-item">
+        <img src="${getImg(name)}" alt="Oso Mates" loading="lazy"/>
+        <div class="gallery-item-overlay"><span class="gallery-item-name">Oso Mates</span></div>
+      </div>
+    `).join('');
+    return;
+  }
   if(!allProds.length){return;}
   const items=allProds.filter(p=>p.imagen).slice(0,7);
   if(!items.length){document.getElementById('galeria').style.display='none';return;}

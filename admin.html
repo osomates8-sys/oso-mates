@@ -195,6 +195,13 @@ body{font-family:Montserrat,sans-serif;background:#f0f0ee;color:#0a0a0a;}
         <div class="fg"><label class="fl">Texto principal</label><textarea class="fi-textarea" id="pg-nosotros"></textarea></div>
         <button class="save-page-btn" id="save-nosotros-btn">Guardar nosotros</button>
       </div>
+      <div class="page-section">
+        <div class="page-section-title">Galeria del sitio</div>
+        <p style="font-size:.62rem;color:#888;margin-bottom:.8rem">Eleg\u00ed las fotos que quer\u00e9s mostrar en la secci\u00f3n "Cada mate, una historia" de la p\u00e1gina principal. Si no eleg\u00eds ninguna, se muestran fotos de productos autom\u00e1ticamente.</p>
+        <div class="selected-imgs" id="selected-gallery-preview"></div>
+        <div class="img-selector" id="gallery-selector-grid"><div style="font-size:.7rem;color:#888;padding:.5rem">Cargando imagenes...</div></div>
+        <button class="save-page-btn" id="save-gallery-btn">Guardar galeria</button>
+      </div>
     </div>
   </div>
 </div>
@@ -250,6 +257,7 @@ body{font-family:Montserrat,sans-serif;background:#f0f0ee;color:#0a0a0a;}
   var prodCache = [];
   var filesToUpload = [];
   var selectedImages = [];
+  var selectedGalleryImages = [];
   var sbClient = supabase.createClient('https://dkyfaeqcbeyhibqjztwa.supabase.co', 'sb_publishable_zzsZ-7Upi-SAUD78wx0CJQ_skroMzF4');
 
   function fmt(n) { return '$' + parseInt(n).toLocaleString('es-AR'); }
@@ -498,6 +506,64 @@ body{font-family:Montserrat,sans-serif;background:#f0f0ee;color:#0a0a0a;}
       data.forEach(function(item) {
         var el = document.getElementById('pg-' + item.clave);
         if (el) el.value = item.valor;
+        if (item.clave === 'galeria_imgs') {
+          try { selectedGalleryImages = JSON.parse(item.valor) || []; } catch(e) { selectedGalleryImages = []; }
+          renderSelectedGalleryImgs();
+        }
+      });
+      loadGalleryImageSelector();
+    });
+  }
+
+  function loadGalleryImageSelector() {
+    sbClient.storage.from('imagenes').list('', {limit:100}).then(function(res) {
+      var grid = document.getElementById('gallery-selector-grid');
+      if (!grid) return;
+      var files = res.data || [];
+      if (!files.length) { grid.innerHTML = '<div style="font-size:.7rem;color:#888;padding:.5rem">No hay imagenes subidas</div>'; return; }
+      grid.innerHTML = files.map(function(f) {
+        var url = 'https://dkyfaeqcbeyhibqjztwa.supabase.co/storage/v1/object/public/imagenes/' + f.name;
+        var isSelected = selectedGalleryImages.indexOf(f.name) > -1;
+        return '<div class="img-sel-item' + (isSelected?' selected':'') + '" data-name="' + f.name + '">' +
+          '<img src="' + url + '" alt="' + f.name + '"/>' +
+          '<div class="img-sel-check">&#x2713;</div>' +
+          '</div>';
+      }).join('');
+      grid.querySelectorAll('.img-sel-item').forEach(function(item) {
+        item.addEventListener('click', function() {
+          var name = this.dataset.name;
+          var idx = selectedGalleryImages.indexOf(name);
+          if (idx > -1) {
+            selectedGalleryImages.splice(idx, 1);
+            this.classList.remove('selected');
+          } else {
+            selectedGalleryImages.push(name);
+            this.classList.add('selected');
+          }
+          renderSelectedGalleryImgs();
+        });
+      });
+    });
+  }
+
+  function renderSelectedGalleryImgs() {
+    var preview = document.getElementById('selected-gallery-preview');
+    if (!preview) return;
+    preview.innerHTML = selectedGalleryImages.map(function(name, i) {
+      var url = 'https://dkyfaeqcbeyhibqjztwa.supabase.co/storage/v1/object/public/imagenes/' + name;
+      return '<div class="selected-img-thumb">' +
+        '<img src="' + url + '" alt="' + name + '"/>' +
+        '<button data-idx="' + i + '">x</button>' +
+        '</div>';
+    }).join('');
+    preview.querySelectorAll('button').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        var idx = parseInt(this.dataset.idx, 10);
+        var name = selectedGalleryImages[idx];
+        selectedGalleryImages.splice(idx, 1);
+        renderSelectedGalleryImgs();
+        var gridItem = document.querySelector('#gallery-selector-grid .img-sel-item[data-name="' + name + '"]');
+        if (gridItem) gridItem.classList.remove('selected');
       });
     });
   }
@@ -520,6 +586,10 @@ body{font-family:Montserrat,sans-serif;background:#f0f0ee;color:#0a0a0a;}
   });
   document.getElementById('save-nosotros-btn').addEventListener('click', function() {
     saveSetting('nosotros_texto', document.getElementById('pg-nosotros').value);
+  });
+  document.getElementById('save-gallery-btn').addEventListener('click', function() {
+    saveSetting('galeria_imgs', JSON.stringify(selectedGalleryImages));
+    showToast('Galeria guardada');
   });
 
   function openEdit(idx) {
