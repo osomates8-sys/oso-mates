@@ -556,16 +556,8 @@ fbq('track', 'PageView');
   </div>
 </section>
 <section id="nosotros" style="padding:0">
-  <div class="nos-right reveal">
-    <div class="nos-tag">04 — Nosotros</div>
-    <h2 class="nos-title">Un oficio que<br/><em>se hereda</em></h2>
-    <p class="nos-body">Empezamos tallando en un galpón familiar y hoy llegamos a cada rincón de Argentina. Cada mate lleva el mismo cuidado del primer día. Sin máquinas, sin moldes, sin atajos.</p>
-    <div class="values-list">
-      <div class="value-item"><span class="value-icon">🌲</span><div class="value-name">Sustentable</div><div class="value-desc">Maderas de bosques responsables</div></div>
-      <div class="value-item"><span class="value-icon">✋</span><div class="value-name">A mano</div><div class="value-desc">Sin moldes ni replicados</div></div>
-      <div class="value-item"><span class="value-icon">📦</span><div class="value-name">Todo el país</div><div class="value-desc">Envíos en 48hs hábiles</div></div>
-      <div class="value-item"><span class="value-icon">💬</span><div class="value-name">Atención real</div><div class="value-desc">Respondemos el mismo día</div></div>
-    </div>
+  <div class="nos-right reveal" id="nosotros-content">
+    <div class="loading">Cargando...</div>
   </div>
 </section>
 <section id="contacto">
@@ -732,6 +724,39 @@ function trackPurchase(total) {
 
 function toggleFaq(el){var item=el.parentElement;var isOpen=item.classList.contains('open');document.querySelectorAll('.faq-item').forEach(function(i){i.classList.remove('open');});if(!isOpen)item.classList.add('open');}
 
+// ── Nosotros: editable desde Admin → Pagina → Sobre nosotros ─────────────────
+const DEFAULT_NOSOTROS={
+  title1:'Un oficio que',
+  title2:'se hereda',
+  body:'Empezamos tallando en un galpón familiar y hoy llegamos a cada rincón de Argentina. Cada mate lleva el mismo cuidado del primer día. Sin máquinas, sin moldes, sin atajos.',
+  values:[
+    {icon:'🌲',name:'Sustentable',desc:'Maderas de bosques responsables'},
+    {icon:'✋',name:'A mano',desc:'Sin moldes ni replicados'},
+    {icon:'📦',name:'Todo el país',desc:'Envíos en 48hs hábiles'},
+    {icon:'💬',name:'Atención real',desc:'Respondemos el mismo día'}
+  ]
+};
+async function loadNosotros(){
+  const cont=document.getElementById('nosotros-content');
+  let d=DEFAULT_NOSOTROS;
+  try{
+    const {data}=await sb.from('config').select('*').eq('clave','nosotros_content').limit(1);
+    if(data&&data[0]&&data[0].valor){
+      const parsed=JSON.parse(data[0].valor);
+      if(parsed&&parsed.title1)d=parsed;
+    }
+  }catch(e){}
+  cont.innerHTML=
+    '<div class="nos-tag">04 — Nosotros</div>'+
+    '<h2 class="nos-title">'+d.title1+'<br/><em>'+d.title2+'</em></h2>'+
+    '<p class="nos-body">'+d.body+'</p>'+
+    '<div class="values-list">'+
+    (d.values||[]).map(function(v){
+      return '<div class="value-item"><span class="value-icon">'+v.icon+'</span><div class="value-name">'+v.name+'</div><div class="value-desc">'+v.desc+'</div></div>';
+    }).join('')+
+    '</div>';
+}
+
 // ── FAQ: editable desde Admin → Pagina → Preguntas frecuentes ────────────────
 const DEFAULT_FAQ=[
   {q:'¿Cuánto tarda en llegar el pedido?',a:'Despachamos en 48 horas hábiles desde que confirmamos el pago. El tiempo de entrega depende de tu ubicación: CABA y GBA 2-3 días, interior del país 3-7 días hábiles. Te enviamos el número de seguimiento por email.'},
@@ -888,7 +913,7 @@ function showToast(msg){const t=document.getElementById('toast');t.textContent=m
 const obs=new IntersectionObserver(entries=>{entries.forEach((e,i)=>{if(e.isIntersecting)setTimeout(()=>e.target.classList.add('in'),i*80);});},{threshold:.1});
 document.querySelectorAll('.reveal').forEach(el=>obs.observe(el));
 
-loadCart();loadProducts();loadBestsellers();loadBombillas();loadFaq();updateCartUI();
+loadCart();loadProducts();loadBestsellers();loadBombillas();loadFaq();loadNosotros();updateCartUI();
 
 // ── CACHE de productos (10 min TTL) ──────────────────────────────────────────
 const CACHE_KEY='om_products';const CACHE_TTL=10*60*1000;

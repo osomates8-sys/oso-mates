@@ -102,6 +102,10 @@ body{font-family:Montserrat,sans-serif;background:#f0f0ee;color:#0a0a0a;}
 .faq-edit-item .fl{margin-top:.6rem;}
 .faq-edit-item .fl:first-child{margin-top:0;}
 .faq-edit-del{position:absolute;top:.6rem;right:.6rem;background:#e74c3c;color:#fff;border:none;width:22px;height:22px;font-size:.7rem;cursor:pointer;}
+.nos-value-edit-item{border:1px solid #ebebeb;padding:1rem;margin-bottom:.8rem;}
+.nos-value-edit-item .fl{margin-top:.6rem;}
+.nos-value-edit-item .fl:first-child{margin-top:0;}
+.nos-value-row{display:grid;grid-template-columns:80px 1fr;gap:.8rem;}
 .faq-add-btn{background:none;border:1px dashed #ccc;padding:.6rem 1.2rem;font-size:.65rem;letter-spacing:.15em;text-transform:uppercase;cursor:pointer;color:#888;margin-bottom:1rem;width:100%;}
 .faq-add-btn:hover{border-color:#0a0a0a;color:#0a0a0a;}
 .selected-img-thumb{position:relative;width:60px;}
@@ -198,7 +202,12 @@ body{font-family:Montserrat,sans-serif;background:#f0f0ee;color:#0a0a0a;}
       </div>
       <div class="page-section">
         <div class="page-section-title">Seccion Nosotros</div>
-        <div class="fg"><label class="fl">Texto principal</label><textarea class="fi-textarea" id="pg-nosotros"></textarea></div>
+        <div class="fg2">
+          <div class="fg"><label class="fl">Titulo (linea 1)</label><input class="fi" id="nos-title1" placeholder="Un oficio que"/></div>
+          <div class="fg"><label class="fl">Titulo (linea 2 - italica)</label><input class="fi" id="nos-title2" placeholder="se hereda"/></div>
+        </div>
+        <div class="fg"><label class="fl">Texto principal</label><textarea class="fi-textarea" id="nos-body"></textarea></div>
+        <div id="nos-values-editor"></div>
         <button class="save-page-btn" id="save-nosotros-btn">Guardar nosotros</button>
       </div>
       <div class="page-section">
@@ -274,11 +283,23 @@ body{font-family:Montserrat,sans-serif;background:#f0f0ee;color:#0a0a0a;}
     {q:'\u00bfQu\u00e9 hago si el producto llega da\u00f1ado?',a:'Todos nuestros env\u00edos tienen seguro. Si el producto llega da\u00f1ado, escribinos por WhatsApp con una foto en las primeras 48hs y lo reponemos sin costo.'},
     {q:'\u00bfTienen local f\u00edsico?',a:'Somos un emprendimiento online con taller en Mar del Plata. Por el momento no tenemos local f\u00edsico, pero pod\u00e9s coordinar retiro en mano si est\u00e1s en MDP escribi\u00e9ndonos por WhatsApp.'}
   ];
+  var DEFAULT_NOSOTROS = {
+    title1: 'Un oficio que',
+    title2: 'se hereda',
+    body: 'Empezamos tallando en un galp\u00f3n familiar y hoy llegamos a cada rinc\u00f3n de Argentina. Cada mate lleva el mismo cuidado del primer d\u00eda. Sin m\u00e1quinas, sin moldes, sin atajos.',
+    values: [
+      {icon:'\ud83c\udf32', name:'Sustentable', desc:'Maderas de bosques responsables'},
+      {icon:'\u270b', name:'A mano', desc:'Sin moldes ni replicados'},
+      {icon:'\ud83d\udce6', name:'Todo el pa\u00eds', desc:'Env\u00edos en 48hs h\u00e1biles'},
+      {icon:'\ud83d\udcac', name:'Atenci\u00f3n real', desc:'Respondemos el mismo d\u00eda'}
+    ]
+  };
   var prodCache = [];
   var filesToUpload = [];
   var selectedImages = [];
   var selectedGalleryImages = [];
   var faqItems = [];
+  var nosotrosData = null;
   var sbClient = supabase.createClient('https://dkyfaeqcbeyhibqjztwa.supabase.co', 'sb_publishable_zzsZ-7Upi-SAUD78wx0CJQ_skroMzF4');
 
   function fmt(n) { return '$' + parseInt(n).toLocaleString('es-AR'); }
@@ -538,10 +559,49 @@ body{font-family:Montserrat,sans-serif;background:#f0f0ee;color:#0a0a0a;}
             if (Array.isArray(parsed) && parsed.length) { faqItems = parsed; faqLoaded = true; }
           } catch(e) {}
         }
+        if (item.clave === 'nosotros_content') {
+          try {
+            var parsedN = JSON.parse(item.valor);
+            if (parsedN && parsedN.title1) nosotrosData = parsedN;
+          } catch(e) {}
+        }
       });
       if (!faqLoaded) faqItems = JSON.parse(JSON.stringify(DEFAULT_FAQ));
+      if (!nosotrosData) nosotrosData = JSON.parse(JSON.stringify(DEFAULT_NOSOTROS));
       renderFaqEditor();
+      renderNosotrosEditor();
       loadGalleryImageSelector();
+    });
+  }
+
+  function renderNosotrosEditor() {
+    document.getElementById('nos-title1').value = nosotrosData.title1 || '';
+    document.getElementById('nos-title2').value = nosotrosData.title2 || '';
+    document.getElementById('nos-body').value = nosotrosData.body || '';
+    var container = document.getElementById('nos-values-editor');
+    container.innerHTML = nosotrosData.values.map(function(v, i) {
+      return '<div class="nos-value-edit-item" data-idx="' + i + '">' +
+        '<div class="nos-value-row">' +
+        '<div class="fg"><label class="fl">Icono</label><input class="fi nos-v-icon" data-idx="' + i + '" value="' + (v.icon || '').replace(/"/g, '&quot;') + '"/></div>' +
+        '<div class="fg"><label class="fl">Nombre</label><input class="fi nos-v-name" data-idx="' + i + '" value="' + (v.name || '').replace(/"/g, '&quot;') + '"/></div>' +
+        '</div>' +
+        '<label class="fl">Descripcion</label><input class="fi nos-v-desc" data-idx="' + i + '" value="' + (v.desc || '').replace(/"/g, '&quot;') + '"/>' +
+        '</div>';
+    }).join('');
+    container.querySelectorAll('.nos-v-icon').forEach(function(inp) {
+      inp.addEventListener('input', function() {
+        nosotrosData.values[parseInt(this.dataset.idx, 10)].icon = this.value;
+      });
+    });
+    container.querySelectorAll('.nos-v-name').forEach(function(inp) {
+      inp.addEventListener('input', function() {
+        nosotrosData.values[parseInt(this.dataset.idx, 10)].name = this.value;
+      });
+    });
+    container.querySelectorAll('.nos-v-desc').forEach(function(inp) {
+      inp.addEventListener('input', function() {
+        nosotrosData.values[parseInt(this.dataset.idx, 10)].desc = this.value;
+      });
     });
   }
 
@@ -644,7 +704,10 @@ body{font-family:Montserrat,sans-serif;background:#f0f0ee;color:#0a0a0a;}
     showToast('Hero guardado');
   });
   document.getElementById('save-nosotros-btn').addEventListener('click', function() {
-    saveSetting('nosotros_texto', document.getElementById('pg-nosotros').value);
+    nosotrosData.title1 = document.getElementById('nos-title1').value;
+    nosotrosData.title2 = document.getElementById('nos-title2').value;
+    nosotrosData.body = document.getElementById('nos-body').value;
+    saveSetting('nosotros_content', JSON.stringify(nosotrosData));
   });
   document.getElementById('save-gallery-btn').addEventListener('click', function() {
     saveSetting('galeria_imgs', JSON.stringify(selectedGalleryImages));
