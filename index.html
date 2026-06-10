@@ -100,29 +100,6 @@ section{padding:8rem 4rem}
 .p-view-btn:hover{background:var(--black);color:var(--white);}
 .p-add-btn{background:var(--black);color:var(--white);border:none;font-family:'Montserrat',sans-serif;font-size:.55rem;letter-spacing:.12em;text-transform:uppercase;padding:.5rem .9rem;cursor:pointer;transition:all .2s;}
 .p-add-btn:hover{background:var(--warm);}
-#precios{background:var(--black);color:var(--white);}
-#precios .section-title{color:var(--white)}
-#precios .section-num{color:#444}
-#precios .section-header{border-bottom-color:#222}
-.price-grid{display:grid;grid-template-columns:repeat(3,1fr);border:1px solid #222;}
-.price-col{padding:3rem 2.5rem;border-right:1px solid #222;transition:background .3s;}
-.price-col:last-child{border-right:none}
-.price-col.featured{background:#111}
-.price-col:hover{background:#111}
-.price-tag-label{font-size:.55rem;letter-spacing:.25em;text-transform:uppercase;color:var(--gray);margin-bottom:3rem;display:block;}
-.price-col.featured .price-tag-label{color:var(--white)}
-.price-amount{font-family:'Cormorant Garamond',serif;font-size:clamp(2.5rem,4vw,4rem);font-weight:300;color:var(--white);line-height:1;margin-bottom:.5rem;}
-.price-ars{font-size:.62rem;color:var(--gray);margin-bottom:3rem;display:block;}
-.price-name{font-family:'Cormorant Garamond',serif;font-size:1.4rem;color:var(--white);margin-bottom:.5rem;}
-.price-desc{font-size:.7rem;color:var(--gray);font-weight:300;line-height:1.8;margin-bottom:3rem;}
-.price-list{list-style:none;margin-bottom:3rem}
-.price-list li{font-size:.68rem;color:rgba(248,248,246,.5);padding:.8rem 0;border-bottom:1px solid #1a1a1a;display:flex;align-items:center;gap:.6rem;}
-.price-list li::before{content:'';width:12px;height:1px;background:var(--gray);flex-shrink:0;}
-.price-list li.inc{color:rgba(248,248,246,.8)}
-.price-list li.inc::before{background:var(--white);width:16px}
-.price-cta{display:block;width:100%;padding:1rem;background:none;border:1px solid #333;color:var(--gray);font-family:'Montserrat',sans-serif;font-size:.6rem;letter-spacing:.2em;text-transform:uppercase;cursor:pointer;transition:all .2s;}
-.price-col.featured .price-cta{border-color:var(--white);color:var(--white)}
-.price-cta:hover,.price-col.featured .price-cta:hover{background:var(--white);color:var(--black);}
 #nosotros{display:grid;grid-template-columns:5fr 7fr;padding:0;min-height:80vh;}
 .nos-left{background:var(--black);padding:6rem 4rem;display:flex;flex-direction:column;justify-content:space-between;}
 .nos-right{padding:6rem 4rem;display:flex;flex-direction:column;justify-content:center;}
@@ -249,7 +226,6 @@ footer{background:var(--black);padding:3rem 4rem;display:flex;justify-content:sp
   #hero{grid-template-columns:1fr;min-height:auto;}.hero-right{display:none;}.hero-left{padding:6rem 2rem 4rem;}
   section{padding:4rem 1.5rem;}
   .catalog-grid{grid-template-columns:1fr 1fr;}
-  .price-grid{grid-template-columns:1fr;}.price-col{border-right:none;border-bottom:1px solid #222;}
   #nosotros{grid-template-columns:1fr;min-height:auto;}.nos-left,.nos-right{padding:3rem 1.5rem;}
   .contact-layout{grid-template-columns:1fr;gap:2rem;}
   .section-header{flex-direction:column;align-items:flex-start;gap:1rem;}
@@ -356,6 +332,74 @@ footer{background:var(--black);padding:3rem 4rem;display:flex;justify-content:sp
 .bs-price{font-family:'Cormorant Garamond',serif;font-size:1.3rem;}
 .bs-btn{background:var(--black);color:var(--white);border:none;font-family:'Montserrat',sans-serif;font-size:.55rem;letter-spacing:.12em;text-transform:uppercase;padding:.5rem 1rem;cursor:pointer;transition:background .2s;}
 .bs-btn:hover{background:var(--warm);}
+
+/* ── TESTIMONIOS ─────────────────────────────── */
+#testimonios{padding:8rem 4rem;background:var(--white);}
+.testimonios-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2rem;margin-top:4rem;}
+.review-card{background:var(--light);padding:2.5rem;display:flex;flex-direction:column;gap:1.2rem;transition:transform .3s;}
+.review-card:hover{transform:translateY(-4px);}
+.review-stars{color:var(--warm);font-size:.9rem;letter-spacing:.1em;}
+.review-text{font-family:'Cormorant Garamond',serif;font-size:1.15rem;font-weight:300;line-height:1.7;font-style:italic;color:var(--black);}
+.review-author{font-size:.65rem;letter-spacing:.2em;text-transform:uppercase;color:var(--gray);margin-top:auto;padding-top:1rem;border-top:1px solid #ddd;}
+.review-author strong{color:var(--black);display:block;margin-bottom:.2rem;}
+
+/* ── GALERÍA ─────────────────────────────────── */
+#galeria{padding:8rem 4rem;background:#f0f0ee;}
+.gallery-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:.6rem;margin-top:3rem;}
+.gallery-item{position:relative;overflow:hidden;cursor:pointer;aspect-ratio:1;}
+.gallery-item:first-child{grid-column:span 2;grid-row:span 2;}
+.gallery-item img{width:100%;height:100%;object-fit:cover;transition:transform .5s cubic-bezier(.25,.46,.45,.94);}
+.gallery-item:hover img{transform:scale(1.06);}
+.gallery-item-overlay{position:absolute;inset:0;background:rgba(10,10,10,0);display:flex;align-items:flex-end;padding:1.2rem;transition:background .3s;}
+.gallery-item:hover .gallery-item-overlay{background:rgba(10,10,10,.35);}
+.gallery-item-name{color:var(--white);font-size:.65rem;letter-spacing:.2em;text-transform:uppercase;opacity:0;transform:translateY(6px);transition:all .3s;}
+.gallery-item:hover .gallery-item-name{opacity:1;transform:translateY(0);}
+
+/* ── STOCK BADGE ─────────────────────────────── */
+.stock-low{display:inline-block;background:#e74c3c;color:#fff;font-size:.55rem;letter-spacing:.15em;text-transform:uppercase;padding:.2rem .5rem;margin-bottom:.4rem;font-weight:600;}
+
+/* ── ENVÍO GRATIS BADGE ───────────────────────── */
+.free-ship{display:inline-block;background:var(--green);color:#fff;font-size:.55rem;letter-spacing:.15em;text-transform:uppercase;padding:.2rem .5rem;margin-bottom:.4rem;font-weight:600;}
+
+/* ── FILTRO PRECIO ───────────────────────────── */
+.price-filter-row{display:flex;gap:.6rem;flex-wrap:wrap;padding:.8rem 4rem;border-bottom:1px solid var(--light);background:var(--white);}
+.pfab{background:none;border:1px solid var(--light);padding:.4rem 1rem;font-family:'Montserrat',sans-serif;font-size:.6rem;letter-spacing:.15em;text-transform:uppercase;cursor:pointer;color:var(--mid);transition:all .2s;}
+.pfab:hover,.pfab.active{background:var(--black);color:var(--white);border-color:var(--black);}
+.pfab-label{font-size:.52rem;opacity:.7;margin-right:.3rem;}
+
+/* ── BTN AGREGAR MÁS VISIBLE ──────────────────── */
+.p-add-btn{background:var(--black)!important;color:var(--white)!important;border:none!important;padding:.55rem 1.1rem!important;font-size:.62rem!important;letter-spacing:.12em!important;font-weight:600!important;cursor:pointer;transition:background .2s,transform .15s!important;}
+.p-add-btn:hover{background:var(--warm)!important;transform:scale(1.04)!important;}
+
+/* ── POPUP SALIDA ────────────────────────────── */
+.exit-overlay{position:fixed;inset:0;background:rgba(10,10,10,.7);z-index:9999;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .3s;}
+.exit-overlay.open{opacity:1;pointer-events:all;}
+.exit-box{background:var(--white);max-width:480px;width:90%;padding:3.5rem 3rem;text-align:center;position:relative;}
+.exit-close{position:absolute;top:1rem;right:1.2rem;background:none;border:none;font-size:1.3rem;cursor:pointer;color:var(--gray);line-height:1;}
+.exit-eyebrow{font-size:.6rem;letter-spacing:.3em;text-transform:uppercase;color:var(--warm);margin-bottom:1rem;}
+.exit-title{font-family:'Cormorant Garamond',serif;font-size:2.2rem;font-weight:300;line-height:1.2;margin-bottom:.8rem;}
+.exit-desc{font-size:.75rem;color:var(--mid);line-height:1.7;margin-bottom:2rem;}
+.exit-code{background:var(--light);padding:.8rem 1.5rem;font-size:.85rem;letter-spacing:.25em;text-transform:uppercase;font-weight:600;margin-bottom:2rem;display:inline-block;}
+.exit-cta{background:var(--black);color:var(--white);border:none;padding:.9rem 2.5rem;font-family:'Montserrat',sans-serif;font-size:.65rem;letter-spacing:.2em;text-transform:uppercase;cursor:pointer;width:100%;transition:background .2s;}
+.exit-cta:hover{background:var(--warm);}
+.exit-skip{display:block;margin-top:1rem;font-size:.6rem;color:var(--gray);cursor:pointer;letter-spacing:.1em;text-transform:uppercase;}
+
+/* ── IMG SKELETON ─────────────────────────────── */
+.p-img-wrap{background:linear-gradient(90deg,#eee 25%,#f5f5f5 50%,#eee 75%);background-size:200% 100%;animation:skeleton 1.4s infinite;}
+@keyframes skeleton{0%{background-position:200% 0}100%{background-position:-200% 0}}
+.p-img-wrap.loaded{animation:none;background:transparent;}
+
+/* ── RESPONSIVE NUEVAS SECCIONES ──────────────── */
+@media(max-width:900px){
+  .testimonios-grid{grid-template-columns:1fr;}
+  .gallery-grid{grid-template-columns:repeat(2,1fr);}
+  .gallery-item:first-child{grid-column:span 2;grid-row:span 1;}
+  .price-filter-row{padding:.8rem 1.5rem;}
+}
+@media(max-width:600px){
+  #testimonios,#galeria{padding:5rem 1.5rem;}
+  .gallery-grid{grid-template-columns:repeat(2,1fr);}
+}
 </style>
 <!-- Meta Pixel -->
 <script>
@@ -383,7 +427,7 @@ fbq('track', 'PageView');
   <ul class="nav-links">
     <li><a href="#catalogo">Catálogo</a></li>
     <li><a href="#bombillas-section">Bombillas</a></li>
-    <li><a href="#precios">Precios</a></li>
+    
     <li><a href="#nosotros">Nosotros</a></li>
     <li><a href="#contacto">Contacto</a></li>
   </ul>
@@ -394,7 +438,6 @@ fbq('track', 'PageView');
   <div class="mobile-nav-sub">Oso Mates</div>
   <a href="#catalogo" onclick="toggleMobileNav()">Catálogo</a>
   <a href="#bombillas-section" onclick="toggleMobileNav()">Bombillas</a>
-  <a href="#precios" onclick="toggleMobileNav()">Precios</a>
   <a href="#nosotros" onclick="toggleMobileNav()">Nosotros</a>
   <a href="#contacto" onclick="toggleMobileNav()">Contacto</a>
 </div>
@@ -425,6 +468,33 @@ fbq('track', 'PageView');
   <div class="bestsellers-grid" id="bestsellers-grid">
     <div class="loading">Cargando...</div>
   </div>
+
+<!-- TESTIMONIOS -->
+<section id="testimonios" class="reveal">
+  <div class="section-header">
+    <div>
+      <div class="section-num">★ Clientes</div>
+      <h2 class="section-title">Lo que dicen <em>nuestros clientes</em></h2>
+    </div>
+  </div>
+  <div class="testimonios-grid">
+    <div class="review-card reveal">
+      <div class="review-stars">★★★★★</div>
+      <div class="review-text">"Compré el Imperial Algarrobo y es una joya. La madera tiene una textura increíble, se nota que es tallado a mano. Llegó perfectamente embalado y curado."</div>
+      <div class="review-author"><strong>Martina G.</strong>Buenos Aires · Compra verificada</div>
+    </div>
+    <div class="review-card reveal">
+      <div class="review-stars">★★★★★</div>
+      <div class="review-text">"Pedí uno para regalar y quedaron fascinados. La calidad es impresionante para el precio. La bombilla artesanal también es hermosa. 100% lo recomiendo."</div>
+      <div class="review-author"><strong>Federico R.</strong>Rosario · Compra verificada</div>
+    </div>
+    <div class="review-card reveal">
+      <div class="review-stars">★★★★★</div>
+      <div class="review-text">"Llevo 3 meses usándolo todos los días y está perfecto. El curado viene impecable. Además la atención fue excelente, me respondieron rápido por WhatsApp."</div>
+      <div class="review-author"><strong>Lucía P.</strong>Córdoba · Compra verificada</div>
+    </div>
+  </div>
+</section>
 </section>
 
 <!-- SECCIÓN BOMBILLAS -->
@@ -449,11 +519,29 @@ fbq('track', 'PageView');
     <button class="ftab" data-filter="calabaza" onclick="filterP('calabaza',this)">Calabaza</button>
     <button class="ftab" data-filter="bombillas" onclick="filterP('bombillas',this)">Bombillas</button>
   </div>
+  <div class="price-filter-row">
+    <span class="pfab-label">Precio:</span>
+    <button class="pfab active" data-price="todos" onclick="filterPrice('todos',this)">Todos</button>
+    <button class="pfab" data-price="0-30000" onclick="filterPrice('0-30000',this)">Hasta $30k</button>
+    <button class="pfab" data-price="30000-55000" onclick="filterPrice('30000-55000',this)">$30k – $55k</button>
+    <button class="pfab" data-price="55000-999999" onclick="filterPrice('55000-999999',this)">+$55k</button>
+  </div>
   <div class="catalog-grid" id="grid"><div class="loading">Cargando productos...</div></div>
 </section>
-<section id="precios">
-  <div class="section-header reveal"><div><div class="section-num" style="color:var(--warm)">02 — Precios</div><h2 class="section-title">Sin <em>sorpresas</em></h2></div></div>
-  <div class="price-grid" id="price-grid"><div class="loading" style="color:#888;grid-column:1/-1">Cargando...</div></div>
+
+
+<!-- GALERÍA -->
+<section id="galeria">
+  <div class="section-header reveal">
+    <div>
+      <div class="section-num">02 — Galería</div>
+      <h2 class="section-title">Cada mate, <em>una historia</em></h2>
+    </div>
+    <a href="https://www.instagram.com/oso_mates" target="_blank" style="font-size:.62rem;letter-spacing:.2em;text-transform:uppercase;color:var(--gray);text-decoration:none;display:flex;align-items:center;gap:1rem;">@oso_mates ↗</a>
+  </div>
+  <div class="gallery-grid" id="gallery-grid">
+    <div class="loading" style="grid-column:1/-1">Cargando galería...</div>
+  </div>
 </section>
 
 <!-- FAQ -->
@@ -709,30 +797,31 @@ function getImg(img){
 function fmt(n){return '$'+parseInt(n).toLocaleString('es-AR');}
 
 async function loadProducts(){
+  const cached=getCachedProducts();
+  if(cached){allProds=cached;renderGrid(allProds);loadGallery();return;}
   const {data,error}=await sb.from('productos').select('*').eq('activo',true).order('created_at');
   if(error){console.error(error);return;}
   allProds=data;
-  renderGrid('todos');
-  renderPrices();
+  setCachedProducts(data);
+  renderGrid(allProds);
+  loadGallery();
 }
 
-function renderGrid(f){
+function renderGrid(listOrFilter){
   const g=document.getElementById('grid');
-  const list=f==='todos'?allProds:allProds.filter(p=>p.categoria===f);
+  let list;
+  if(Array.isArray(listOrFilter)){list=listOrFilter;}
+  else{list=listOrFilter==='todos'?allProds:allProds.filter(p=>p.categoria===listOrFilter);}
   if(!list.length){g.innerHTML='<div class="loading">No hay productos</div>';return;}
-  g.innerHTML=list.map((p,i)=>`<div class="product-card"><div class="p-img-wrap" onclick="viewProduct('${p.id}')"><img src="${getImg(p.imagen)}" alt="${p.nombre}" class="p-img" loading="lazy" onerror="this.style.opacity='0'" crossorigin="anonymous"/></div><div class="p-body"><div class="p-num">N\u00b000${i+1}</div>${p.badge?`<div class="p-badge">${p.badge}</div>`:''}<div class="p-name" onclick="viewProduct('${p.id}')">${p.nombre}</div><div class="p-mat">${p.material}</div><div class="p-footer"><div><div class="p-price">${fmt(p.precio)}</div><div class="p-transfer">Transf. <strong>${fmt(p.precio_transferencia)}</strong> (\u221210%)</div></div><div class="p-btns"><button class="p-view-btn" onclick="viewProduct('${p.id}')">Ver</button><button class="p-add-btn" onclick="addToCart('${p.id}')">+ Agregar</button></div></div></div></div>`).join('');
+  g.innerHTML=list.map((p,i)=>{
+    const stockBadge=p.stock&&p.stock<=5?`<span class="stock-low">\u00daltimas ${p.stock}</span>`:'';
+    const shipBadge=p.precio>=100000?`<span class="free-ship">Env\u00edo gratis</span>`:'';
+    return `<div class="product-card"><div class="p-img-wrap" onclick="viewProduct('${p.id}')"><img src="${getImg(p.imagen)}" alt="${p.nombre}" class="p-img" loading="lazy" onload="this.closest('.p-img-wrap').classList.add('loaded')" crossorigin="anonymous"/></div><div class="p-body"><div class="p-num">N\u00b000${i+1}</div>${stockBadge}${shipBadge}${p.badge?`<div class="p-badge">${p.badge}</div>`:''}<div class="p-name" onclick="viewProduct('${p.id}')">${p.nombre}</div><div class="p-mat">${p.material}</div><div class="p-footer"><div><div class="p-price">${fmt(p.precio)}</div><div class="p-transfer">Transf. <strong>${fmt(p.precio_transferencia)}</strong> (\u221210%)</div></div><div class="p-btns"><button class="p-view-btn" onclick="viewProduct('${p.id}')">Ver</button><button class="p-add-btn" onclick="addToCart('${p.id}')">+ Agregar</button></div></div></div></div>`;
+  }).join('');
 }
 
-function renderPrices(){
-  const mates=allProds.filter(p=>p.categoria!=='bombillas');
-  if(!mates.length){document.getElementById('price-grid').innerHTML='';return;}
-  const sorted=[...mates].sort((a,b)=>a.precio-b.precio);
-  const picks=[sorted[0],sorted[Math.floor(sorted.length/2)],sorted[sorted.length-1]];
-  const labels=['Entrada','\u2014 M\u00e1s vendido \u2014','Premium'];
-  document.getElementById('price-grid').innerHTML=picks.map((p,i)=>`<div class="price-col ${i===1?'featured':''}"><span class="price-tag-label">${labels[i]}</span><div class="price-amount">${fmt(p.precio)}</div><span class="price-ars">Pesos argentinos</span><div class="price-name">${p.nombre}</div><div class="price-desc">${p.descripcion}</div><ul class="price-list"><li class="inc">Artesanal</li><li class="inc">Curado incluido</li><li class="inc">Env\u00edo a todo el pa\u00eds</li><li ${i>0?'class="inc"':''}>Bombilla artesanal</li></ul><button class="price-cta" onclick="addToCart('${p.id}');showToast('Agregado \ud83d\uded2')">Comprar</button></div>`).join('');
-}
 
-function filterP(f,btn){document.querySelectorAll('.ftab').forEach(t=>t.classList.remove('active'));btn.classList.add('active');renderGrid(f);}
+
 function viewProduct(id){window.location.href='producto.html?id='+id;}
 
 function addToCart(id){
@@ -822,6 +911,77 @@ document.querySelectorAll('.reveal').forEach(el=>obs.observe(el));
 
 loadCart();loadProducts();loadBestsellers();loadBombillas();updateCartUI();
 
+// ── CACHE de productos (10 min TTL) ──────────────────────────────────────────
+const CACHE_KEY='om_products';const CACHE_TTL=10*60*1000;
+function getCachedProducts(){
+  try{
+    const raw=localStorage.getItem(CACHE_KEY);
+    if(!raw)return null;
+    const {data,ts}=JSON.parse(raw);
+    if(Date.now()-ts>CACHE_TTL){localStorage.removeItem(CACHE_KEY);return null;}
+    return data;
+  }catch(e){return null;}
+}
+function setCachedProducts(data){
+  try{localStorage.setItem(CACHE_KEY,JSON.stringify({data,ts:Date.now()}));}catch(e){}
+}
+
+// ── FILTRO DE PRECIO ──────────────────────────────────────────────────────────
+let currentCatFilter='todos', currentPriceFilter='todos';
+function filterPrice(range,btn){
+  currentPriceFilter=range;
+  document.querySelectorAll('.pfab').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  applyFilters();
+}
+function filterP(f,btn){
+  currentCatFilter=f;
+  document.querySelectorAll('.ftab').forEach(t=>t.classList.remove('active'));
+  btn.classList.add('active');
+  applyFilters();
+}
+function applyFilters(){
+  const g=document.getElementById('grid');
+  let list=currentCatFilter==='todos'?allProds:allProds.filter(p=>p.categoria===currentCatFilter);
+  if(currentPriceFilter!=='todos'){
+    const [min,max]=currentPriceFilter.split('-').map(Number);
+    list=list.filter(p=>p.precio>=min&&p.precio<=max);
+  }
+  if(!list.length){g.innerHTML='<div class="loading">Sin productos en este rango</div>';return;}
+  renderGrid(list);
+}
+
+// ── GALERÍA ───────────────────────────────────────────────────────────────────
+function loadGallery(){
+  const grid=document.getElementById('gallery-grid');
+  if(!allProds.length){return;}
+  const items=allProds.filter(p=>p.imagen).slice(0,7);
+  if(!items.length){document.getElementById('galeria').style.display='none';return;}
+  grid.innerHTML=items.map(p=>`
+    <div class="gallery-item" onclick="viewProduct('${p.id}')">
+      <img src="${getImg(p.imagen)}" alt="${p.nombre}" loading="lazy"/>
+      <div class="gallery-item-overlay"><span class="gallery-item-name">${p.nombre}</span></div>
+    </div>
+  `).join('');
+}
+
+// ── EXIT INTENT ───────────────────────────────────────────────────────────────
+let exitShown=false;
+function closeExitPopup(){document.getElementById('exit-overlay').classList.remove('open');}
+function copyExitCode(){
+  navigator.clipboard.writeText('OSO10').then(()=>showToast('Código copiado ✓')).catch(()=>{});
+}
+document.addEventListener('mouseleave',function(e){
+  if(e.clientY<10&&!exitShown&&!sessionStorage.getItem('exitShown')){
+    exitShown=true;
+    sessionStorage.setItem('exitShown','1');
+    setTimeout(()=>document.getElementById('exit-overlay').classList.add('open'),200);
+  }
+});
+document.getElementById('exit-overlay').addEventListener('click',function(e){
+  if(e.target===this)closeExitPopup();
+});
+
 </script>
 
 <!-- WHATSAPP FLOTANTE -->
@@ -842,5 +1002,17 @@ loadCart();loadProducts();loadBestsellers();loadBombillas();updateCartUI();
 <script type="application/ld+json">
 {"@context":"https://schema.org","@type":"Store","name":"Oso Mates","description":"Mates artesanales tallados a mano en Mar del Plata. Algarrobo, calabaza, cuero. Envíos a todo el país.","url":"https://osomates8-sys.github.io/oso-mates/","telephone":"+542233061168","email":"osomates8@gmail.com","address":{"@type":"PostalAddress","addressLocality":"Mar del Plata","addressRegion":"Buenos Aires","addressCountry":"AR"},"sameAs":["https://www.instagram.com/oso_mates"],"priceRange":"$$","image":"https://osomates8-sys.github.io/oso-mates/imperial_algarrobo.jpg","currenciesAccepted":"ARS","paymentAccepted":"Cash, Credit Card, Transfer"}
 </script>
+<!-- POPUP SALIDA -->
+<div class="exit-overlay" id="exit-overlay">
+  <div class="exit-box">
+    <button class="exit-close" onclick="closeExitPopup()">&#x2715;</button>
+    <div class="exit-eyebrow">Antes de que te vayas</div>
+    <h3 class="exit-title">10% OFF<br/><em>en tu primer pedido</em></h3>
+    <p class="exit-desc">Usá este código al hacer tu pedido y recibí un descuento especial. Solo por tiempo limitado.</p>
+    <div class="exit-code" id="exit-code" onclick="copyExitCode()" title="Click para copiar">OSO10</div>
+    <button class="exit-cta" onclick="document.querySelector('#catalogo').scrollIntoView({behavior:'smooth'});closeExitPopup();">Ver colección ahora</button>
+    <span class="exit-skip" onclick="closeExitPopup()">No, gracias</span>
+  </div>
+</div>
 </body>
 </html>
