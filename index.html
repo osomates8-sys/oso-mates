@@ -100,9 +100,8 @@ section{padding:8rem 4rem}
 .p-view-btn:hover{background:var(--black);color:var(--white);}
 .p-add-btn{background:var(--black);color:var(--white);border:none;font-family:'Montserrat',sans-serif;font-size:.55rem;letter-spacing:.12em;text-transform:uppercase;padding:.5rem .9rem;cursor:pointer;transition:all .2s;}
 .p-add-btn:hover{background:var(--warm);}
-#nosotros{display:grid;grid-template-columns:5fr 7fr;padding:0;min-height:80vh;}
-.nos-left{background:var(--black);padding:6rem 4rem;display:flex;flex-direction:column;justify-content:space-between;}
-.nos-right{padding:6rem 4rem;display:flex;flex-direction:column;justify-content:center;}
+#nosotros{display:grid;grid-template-columns:1fr;padding:0;min-height:auto;}
+.nos-right{padding:6rem 4rem;display:flex;flex-direction:column;justify-content:center;max-width:900px;margin:0 auto;}
 .stat-big{font-family:'Cormorant Garamond',serif;font-size:4rem;font-weight:300;color:var(--white);line-height:1;margin-bottom:.4rem;}
 .stat-lab{font-size:.62rem;letter-spacing:.2em;text-transform:uppercase;color:var(--gray);margin-bottom:2rem;}
 .nos-tag{font-size:.6rem;letter-spacing:.25em;text-transform:uppercase;color:var(--gray);margin-bottom:2rem;display:flex;align-items:center;gap:1rem;}
@@ -226,7 +225,7 @@ footer{background:var(--black);padding:3rem 4rem;display:flex;justify-content:sp
   #hero{grid-template-columns:1fr;min-height:auto;}.hero-right{display:none;}.hero-left{padding:6rem 2rem 4rem;}
   section{padding:4rem 1.5rem;}
   .catalog-grid{grid-template-columns:1fr 1fr;}
-  #nosotros{grid-template-columns:1fr;min-height:auto;}.nos-left,.nos-right{padding:3rem 1.5rem;}
+  .nos-right{padding:3rem 1.5rem;}
   .contact-layout{grid-template-columns:1fr;gap:2rem;}
   .section-header{flex-direction:column;align-items:flex-start;gap:1rem;}
   .cart-sidebar{width:100%;}
@@ -553,57 +552,10 @@ fbq('track', 'PageView');
     </div>
   </div>
   <div class="faq-grid" id="faq-grid">
-    <div class="faq-item">
-      <div class="faq-question" onclick="toggleFaq(this)">
-        <span>¿Cuánto tarda en llegar el pedido?</span>
-        <span class="faq-icon">+</span>
-      </div>
-      <div class="faq-answer">Despachamos en 48 horas hábiles desde que confirmamos el pago. El tiempo de entrega depende de tu ubicación: CABA y GBA 2-3 días, interior del país 3-7 días hábiles. Te enviamos el número de seguimiento por email.</div>
-    </div>
-    <div class="faq-item">
-      <div class="faq-question" onclick="toggleFaq(this)">
-        <span>¿Los mates vienen curados?</span>
-        <span class="faq-icon">+</span>
-      </div>
-      <div class="faq-answer">Sí, todos nuestros mates vienen curados y listos para usar desde el primer día. Usamos aceite natural de lino para los de madera y el método tradicional con yerba para los de calabaza.</div>
-    </div>
-    <div class="faq-item">
-      <div class="faq-question" onclick="toggleFaq(this)">
-        <span>¿Cómo funciona el descuento por transferencia?</span>
-        <span class="faq-icon">+</span>
-      </div>
-      <div class="faq-answer">Al elegir el método de pago "Transferencia" en el checkout, el 10% de descuento se aplica automáticamente. Los datos bancarios (CBU del Banco Francés) aparecen en pantalla y te los enviamos por email.</div>
-    </div>
-    <div class="faq-item">
-      <div class="faq-question" onclick="toggleFaq(this)">
-        <span>¿Puedo pedir un mate personalizado?</span>
-        <span class="faq-icon">+</span>
-      </div>
-      <div class="faq-answer">¡Sí! Hacemos grabados personalizados con nombres, fechas o diseños. Escribinos por WhatsApp para consultar opciones y presupuesto. El tiempo de producción es de 5 a 7 días hábiles.</div>
-    </div>
-    <div class="faq-item">
-      <div class="faq-question" onclick="toggleFaq(this)">
-        <span>¿Qué hago si el producto llega dañado?</span>
-        <span class="faq-icon">+</span>
-      </div>
-      <div class="faq-answer">Todos nuestros envíos tienen seguro. Si el producto llega dañado, escribinos por WhatsApp con una foto en las primeras 48hs y lo reponemos sin costo.</div>
-    </div>
-    <div class="faq-item">
-      <div class="faq-question" onclick="toggleFaq(this)">
-        <span>¿Tienen local físico?</span>
-        <span class="faq-icon">+</span>
-      </div>
-      <div class="faq-answer">Somos un emprendimiento online con taller en Mar del Plata. Por el momento no tenemos local físico, pero podés coordinar retiro en mano si estás en MDP escribiéndonos por WhatsApp.</div>
-    </div>
+    <div class="loading">Cargando...</div>
   </div>
 </section>
 <section id="nosotros" style="padding:0">
-  <div class="nos-left">
-    <div><div class="stat-lab" style="color:#444;margin-bottom:.5rem">Desde</div><div class="stat-big">2016</div></div>
-    <div><div class="stat-big">+200</div><div class="stat-lab">Clientes</div></div>
-    <div><div class="stat-big">100%</div><div class="stat-lab">Artesanal</div></div>
-    <div><div class="stat-big">&#x221E;</div><div class="stat-lab">Piezas únicas</div></div>
-  </div>
   <div class="nos-right reveal">
     <div class="nos-tag">04 — Nosotros</div>
     <h2 class="nos-title">Un oficio que<br/><em>se hereda</em></h2>
@@ -780,6 +732,33 @@ function trackPurchase(total) {
 
 function toggleFaq(el){var item=el.parentElement;var isOpen=item.classList.contains('open');document.querySelectorAll('.faq-item').forEach(function(i){i.classList.remove('open');});if(!isOpen)item.classList.add('open');}
 
+// ── FAQ: editable desde Admin → Pagina → Preguntas frecuentes ────────────────
+const DEFAULT_FAQ=[
+  {q:'¿Cuánto tarda en llegar el pedido?',a:'Despachamos en 48 horas hábiles desde que confirmamos el pago. El tiempo de entrega depende de tu ubicación: CABA y GBA 2-3 días, interior del país 3-7 días hábiles. Te enviamos el número de seguimiento por email.'},
+  {q:'¿Los mates vienen curados?',a:'Sí, todos nuestros mates vienen curados y listos para usar desde el primer día. Usamos aceite natural de lino para los de madera y el método tradicional con yerba para los de calabaza.'},
+  {q:'¿Cómo funciona el descuento por transferencia?',a:'Al elegir el método de pago "Transferencia" en el checkout, el 10% de descuento se aplica automáticamente. Los datos bancarios (CBU del Banco Francés) aparecen en pantalla y te los enviamos por email.'},
+  {q:'¿Puedo pedir un mate personalizado?',a:'¡Sí! Hacemos grabados personalizados con nombres, fechas o diseños. Escribinos por WhatsApp para consultar opciones y presupuesto. El tiempo de producción es de 5 a 7 días hábiles.'},
+  {q:'¿Qué hago si el producto llega dañado?',a:'Todos nuestros envíos tienen seguro. Si el producto llega dañado, escribinos por WhatsApp con una foto en las primeras 48hs y lo reponemos sin costo.'},
+  {q:'¿Tienen local físico?',a:'Somos un emprendimiento online con taller en Mar del Plata. Por el momento no tenemos local físico, pero podés coordinar retiro en mano si estás en MDP escribiéndonos por WhatsApp.'}
+];
+async function loadFaq(){
+  const grid=document.getElementById('faq-grid');
+  let items=DEFAULT_FAQ;
+  try{
+    const {data}=await sb.from('config').select('*').eq('clave','faq_items').limit(1);
+    if(data&&data[0]&&data[0].valor){
+      const parsed=JSON.parse(data[0].valor);
+      if(Array.isArray(parsed)&&parsed.length)items=parsed;
+    }
+  }catch(e){}
+  grid.innerHTML=items.map(function(item){
+    return '<div class="faq-item">'+
+      '<div class="faq-question" onclick="toggleFaq(this)"><span>'+item.q+'</span><span class="faq-icon">+</span></div>'+
+      '<div class="faq-answer">'+item.a+'</div>'+
+    '</div>';
+  }).join('');
+}
+
 const cur=document.getElementById('cur'),ring=document.getElementById('curRing');
 let mx=0,my=0,rx=0,ry=0;
 document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;cur.style.left=mx+'px';cur.style.top=my+'px';});
@@ -909,7 +888,7 @@ function showToast(msg){const t=document.getElementById('toast');t.textContent=m
 const obs=new IntersectionObserver(entries=>{entries.forEach((e,i)=>{if(e.isIntersecting)setTimeout(()=>e.target.classList.add('in'),i*80);});},{threshold:.1});
 document.querySelectorAll('.reveal').forEach(el=>obs.observe(el));
 
-loadCart();loadProducts();loadBestsellers();loadBombillas();updateCartUI();
+loadCart();loadProducts();loadBestsellers();loadBombillas();loadFaq();updateCartUI();
 
 // ── CACHE de productos (10 min TTL) ──────────────────────────────────────────
 const CACHE_KEY='om_products';const CACHE_TTL=10*60*1000;
