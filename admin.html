@@ -109,8 +109,11 @@ body{font-family:Montserrat,sans-serif;background:#f0f0ee;color:#0a0a0a;}
 .faq-add-btn{background:none;border:1px dashed #ccc;padding:.6rem 1.2rem;font-size:.65rem;letter-spacing:.15em;text-transform:uppercase;cursor:pointer;color:#888;margin-bottom:1rem;width:100%;}
 .faq-add-btn:hover{border-color:#0a0a0a;color:#0a0a0a;}
 .selected-img-thumb{position:relative;width:60px;}
-.selected-img-thumb img{width:60px;height:60px;object-fit:cover;}
+.selected-img-thumb img{width:60px;height:60px;object-fit:cover;display:block;}
 .selected-img-thumb button{position:absolute;top:0;right:0;background:#e74c3c;color:white;border:none;width:16px;height:16px;font-size:.6rem;cursor:pointer;}
+.selected-img-thumb.is-main img{outline:2px solid #2a9d5c;outline-offset:-2px;}
+.set-main-btn{position:absolute;bottom:0;left:0;right:0;background:rgba(10,10,10,.7);color:#fff;border:none;font-size:.5rem;letter-spacing:.05em;text-transform:uppercase;padding:2px 0;cursor:pointer;}
+.set-main-btn.active{background:#2a9d5c;}
 </style>
 </head>
 <body>
@@ -447,9 +450,15 @@ body{font-family:Montserrat,sans-serif;background:#f0f0ee;color:#0a0a0a;}
           if (idx > -1) {
             selectedImages.splice(idx, 1);
             this.classList.remove('selected');
+            if (document.getElementById('f-img').value === name) {
+              document.getElementById('f-img').value = selectedImages[0] || '';
+            }
           } else {
             selectedImages.push(name);
             this.classList.add('selected');
+            if (!document.getElementById('f-img').value) {
+              document.getElementById('f-img').value = name;
+            }
           }
           renderSelectedImgs();
         });
@@ -460,19 +469,32 @@ body{font-family:Montserrat,sans-serif;background:#f0f0ee;color:#0a0a0a;}
   function renderSelectedImgs() {
     var preview = document.getElementById('selected-imgs-preview');
     if (!preview) return;
+    var mainImg = document.getElementById('f-img').value;
     preview.innerHTML = selectedImages.map(function(name, i) {
       var url = 'https://dkyfaeqcbeyhibqjztwa.supabase.co/storage/v1/object/public/imagenes/' + name;
-      return '<div class="selected-img-thumb">' +
+      var isMain = name === mainImg;
+      return '<div class="selected-img-thumb' + (isMain?' is-main':'') + '">' +
         '<img src="' + url + '" alt="' + name + '"/>' +
-        '<button data-idx="' + i + '">x</button>' +
+        '<button class="del-img-btn" data-idx="' + i + '">x</button>' +
+        '<button class="set-main-btn' + (isMain?' active':'') + '" data-name="' + name + '">' + (isMain?'Principal':'Usar') + '</button>' +
         '</div>';
     }).join('');
-    preview.querySelectorAll('button').forEach(function(btn) {
+    preview.querySelectorAll('.del-img-btn').forEach(function(btn) {
       btn.addEventListener('click', function() {
         var idx = parseInt(this.dataset.idx);
+        var removed = selectedImages[idx];
         selectedImages.splice(idx, 1);
+        if (document.getElementById('f-img').value === removed) {
+          document.getElementById('f-img').value = selectedImages[0] || '';
+        }
         renderSelectedImgs();
         loadImageSelector();
+      });
+    });
+    preview.querySelectorAll('.set-main-btn').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        document.getElementById('f-img').value = this.dataset.name;
+        renderSelectedImgs();
       });
     });
   }
@@ -760,7 +782,7 @@ body{font-family:Montserrat,sans-serif;background:#f0f0ee;color:#0a0a0a;}
 
   function saveProduct() {
     var id = document.getElementById('f-id').value;
-    var imgVal = document.getElementById('f-img').value;
+    var imgVal = document.getElementById('f-img').value || (selectedImages[0] || '');
     var data = {
       nombre: document.getElementById('f-nombre').value,
       material: document.getElementById('f-material').value,
