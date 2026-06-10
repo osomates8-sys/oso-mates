@@ -476,22 +476,8 @@ fbq('track', 'PageView');
       <h2 class="section-title">Lo que dicen <em>nuestros clientes</em></h2>
     </div>
   </div>
-  <div class="testimonios-grid">
-    <div class="review-card reveal">
-      <div class="review-stars">★★★★★</div>
-      <div class="review-text">"Compré el Imperial Algarrobo y es una joya. La madera tiene una textura increíble, se nota que es tallado a mano. Llegó perfectamente embalado y curado."</div>
-      <div class="review-author"><strong>Martina G.</strong>Buenos Aires · Compra verificada</div>
-    </div>
-    <div class="review-card reveal">
-      <div class="review-stars">★★★★★</div>
-      <div class="review-text">"Pedí uno para regalar y quedaron fascinados. La calidad es impresionante para el precio. La bombilla artesanal también es hermosa. 100% lo recomiendo."</div>
-      <div class="review-author"><strong>Federico R.</strong>Rosario · Compra verificada</div>
-    </div>
-    <div class="review-card reveal">
-      <div class="review-stars">★★★★★</div>
-      <div class="review-text">"Llevo 3 meses usándolo todos los días y está perfecto. El curado viene impecable. Además la atención fue excelente, me respondieron rápido por WhatsApp."</div>
-      <div class="review-author"><strong>Lucía P.</strong>Córdoba · Compra verificada</div>
-    </div>
+  <div class="testimonios-grid" id="testimonios-grid">
+    <div class="loading">Cargando...</div>
   </div>
 </section>
 </section>
@@ -518,12 +504,9 @@ fbq('track', 'PageView');
     <button class="ftab" data-filter="calabaza" onclick="filterP('calabaza',this)">Calabaza</button>
     <button class="ftab" data-filter="bombillas" onclick="filterP('bombillas',this)">Bombillas</button>
   </div>
-  <div class="price-filter-row">
+  <div class="price-filter-row" id="price-filter-row">
     <span class="pfab-label">Precio:</span>
     <button class="pfab active" data-price="todos" onclick="filterPrice('todos',this)">Todos</button>
-    <button class="pfab" data-price="0-30000" onclick="filterPrice('0-30000',this)">Hasta $30k</button>
-    <button class="pfab" data-price="30000-55000" onclick="filterPrice('30000-55000',this)">$30k – $55k</button>
-    <button class="pfab" data-price="55000-999999" onclick="filterPrice('55000-999999',this)">+$55k</button>
   </div>
   <div class="catalog-grid" id="grid"><div class="loading">Cargando productos...</div></div>
 </section>
@@ -724,6 +707,58 @@ function trackPurchase(total) {
 }
 
 function toggleFaq(el){var item=el.parentElement;var isOpen=item.classList.contains('open');document.querySelectorAll('.faq-item').forEach(function(i){i.classList.remove('open');});if(!isOpen)item.classList.add('open');}
+
+// ── Testimonios: editable desde Admin → Pagina → Testimonios de clientes ─────
+const DEFAULT_TESTIMONIOS=[
+  {stars:5,text:'Compré el Imperial Algarrobo y es una joya. La madera tiene una textura increíble, se nota que es tallado a mano. Llegó perfectamente embalado y curado.',author:'Martina G.',location:'Buenos Aires'},
+  {stars:5,text:'Pedí uno para regalar y quedaron fascinados. La calidad es impresionante para el precio. La bombilla artesanal también es hermosa. 100% lo recomiendo.',author:'Federico R.',location:'Rosario'},
+  {stars:5,text:'Llevo 3 meses usándolo todos los días y está perfecto. El curado viene impecable. Además la atención fue excelente, me respondieron rápido por WhatsApp.',author:'Lucía P.',location:'Córdoba'}
+];
+async function loadTestimonios(){
+  const grid=document.getElementById('testimonios-grid');
+  let items=DEFAULT_TESTIMONIOS;
+  try{
+    const {data}=await sb.from('config').select('*').eq('clave','testimonios').limit(1);
+    if(data&&data[0]&&data[0].valor){
+      const parsed=JSON.parse(data[0].valor);
+      if(Array.isArray(parsed)&&parsed.length)items=parsed;
+    }
+  }catch(e){}
+  grid.innerHTML=items.map(function(item){
+    const stars='★★★★★'.slice(0,item.stars||5);
+    return '<div class="review-card reveal">'+
+      '<div class="review-stars">'+stars+'</div>'+
+      '<div class="review-text">"'+item.text+'"</div>'+
+      '<div class="review-author"><strong>'+item.author+'</strong>'+item.location+' · Compra verificada</div>'+
+    '</div>';
+  }).join('');
+  grid.querySelectorAll('.reveal').forEach(function(el){
+    if(typeof obs!=='undefined')obs.observe(el);
+    else el.classList.add('in');
+  });
+}
+
+// ── Filtro de precio: editable desde Admin → Pagina → Filtros de precio ──────
+const DEFAULT_PRICE_FILTERS=[
+  {label:'Hasta $30k',min:0,max:30000},
+  {label:'$30k – $55k',min:30000,max:55000},
+  {label:'+$55k',min:55000,max:999999}
+];
+async function loadPriceFilters(){
+  const row=document.getElementById('price-filter-row');
+  let items=DEFAULT_PRICE_FILTERS;
+  try{
+    const {data}=await sb.from('config').select('*').eq('clave','price_filters').limit(1);
+    if(data&&data[0]&&data[0].valor){
+      const parsed=JSON.parse(data[0].valor);
+      if(Array.isArray(parsed)&&parsed.length)items=parsed;
+    }
+  }catch(e){}
+  const html=items.map(function(it){
+    return '<button class="pfab" data-price="'+it.min+'-'+it.max+'" onclick="filterPrice(\''+it.min+'-'+it.max+'\',this)">'+it.label+'</button>';
+  }).join('');
+  row.insertAdjacentHTML('beforeend',html);
+}
 
 // ── Hero y banner: editable desde Admin → Pagina ──────────────────────────────
 async function loadHeroBanner(){
@@ -934,7 +969,7 @@ function showToast(msg){const t=document.getElementById('toast');t.textContent=m
 const obs=new IntersectionObserver(entries=>{entries.forEach((e,i)=>{if(e.isIntersecting)setTimeout(()=>e.target.classList.add('in'),i*80);});},{threshold:.1});
 document.querySelectorAll('.reveal').forEach(el=>obs.observe(el));
 
-loadCart();loadProducts();loadBestsellers();loadBombillas();loadFaq();loadNosotros();loadHeroBanner();updateCartUI();
+loadCart();loadProducts();loadBestsellers();loadBombillas();loadFaq();loadNosotros();loadHeroBanner();loadTestimonios();loadPriceFilters();updateCartUI();
 
 // ── CACHE de productos (10 min TTL) ──────────────────────────────────────────
 const CACHE_KEY='om_products';const CACHE_TTL=10*60*1000;

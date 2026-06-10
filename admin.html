@@ -106,6 +106,13 @@ body{font-family:Montserrat,sans-serif;background:#f0f0ee;color:#0a0a0a;}
 .nos-value-edit-item .fl{margin-top:.6rem;}
 .nos-value-edit-item .fl:first-child{margin-top:0;}
 .nos-value-row{display:grid;grid-template-columns:80px 1fr;gap:.8rem;}
+.testi-edit-item{border:1px solid #ebebeb;padding:1rem;margin-bottom:.8rem;position:relative;}
+.testi-edit-item .fl{margin-top:.6rem;}
+.testi-edit-item .fl:first-child{margin-top:0;}
+.testi-row{display:grid;grid-template-columns:1fr 100px;gap:.8rem;}
+.pricef-edit-item{border:1px solid #ebebeb;padding:1rem;margin-bottom:.8rem;position:relative;}
+.pricef-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:.8rem;}
+.pricef-row .fl{margin-top:0;}
 .faq-add-btn{background:none;border:1px dashed #ccc;padding:.6rem 1.2rem;font-size:.65rem;letter-spacing:.15em;text-transform:uppercase;cursor:pointer;color:#888;margin-bottom:1rem;width:100%;}
 .faq-add-btn:hover{border-color:#0a0a0a;color:#0a0a0a;}
 .selected-img-thumb{position:relative;width:60px;}
@@ -214,6 +221,19 @@ body{font-family:Montserrat,sans-serif;background:#f0f0ee;color:#0a0a0a;}
         <button class="save-page-btn" id="save-nosotros-btn">Guardar nosotros</button>
       </div>
       <div class="page-section">
+        <div class="page-section-title">Testimonios de clientes</div>
+        <div id="testi-editor"></div>
+        <button class="faq-add-btn" id="testi-add-btn">+ Agregar testimonio</button>
+        <button class="save-page-btn" id="save-testi-btn">Guardar testimonios</button>
+      </div>
+      <div class="page-section">
+        <div class="page-section-title">Filtros de precio (catalogo)</div>
+        <p style="font-size:.62rem;color:#888;margin-bottom:.8rem">Estos botones aparecen junto al catalogo para filtrar productos por rango de precio.</p>
+        <div id="pricef-editor"></div>
+        <button class="faq-add-btn" id="pricef-add-btn">+ Agregar rango</button>
+        <button class="save-page-btn" id="save-pricef-btn">Guardar filtros de precio</button>
+      </div>
+      <div class="page-section">
         <div class="page-section-title">Preguntas frecuentes</div>
         <div id="faq-editor"></div>
         <button class="faq-add-btn" id="faq-add-btn">+ Agregar pregunta</button>
@@ -297,12 +317,24 @@ body{font-family:Montserrat,sans-serif;background:#f0f0ee;color:#0a0a0a;}
       {icon:'\ud83d\udcac', name:'Atenci\u00f3n real', desc:'Respondemos el mismo d\u00eda'}
     ]
   };
+  var DEFAULT_TESTIMONIOS = [
+    {stars:5, text:'Compr\u00e9 el Imperial Algarrobo y es una joya. La madera tiene una textura incre\u00edble, se nota que es tallado a mano. Lleg\u00f3 perfectamente embalado y curado.', author:'Martina G.', location:'Buenos Aires'},
+    {stars:5, text:'Ped\u00ed uno para regalar y quedaron fascinados. La calidad es impresionante para el precio. La bombilla artesanal tambi\u00e9n es hermosa. 100% lo recomiendo.', author:'Federico R.', location:'Rosario'},
+    {stars:5, text:'Llevo 3 meses usandolo todos los dias y esta perfecto. El curado viene impecable. Adem\u00e1s la atenci\u00f3n fue excelente, me respondieron r\u00e1pido por WhatsApp.', author:'Luc\u00eda P.', location:'C\u00f3rdoba'}
+  ];
+  var DEFAULT_PRICE_FILTERS = [
+    {label:'Hasta $30k', min:0, max:30000},
+    {label:'$30k \u2013 $55k', min:30000, max:55000},
+    {label:'+$55k', min:55000, max:999999}
+  ];
   var prodCache = [];
   var filesToUpload = [];
   var selectedImages = [];
   var selectedGalleryImages = [];
   var faqItems = [];
   var nosotrosData = null;
+  var testiItems = [];
+  var pricefItems = [];
   var sbClient = supabase.createClient('https://dkyfaeqcbeyhibqjztwa.supabase.co', 'sb_publishable_zzsZ-7Upi-SAUD78wx0CJQ_skroMzF4');
 
   function fmt(n) { return '$' + parseInt(n).toLocaleString('es-AR'); }
@@ -587,11 +619,27 @@ body{font-family:Montserrat,sans-serif;background:#f0f0ee;color:#0a0a0a;}
             if (parsedN && parsedN.title1) nosotrosData = parsedN;
           } catch(e) {}
         }
+        if (item.clave === 'testimonios') {
+          try {
+            var parsedT = JSON.parse(item.valor);
+            if (Array.isArray(parsedT) && parsedT.length) testiItems = parsedT;
+          } catch(e) {}
+        }
+        if (item.clave === 'price_filters') {
+          try {
+            var parsedPf = JSON.parse(item.valor);
+            if (Array.isArray(parsedPf) && parsedPf.length) pricefItems = parsedPf;
+          } catch(e) {}
+        }
       });
       if (!faqLoaded) faqItems = JSON.parse(JSON.stringify(DEFAULT_FAQ));
       if (!nosotrosData) nosotrosData = JSON.parse(JSON.stringify(DEFAULT_NOSOTROS));
+      if (!testiItems.length) testiItems = JSON.parse(JSON.stringify(DEFAULT_TESTIMONIOS));
+      if (!pricefItems.length) pricefItems = JSON.parse(JSON.stringify(DEFAULT_PRICE_FILTERS));
       renderFaqEditor();
       renderNosotrosEditor();
+      renderTestiEditor();
+      renderPricefEditor();
       loadGalleryImageSelector();
     });
   }
@@ -623,6 +671,68 @@ body{font-family:Montserrat,sans-serif;background:#f0f0ee;color:#0a0a0a;}
     container.querySelectorAll('.nos-v-desc').forEach(function(inp) {
       inp.addEventListener('input', function() {
         nosotrosData.values[parseInt(this.dataset.idx, 10)].desc = this.value;
+      });
+    });
+  }
+
+  function renderTestiEditor() {
+    var container = document.getElementById('testi-editor');
+    container.innerHTML = testiItems.map(function(item, i) {
+      return '<div class="testi-edit-item" data-idx="' + i + '">' +
+        '<button class="faq-edit-del testi-del" data-idx="' + i + '">x</button>' +
+        '<div class="testi-row">' +
+        '<div class="fg"><label class="fl">Autor</label><input class="fi testi-author" data-idx="' + i + '" value="' + (item.author || '').replace(/"/g, '&quot;') + '"/></div>' +
+        '<div class="fg"><label class="fl">Estrellas (1-5)</label><input class="fi testi-stars" type="number" min="1" max="5" data-idx="' + i + '" value="' + (item.stars || 5) + '"/></div>' +
+        '</div>' +
+        '<label class="fl">Ciudad</label><input class="fi testi-location" data-idx="' + i + '" value="' + (item.location || '').replace(/"/g, '&quot;') + '"/>' +
+        '<label class="fl">Comentario</label><textarea class="fi-textarea testi-text" data-idx="' + i + '">' + (item.text || '') + '</textarea>' +
+        '</div>';
+    }).join('');
+    container.querySelectorAll('.testi-author').forEach(function(inp) {
+      inp.addEventListener('input', function() { testiItems[parseInt(this.dataset.idx, 10)].author = this.value; });
+    });
+    container.querySelectorAll('.testi-location').forEach(function(inp) {
+      inp.addEventListener('input', function() { testiItems[parseInt(this.dataset.idx, 10)].location = this.value; });
+    });
+    container.querySelectorAll('.testi-stars').forEach(function(inp) {
+      inp.addEventListener('input', function() { testiItems[parseInt(this.dataset.idx, 10)].stars = parseInt(this.value, 10) || 5; });
+    });
+    container.querySelectorAll('.testi-text').forEach(function(inp) {
+      inp.addEventListener('input', function() { testiItems[parseInt(this.dataset.idx, 10)].text = this.value; });
+    });
+    container.querySelectorAll('.testi-del').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        testiItems.splice(parseInt(this.dataset.idx, 10), 1);
+        renderTestiEditor();
+      });
+    });
+  }
+
+  function renderPricefEditor() {
+    var container = document.getElementById('pricef-editor');
+    container.innerHTML = pricefItems.map(function(item, i) {
+      return '<div class="pricef-edit-item" data-idx="' + i + '">' +
+        '<button class="faq-edit-del pricef-del" data-idx="' + i + '">x</button>' +
+        '<div class="pricef-row">' +
+        '<div class="fg"><label class="fl">Etiqueta</label><input class="fi pricef-label" data-idx="' + i + '" value="' + (item.label || '').replace(/"/g, '&quot;') + '"/></div>' +
+        '<div class="fg"><label class="fl">Desde ($)</label><input class="fi pricef-min" type="number" data-idx="' + i + '" value="' + (item.min || 0) + '"/></div>' +
+        '<div class="fg"><label class="fl">Hasta ($)</label><input class="fi pricef-max" type="number" data-idx="' + i + '" value="' + (item.max || 0) + '"/></div>' +
+        '</div>' +
+        '</div>';
+    }).join('');
+    container.querySelectorAll('.pricef-label').forEach(function(inp) {
+      inp.addEventListener('input', function() { pricefItems[parseInt(this.dataset.idx, 10)].label = this.value; });
+    });
+    container.querySelectorAll('.pricef-min').forEach(function(inp) {
+      inp.addEventListener('input', function() { pricefItems[parseInt(this.dataset.idx, 10)].min = parseInt(this.value, 10) || 0; });
+    });
+    container.querySelectorAll('.pricef-max').forEach(function(inp) {
+      inp.addEventListener('input', function() { pricefItems[parseInt(this.dataset.idx, 10)].max = parseInt(this.value, 10) || 0; });
+    });
+    container.querySelectorAll('.pricef-del').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        pricefItems.splice(parseInt(this.dataset.idx, 10), 1);
+        renderPricefEditor();
       });
     });
   }
@@ -743,6 +853,24 @@ body{font-family:Montserrat,sans-serif;background:#f0f0ee;color:#0a0a0a;}
     var clean = faqItems.filter(function(it) { return (it.q || '').trim() && (it.a || '').trim(); });
     saveSetting('faq_items', JSON.stringify(clean));
     showToast('FAQ guardada');
+  });
+  document.getElementById('testi-add-btn').addEventListener('click', function() {
+    testiItems.push({stars: 5, text: '', author: '', location: ''});
+    renderTestiEditor();
+  });
+  document.getElementById('save-testi-btn').addEventListener('click', function() {
+    var clean = testiItems.filter(function(it) { return (it.text || '').trim() && (it.author || '').trim(); });
+    saveSetting('testimonios', JSON.stringify(clean));
+    showToast('Testimonios guardados');
+  });
+  document.getElementById('pricef-add-btn').addEventListener('click', function() {
+    pricefItems.push({label: '', min: 0, max: 0});
+    renderPricefEditor();
+  });
+  document.getElementById('save-pricef-btn').addEventListener('click', function() {
+    var clean = pricefItems.filter(function(it) { return (it.label || '').trim(); });
+    saveSetting('price_filters', JSON.stringify(clean));
+    showToast('Filtros de precio guardados');
   });
 
   function openEdit(idx) {
