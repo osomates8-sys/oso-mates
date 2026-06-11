@@ -121,6 +121,12 @@ body{font-family:Montserrat,sans-serif;background:#f0f0ee;color:#0a0a0a;}
 .selected-img-thumb.is-main img{outline:2px solid #2a9d5c;outline-offset:-2px;}
 .set-main-btn{position:absolute;bottom:0;left:0;right:0;background:rgba(10,10,10,.7);color:#fff;border:none;font-size:.5rem;letter-spacing:.05em;text-transform:uppercase;padding:2px 0;cursor:pointer;}
 .set-main-btn.active{background:#2a9d5c;}
+.imgpos-grid{display:grid;grid-template-columns:repeat(3,28px);grid-template-rows:repeat(3,28px);gap:4px;}
+.imgpos-btn{border:1px solid #ccc;background:#fff;cursor:pointer;padding:0;}
+.imgpos-btn:hover{border-color:#0a0a0a;}
+.imgpos-btn.active{background:#0a0a0a;border-color:#0a0a0a;}
+.imgpos-preview{width:160px;height:110px;overflow:hidden;background:#ebebeb;flex-shrink:0;}
+.imgpos-preview img{width:100%;height:100%;object-fit:cover;display:block;}
 </style>
 </head>
 <body>
@@ -271,8 +277,16 @@ body{font-family:Montserrat,sans-serif;background:#f0f0ee;color:#0a0a0a;}
       <div class="fg"><label class="fl">Link Mercado Pago</label><input class="fi" id="f-mp"/></div>
       <div class="fg">
         <label class="fl">Imagen principal</label>
-        <input class="fi" id="f-img" placeholder="camionero.jpg"/>
+        <input class="fi" id="f-img" placeholder="camionero.jpg" oninput="currentImgPos='center';renderImgPosPicker();"/>
         <p style="font-size:.62rem;color:#888;margin-top:.4rem">Nombre de la imagen principal</p>
+        <div class="imgpos-wrap" id="imgpos-wrap" style="display:none;margin-top:.8rem;">
+          <label class="fl">Encuadre de la portada</label>
+          <div style="display:flex;gap:1rem;align-items:flex-start;flex-wrap:wrap;margin-top:.4rem;">
+            <div class="imgpos-grid" id="imgpos-grid"></div>
+            <div class="imgpos-preview"><img id="imgpos-preview-img" alt="vista previa"/></div>
+          </div>
+          <p style="font-size:.62rem;color:#888;margin-top:.4rem">Elegí qué parte de la foto se ve en la tarjeta del producto.</p>
+        </div>
       </div>
       <div class="fg">
         <label class="fl">Galeria de imagenes (selecciona varias)</label>
@@ -330,6 +344,8 @@ body{font-family:Montserrat,sans-serif;background:#f0f0ee;color:#0a0a0a;}
   var prodCache = [];
   var filesToUpload = [];
   var selectedImages = [];
+  var currentImgPos = 'center';
+  var IMGPOS_OPTIONS = ['left top','top','right top','left','center','right','left bottom','bottom','right bottom'];
   var selectedGalleryImages = [];
   var faqItems = [];
   var nosotrosData = null;
@@ -462,6 +478,38 @@ body{font-family:Montserrat,sans-serif;background:#f0f0ee;color:#0a0a0a;}
   }
 
 
+  function parseImgVal(v) {
+    if (!v) return {file:'', pos:'center'};
+    var idx = v.indexOf('|');
+    if (idx === -1) return {file:v, pos:'center'};
+    return {file:v.slice(0,idx), pos:v.slice(idx+1) || 'center'};
+  }
+  function buildImgVal(file, pos) {
+    if (!file) return '';
+    if (!pos || pos === 'center') return file;
+    return file + '|' + pos;
+  }
+  function renderImgPosPicker() {
+    var wrap = document.getElementById('imgpos-wrap');
+    var fname = document.getElementById('f-img').value;
+    if (!fname) { wrap.style.display = 'none'; return; }
+    wrap.style.display = 'block';
+    var grid = document.getElementById('imgpos-grid');
+    grid.innerHTML = IMGPOS_OPTIONS.map(function(pos) {
+      return '<button type="button" class="imgpos-btn' + (pos === currentImgPos ? ' active' : '') + '" data-pos="' + pos + '"></button>';
+    }).join('');
+    grid.querySelectorAll('.imgpos-btn').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        currentImgPos = this.dataset.pos;
+        renderImgPosPicker();
+      });
+    });
+    var url = 'https://dkyfaeqcbeyhibqjztwa.supabase.co/storage/v1/object/public/imagenes/' + fname;
+    var img = document.getElementById('imgpos-preview-img');
+    img.src = url;
+    img.style.objectPosition = currentImgPos;
+  }
+
   function loadImageSelector() {
     sbClient.storage.from('imagenes').list('', {limit:100}).then(function(res) {
       var grid = document.getElementById('img-selector-grid');
@@ -484,15 +532,18 @@ body{font-family:Montserrat,sans-serif;background:#f0f0ee;color:#0a0a0a;}
             this.classList.remove('selected');
             if (document.getElementById('f-img').value === name) {
               document.getElementById('f-img').value = selectedImages[0] || '';
+              currentImgPos = 'center';
             }
           } else {
             selectedImages.push(name);
             this.classList.add('selected');
             if (!document.getElementById('f-img').value) {
               document.getElementById('f-img').value = name;
+              currentImgPos = 'center';
             }
           }
           renderSelectedImgs();
+          renderImgPosPicker();
         });
       });
     });
@@ -518,15 +569,21 @@ body{font-family:Montserrat,sans-serif;background:#f0f0ee;color:#0a0a0a;}
         selectedImages.splice(idx, 1);
         if (document.getElementById('f-img').value === removed) {
           document.getElementById('f-img').value = selectedImages[0] || '';
+          currentImgPos = 'center';
         }
         renderSelectedImgs();
+        renderImgPosPicker();
         loadImageSelector();
       });
     });
     preview.querySelectorAll('.set-main-btn').forEach(function(btn) {
       btn.addEventListener('click', function() {
+        if (document.getElementById('f-img').value !== this.dataset.name) {
+          currentImgPos = 'center';
+        }
         document.getElementById('f-img').value = this.dataset.name;
         renderSelectedImgs();
+        renderImgPosPicker();
       });
     });
   }
@@ -884,11 +941,14 @@ body{font-family:Montserrat,sans-serif;background:#f0f0ee;color:#0a0a0a;}
     document.getElementById('f-precio').value = p.precio || '';
     document.getElementById('f-transf').value = p.precio_transferencia || '';
     document.getElementById('f-mp').value = p.link_mp || '';
-    document.getElementById('f-img').value = p.imagen || '';
+    var imgParsed = parseImgVal(p.imagen || '');
+    document.getElementById('f-img').value = imgParsed.file;
+    currentImgPos = imgParsed.pos;
     document.getElementById('f-cat').value = p.categoria || 'madera';
     document.getElementById('f-badge').value = p.badge || '';
     selectedImages = p.imagenes || [];
     renderSelectedImgs();
+    renderImgPosPicker();
     loadImageSelector();
     document.getElementById('prod-modal').classList.add('open');
   }
@@ -901,7 +961,9 @@ body{font-family:Montserrat,sans-serif;background:#f0f0ee;color:#0a0a0a;}
     document.getElementById('f-transf').value = '';
     document.getElementById('f-cat').value = 'madera';
     selectedImages = [];
+    currentImgPos = 'center';
     renderSelectedImgs();
+    renderImgPosPicker();
     loadImageSelector();
     document.getElementById('prod-modal').classList.add('open');
   }
@@ -911,6 +973,7 @@ body{font-family:Montserrat,sans-serif;background:#f0f0ee;color:#0a0a0a;}
   function saveProduct() {
     var id = document.getElementById('f-id').value;
     var imgVal = document.getElementById('f-img').value || (selectedImages[0] || '');
+    var imagenFinal = buildImgVal(imgVal, currentImgPos);
     var data = {
       nombre: document.getElementById('f-nombre').value,
       material: document.getElementById('f-material').value,
@@ -918,7 +981,7 @@ body{font-family:Montserrat,sans-serif;background:#f0f0ee;color:#0a0a0a;}
       precio: parseInt(document.getElementById('f-precio').value) || 0,
       precio_transferencia: parseInt(document.getElementById('f-transf').value) || 0,
       link_mp: document.getElementById('f-mp').value,
-      imagen: imgVal,
+      imagen: imagenFinal,
       imagenes: selectedImages.length > 0 ? selectedImages : [imgVal],
       categoria: document.getElementById('f-cat').value,
       badge: document.getElementById('f-badge').value || null,

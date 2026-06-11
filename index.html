@@ -632,7 +632,7 @@ async function loadBombillas(){
   grid.innerHTML=data.map(function(p){
     return '<div class="bs-card" onclick="viewProduct(\'' + p.id + '\')">'+
       '<div class="bs-badge" style="background:var(--warm)">Bombilla</div>'+
-      '<img src="' + getImg(p.imagen) + '" alt="' + p.nombre + '" class="bs-img" loading="lazy"/>'+
+      '<img src="' + getImg(p.imagen) + '" alt="' + p.nombre + '" class="bs-img" style="object-position:' + getImgPos(p.imagen) + '" loading="lazy"/>'+
       '<div class="bs-info">'+
         '<div class="bs-name">' + p.nombre + '</div>'+
         '<div class="bs-mat">' + p.material + '</div>'+
@@ -675,7 +675,7 @@ async function loadBestsellers() {
   grid.innerHTML = data.map(function(p) {
     return '<div class="bs-card" onclick="viewProduct(\'' + p.id + '\')">'+
       '<div class="bs-badge">Popular</div>'+
-      '<img src="' + getImg(p.imagen) + '" alt="' + p.nombre + '" class="bs-img" loading="lazy"/>'+
+      '<img src="' + getImg(p.imagen) + '" alt="' + p.nombre + '" class="bs-img" style="object-position:' + getImgPos(p.imagen) + '" loading="lazy"/>'+
       '<div class="bs-info">'+
         '<div class="bs-name">' + p.nombre + '</div>'+
         '<div class="bs-mat">' + p.material + '</div>'+
@@ -848,11 +848,21 @@ document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;cur.style.le
 let allProds=[],cart=[],payMethod='mp';
 
 const GHBASE='https://osomates8-sys.github.io/oso-mates/';
+function parseImgVal(v){
+  if(!v)return{file:'',pos:'center'};
+  const idx=v.indexOf('|');
+  if(idx===-1)return{file:v,pos:'center'};
+  return{file:v.slice(0,idx),pos:v.slice(idx+1)||'center'};
+}
 function getImg(img){
-  if(!img) return '';
-  if(img.startsWith('http')) return img;
-  if(IMG_MAP[img]) return GHBASE+IMG_MAP[img];
-  return 'https://dkyfaeqcbeyhibqjztwa.supabase.co/storage/v1/object/public/imagenes/'+img;
+  const file=parseImgVal(img).file;
+  if(!file) return '';
+  if(file.startsWith('http')) return file;
+  if(IMG_MAP[file]) return GHBASE+IMG_MAP[file];
+  return 'https://dkyfaeqcbeyhibqjztwa.supabase.co/storage/v1/object/public/imagenes/'+file;
+}
+function getImgPos(img){
+  return parseImgVal(img).pos;
 }
 function fmt(n){return '$'+parseInt(n).toLocaleString('es-AR');}
 
@@ -876,7 +886,7 @@ function renderGrid(listOrFilter){
   g.innerHTML=list.map((p,i)=>{
     const stockBadge=p.stock&&p.stock<=5?`<span class="stock-low">\u00daltimas ${p.stock}</span>`:'';
     const shipBadge=p.precio>=100000?`<span class="free-ship">Env\u00edo gratis</span>`:'';
-    return `<div class="product-card"><div class="p-img-wrap" onclick="viewProduct('${p.id}')"><img src="${getImg(p.imagen)}" alt="${p.nombre}" class="p-img" loading="lazy" onload="this.closest('.p-img-wrap').classList.add('loaded')" crossorigin="anonymous"/></div><div class="p-body"><div class="p-num">N\u00b000${i+1}</div>${stockBadge}${shipBadge}${p.badge?`<div class="p-badge">${p.badge}</div>`:''}<div class="p-name" onclick="viewProduct('${p.id}')">${p.nombre}</div><div class="p-mat">${p.material}</div><div class="p-footer"><div><div class="p-price">${fmt(p.precio)}</div><div class="p-transfer">Transf. <strong>${fmt(p.precio_transferencia)}</strong> (\u221210%)</div></div><div class="p-btns"><button class="p-view-btn" onclick="viewProduct('${p.id}')">Ver</button><button class="p-add-btn" onclick="addToCart('${p.id}')">+ Agregar</button></div></div></div></div>`;
+    return `<div class="product-card"><div class="p-img-wrap" onclick="viewProduct('${p.id}')"><img src="${getImg(p.imagen)}" alt="${p.nombre}" class="p-img" style="object-position:${getImgPos(p.imagen)}" loading="lazy" onload="this.closest('.p-img-wrap').classList.add('loaded')" crossorigin="anonymous"/></div><div class="p-body"><div class="p-num">N\u00b000${i+1}</div>${stockBadge}${shipBadge}${p.badge?`<div class="p-badge">${p.badge}</div>`:''}<div class="p-name" onclick="viewProduct('${p.id}')">${p.nombre}</div><div class="p-mat">${p.material}</div><div class="p-footer"><div><div class="p-price">${fmt(p.precio)}</div><div class="p-transfer">Transf. <strong>${fmt(p.precio_transferencia)}</strong> (\u221210%)</div></div><div class="p-btns"><button class="p-view-btn" onclick="viewProduct('${p.id}')">Ver</button><button class="p-add-btn" onclick="addToCart('${p.id}')">+ Agregar</button></div></div></div></div>`;
   }).join('');
 }
 
@@ -901,7 +911,7 @@ function updateCartUI(){saveCart();
   document.getElementById('cart-count').textContent=count;
   const el=document.getElementById('cart-items');
   if(!cart.length){el.innerHTML='<div class="cart-empty">Tu carrito est\u00e1 vac\u00edo</div>';}
-  else{el.innerHTML=cart.map(item=>`<div class="cart-item"><img src="${getImg(item.imagen)}" alt="${item.nombre}" class="cart-item-img" crossorigin="anonymous"/><div><div class="cart-item-name">${item.nombre}</div><div class="cart-item-mat">${item.material}</div><div class="cart-item-qty"><button class="qty-btn" onclick="changeQty('${item.id}',-1)">\u2212</button><span class="qty-num">${item.qty}</span><button class="qty-btn" onclick="changeQty('${item.id}',1)">+</button></div></div><div><div class="cart-item-price">${fmt(item.precio*item.qty)}</div><div class="cart-item-remove" onclick="removeFromCart('${item.id}')">Quitar</div></div></div>`).join('');}
+  else{el.innerHTML=cart.map(item=>`<div class="cart-item"><img src="${getImg(item.imagen)}" alt="${item.nombre}" class="cart-item-img" style="object-position:${getImgPos(item.imagen)}" crossorigin="anonymous"/><div><div class="cart-item-name">${item.nombre}</div><div class="cart-item-mat">${item.material}</div><div class="cart-item-qty"><button class="qty-btn" onclick="changeQty('${item.id}',-1)">\u2212</button><span class="qty-num">${item.qty}</span><button class="qty-btn" onclick="changeQty('${item.id}',1)">+</button></div></div><div><div class="cart-item-price">${fmt(item.precio*item.qty)}</div><div class="cart-item-remove" onclick="removeFromCart('${item.id}')">Quitar</div></div></div>`).join('');}
   document.getElementById('cart-total').textContent=fmt(cartTotal());
 }
 
