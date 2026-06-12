@@ -370,7 +370,7 @@ function renderProduct(p, related){
         <div>${stockBadge}${shipBadge}${p.badge?`<div class="product-badge" style="display:inline-block">${p.badge}</div>`:''}</div>
         <h1 class="product-title">${p.nombre}</h1>
         <div class="product-mat">${p.material}</div>
-        <p class="product-desc">${p.descripcion} Cada pieza es tallada a mano, curada y lista para usar desde el primer día.</p>
+        <p class="product-desc">${p.descripcion} Cada pieza es tallada a mano y lista para usar desde el primer día.</p>
         <div class="product-price-box">
           <div class="product-price">${fmt(p.precio)}</div>
           <div class="product-transfer">Por transferencia: <strong>${fmt(p.precio_transferencia)}</strong> (&#x2212;10%)</div>
@@ -382,7 +382,6 @@ function renderProduct(p, related){
         </div>
         <ul class="product-features">
           <li>Tallado artesanal a mano</li>
-          <li>Curado incluido</li>
           <li>Envío a todo el país</li>
           <li>Garantía de satisfacción</li>
         </ul>
