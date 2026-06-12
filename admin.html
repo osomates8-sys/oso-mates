@@ -113,6 +113,9 @@ body{font-family:Montserrat,sans-serif;background:#f0f0ee;color:#0a0a0a;}
 .pricef-edit-item{border:1px solid #ebebeb;padding:1rem;margin-bottom:.8rem;position:relative;}
 .pricef-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:.8rem;}
 .pricef-row .fl{margin-top:0;}
+.shipz-edit-item{border:1px solid #ebebeb;padding:1rem;margin-bottom:.8rem;position:relative;}
+.shipz-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:.8rem;}
+.shipz-row .fl{margin-top:0;}
 .faq-add-btn{background:none;border:1px dashed #ccc;padding:.6rem 1.2rem;font-size:.65rem;letter-spacing:.15em;text-transform:uppercase;cursor:pointer;color:#888;margin-bottom:1rem;width:100%;}
 .faq-add-btn:hover{border-color:#0a0a0a;color:#0a0a0a;}
 .selected-img-thumb{position:relative;width:60px;}
@@ -240,6 +243,13 @@ body{font-family:Montserrat,sans-serif;background:#f0f0ee;color:#0a0a0a;}
         <button class="save-page-btn" id="save-pricef-btn">Guardar filtros de precio</button>
       </div>
       <div class="page-section">
+        <div class="page-section-title">Zonas de envio</div>
+        <p style="font-size:.62rem;color:#888;margin-bottom:.8rem">Se muestran en la pagina de producto para que el cliente vea el costo y tiempo estimado de envio segun su zona. Si el precio del producto es $100.000 o mas, se muestra "Envio gratis".</p>
+        <div id="shipz-editor"></div>
+        <button class="faq-add-btn" id="shipz-add-btn">+ Agregar zona</button>
+        <button class="save-page-btn" id="save-shipz-btn">Guardar zonas de envio</button>
+      </div>
+      <div class="page-section">
         <div class="page-section-title">Preguntas frecuentes</div>
         <div id="faq-editor"></div>
         <button class="faq-add-btn" id="faq-add-btn">+ Agregar pregunta</button>
@@ -300,6 +310,11 @@ body{font-family:Montserrat,sans-serif;background:#f0f0ee;color:#0a0a0a;}
         </div>
         <div class="fg"><label class="fl">Badge</label><input class="fi" id="f-badge" placeholder="Popular, Nuevo..."/></div>
       </div>
+      <div class="fg">
+        <label class="fl">Stock</label>
+        <input class="fi" type="number" id="f-stock" placeholder="Dejar vacio si no querés mostrar stock"/>
+        <p style="font-size:.62rem;color:#888;margin-top:.4rem">Si el stock es 5 o menos, en la web se muestra "Ultimas X". Dejalo vacio para no mostrar nada.</p>
+      </div>
       <div class="form-actions">
         <button class="btn-cancel" id="cancel-btn">Cancelar</button>
         <button class="btn-save" id="save-btn">Guardar</button>
@@ -341,6 +356,11 @@ body{font-family:Montserrat,sans-serif;background:#f0f0ee;color:#0a0a0a;}
     {label:'$30k \u2013 $55k', min:30000, max:55000},
     {label:'+$55k', min:55000, max:999999}
   ];
+  var DEFAULT_SHIPPING_ZONES = [
+    {label:'CABA y GBA', cost:4500, days:'2-3 dias habiles'},
+    {label:'Interior del pais', cost:6500, days:'4-7 dias habiles'},
+    {label:'Patagonia y zonas extremas', cost:8500, days:'7-10 dias habiles'}
+  ];
   var prodCache = [];
   var filesToUpload = [];
   var selectedImages = [];
@@ -351,6 +371,7 @@ body{font-family:Montserrat,sans-serif;background:#f0f0ee;color:#0a0a0a;}
   var nosotrosData = null;
   var testiItems = [];
   var pricefItems = [];
+  var shipzItems = [];
   var sbClient = supabase.createClient('https://dkyfaeqcbeyhibqjztwa.supabase.co', 'sb_publishable_zzsZ-7Upi-SAUD78wx0CJQ_skroMzF4');
 
   function fmt(n) { return '$' + parseInt(n).toLocaleString('es-AR'); }
@@ -688,15 +709,23 @@ body{font-family:Montserrat,sans-serif;background:#f0f0ee;color:#0a0a0a;}
             if (Array.isArray(parsedPf) && parsedPf.length) pricefItems = parsedPf;
           } catch(e) {}
         }
+        if (item.clave === 'shipping_zones') {
+          try {
+            var parsedSz = JSON.parse(item.valor);
+            if (Array.isArray(parsedSz) && parsedSz.length) shipzItems = parsedSz;
+          } catch(e) {}
+        }
       });
       if (!faqLoaded) faqItems = JSON.parse(JSON.stringify(DEFAULT_FAQ));
       if (!nosotrosData) nosotrosData = JSON.parse(JSON.stringify(DEFAULT_NOSOTROS));
       if (!testiItems.length) testiItems = JSON.parse(JSON.stringify(DEFAULT_TESTIMONIOS));
       if (!pricefItems.length) pricefItems = JSON.parse(JSON.stringify(DEFAULT_PRICE_FILTERS));
+      if (!shipzItems.length) shipzItems = JSON.parse(JSON.stringify(DEFAULT_SHIPPING_ZONES));
       renderFaqEditor();
       renderNosotrosEditor();
       renderTestiEditor();
       renderPricefEditor();
+      renderShipzEditor();
       loadGalleryImageSelector();
     });
   }
@@ -790,6 +819,35 @@ body{font-family:Montserrat,sans-serif;background:#f0f0ee;color:#0a0a0a;}
       btn.addEventListener('click', function() {
         pricefItems.splice(parseInt(this.dataset.idx, 10), 1);
         renderPricefEditor();
+      });
+    });
+  }
+
+  function renderShipzEditor() {
+    var container = document.getElementById('shipz-editor');
+    container.innerHTML = shipzItems.map(function(item, i) {
+      return '<div class="shipz-edit-item" data-idx="' + i + '">' +
+        '<button class="faq-edit-del shipz-del" data-idx="' + i + '">x</button>' +
+        '<div class="shipz-row">' +
+        '<div class="fg"><label class="fl">Zona</label><input class="fi shipz-label" data-idx="' + i + '" value="' + (item.label || '').replace(/"/g, '&quot;') + '"/></div>' +
+        '<div class="fg"><label class="fl">Costo ($)</label><input class="fi shipz-cost" type="number" data-idx="' + i + '" value="' + (item.cost || 0) + '"/></div>' +
+        '<div class="fg"><label class="fl">Tiempo estimado</label><input class="fi shipz-days" data-idx="' + i + '" value="' + (item.days || '').replace(/"/g, '&quot;') + '"/></div>' +
+        '</div>' +
+        '</div>';
+    }).join('');
+    container.querySelectorAll('.shipz-label').forEach(function(inp) {
+      inp.addEventListener('input', function() { shipzItems[parseInt(this.dataset.idx, 10)].label = this.value; });
+    });
+    container.querySelectorAll('.shipz-cost').forEach(function(inp) {
+      inp.addEventListener('input', function() { shipzItems[parseInt(this.dataset.idx, 10)].cost = parseInt(this.value, 10) || 0; });
+    });
+    container.querySelectorAll('.shipz-days').forEach(function(inp) {
+      inp.addEventListener('input', function() { shipzItems[parseInt(this.dataset.idx, 10)].days = this.value; });
+    });
+    container.querySelectorAll('.shipz-del').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        shipzItems.splice(parseInt(this.dataset.idx, 10), 1);
+        renderShipzEditor();
       });
     });
   }
@@ -929,6 +987,15 @@ body{font-family:Montserrat,sans-serif;background:#f0f0ee;color:#0a0a0a;}
     saveSetting('price_filters', JSON.stringify(clean));
     showToast('Filtros de precio guardados');
   });
+  document.getElementById('shipz-add-btn').addEventListener('click', function() {
+    shipzItems.push({label: '', cost: 0, days: ''});
+    renderShipzEditor();
+  });
+  document.getElementById('save-shipz-btn').addEventListener('click', function() {
+    var clean = shipzItems.filter(function(it) { return (it.label || '').trim(); });
+    saveSetting('shipping_zones', JSON.stringify(clean));
+    showToast('Zonas de envio guardadas');
+  });
 
   function openEdit(idx) {
     var p = prodCache[idx];
@@ -946,6 +1013,7 @@ body{font-family:Montserrat,sans-serif;background:#f0f0ee;color:#0a0a0a;}
     currentImgPos = imgParsed.pos;
     document.getElementById('f-cat').value = p.categoria || 'madera';
     document.getElementById('f-badge').value = p.badge || '';
+    document.getElementById('f-stock').value = (p.stock===null||p.stock===undefined) ? '' : p.stock;
     selectedImages = p.imagenes || [];
     renderSelectedImgs();
     renderImgPosPicker();
@@ -956,7 +1024,7 @@ body{font-family:Montserrat,sans-serif;background:#f0f0ee;color:#0a0a0a;}
   function openNew() {
     document.getElementById('modal-title').textContent = 'Nuevo producto';
     document.getElementById('f-id').value = '';
-    ['nombre','material','desc','mp','img','badge'].forEach(function(f) { document.getElementById('f-'+f).value=''; });
+    ['nombre','material','desc','mp','img','badge','stock'].forEach(function(f) { document.getElementById('f-'+f).value=''; });
     document.getElementById('f-precio').value = '';
     document.getElementById('f-transf').value = '';
     document.getElementById('f-cat').value = 'madera';
@@ -985,6 +1053,7 @@ body{font-family:Montserrat,sans-serif;background:#f0f0ee;color:#0a0a0a;}
       imagenes: selectedImages.length > 0 ? selectedImages : [imgVal],
       categoria: document.getElementById('f-cat').value,
       badge: document.getElementById('f-badge').value || null,
+      stock: document.getElementById('f-stock').value === '' ? null : parseInt(document.getElementById('f-stock').value),
       activo: true
     };
     if (!data.nombre || !data.precio) { showToast('Nombre y precio obligatorios'); return; }

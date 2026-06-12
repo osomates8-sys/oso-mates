@@ -159,6 +159,11 @@ footer{background:var(--black);padding:3rem 4rem;display:flex;justify-content:sp
 .cart-item-remove{font-size:.6rem;color:var(--gray);cursor:pointer;text-align:right;margin-top:.3rem;}
 .cart-item-remove:hover{color:var(--black);}
 .cart-footer{padding:2rem;border-top:1px solid var(--light);}
+.cart-ship-est{border:1px solid var(--light);padding:1rem 1.2rem;margin-bottom:1.2rem;}
+.cart-ship-est-title{font-size:.6rem;letter-spacing:.15em;text-transform:uppercase;color:var(--gray);margin-bottom:.5rem;}
+.cart-ship-est select{width:100%;padding:.5rem;font-size:.72rem;font-family:'Montserrat',sans-serif;border:1px solid var(--light);background:var(--white);color:var(--black);}
+.cart-ship-est-result{font-size:.7rem;color:var(--mid);margin-top:.5rem;}
+.cart-ship-est-result strong{color:var(--black);}
 .cart-subtotal{display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem;}
 .cart-subtotal-label{font-size:.65rem;letter-spacing:.15em;text-transform:uppercase;color:var(--gray);}
 .cart-subtotal-amount{font-family:'Cormorant Garamond',serif;font-size:1.8rem;font-weight:300;}
@@ -578,6 +583,11 @@ fbq('track', 'PageView');
   <div class="cart-header"><div class="cart-header-title">Tu carrito</div><button class="cart-close" onclick="toggleCart()">&#x2715; Cerrar</button></div>
   <div class="cart-items" id="cart-items"></div>
   <div class="cart-footer">
+    <div class="cart-ship-est" id="cart-ship-est">
+      <div class="cart-ship-est-title">Calculá tu envío</div>
+      <select id="cart-ship-zone-select" onchange="updateCartShipEstimate()"></select>
+      <div class="cart-ship-est-result" id="cart-ship-est-result"></div>
+    </div>
     <div class="cart-subtotal"><span class="cart-subtotal-label">Total</span><span class="cart-subtotal-amount" id="cart-total">$0</span></div>
     <button class="checkout-btn mp" onclick="openCheckout('mp')">Pagar con Mercado Pago</button>
     <button class="checkout-btn" onclick="openCheckout('transfer')">Transferencia (&#x2212;10%)</button>
@@ -655,15 +665,15 @@ const {createClient} = supabase;
 const sb = createClient('https://dkyfaeqcbeyhibqjztwa.supabase.co','sb_publishable_zzsZ-7Upi-SAUD78wx0CJQ_skroMzF4');
 emailjs.init('pr1E8ccHpaDtcv1Ml');
 const IMG_MAP = {
-  'camionero.jpg': 'camionero.jpg',
-  'imperial_algarrobo.jpg': 'imperial_algarrobo.jpg',
-  'imperial_algarrobo2.jpg': 'imperial_algarrobo2.jpg',
-  'imperial_calabaza.jpg': 'imperial_calabaza.jpg',
-  'criollo.jpg': 'criollo.jpg',
-  'ranchero.jpg': 'ranchero.jpg',
-  'galleta.jpg': 'galleta.jpg',
-  'foto_camionero_v2.jpg': 'camionero.jpg',
-  'foto_imperial_v2.jpg': 'imperial_algarrobo.jpg',
+  'camionero.jpg': 'camionero.webp',
+  'imperial_algarrobo.jpg': 'imperial_algarrobo.webp',
+  'imperial_algarrobo2.jpg': 'imperial_algarrobo2.webp',
+  'imperial_calabaza.jpg': 'imperial_calabaza.webp',
+  'criollo.jpg': 'criollo.webp',
+  'ranchero.jpg': 'ranchero.webp',
+  'galleta.jpg': 'galleta.webp',
+  'foto_camionero_v2.jpg': 'camionero.webp',
+  'foto_imperial_v2.jpg': 'imperial_algarrobo.webp',
 };
 
 
@@ -906,6 +916,40 @@ function changeQty(id,d){const item=cart.find(x=>x.id===id);if(item){item.qty+=d
 function cartTotal(){return cart.reduce((s,i)=>s+i.precio*i.qty,0);}
 function cartTransferTotal(){return cart.reduce((s,i)=>s+i.precio_transferencia*i.qty,0);}
 
+const DEFAULT_SHIPPING_ZONES=[
+  {label:'CABA y GBA',cost:4500,days:'2-3 días hábiles'},
+  {label:'Interior del país',cost:6500,days:'4-7 días hábiles'},
+  {label:'Patagonia y zonas extremas',cost:8500,days:'7-10 días hábiles'}
+];
+let _shipZones=DEFAULT_SHIPPING_ZONES;
+async function loadShippingZones(){
+  let items=DEFAULT_SHIPPING_ZONES;
+  try{
+    const {data}=await sb.from('config').select('*').eq('clave','shipping_zones').limit(1);
+    if(data&&data[0]&&data[0].valor){
+      const parsed=JSON.parse(data[0].valor);
+      if(Array.isArray(parsed)&&parsed.length)items=parsed;
+    }
+  }catch(e){}
+  _shipZones=items;
+  const sel=document.getElementById('cart-ship-zone-select');
+  if(!sel)return;
+  sel.innerHTML=items.map(function(z,i){return '<option value="'+i+'">'+z.label+'</option>';}).join('');
+  updateCartShipEstimate();
+}
+function updateCartShipEstimate(){
+  const sel=document.getElementById('cart-ship-zone-select');
+  const res=document.getElementById('cart-ship-est-result');
+  if(!sel||!res)return;
+  const z=_shipZones[parseInt(sel.value)||0];
+  if(!z)return;
+  if(cartTotal()>=100000){
+    res.innerHTML='<strong>Envío gratis</strong> a '+z.label+' · '+z.days;
+  }else{
+    res.innerHTML='Costo estimado: <strong>'+fmt(z.cost)+'</strong> · '+z.days;
+  }
+}
+
 function updateCartUI(){saveCart();
   const count=cart.reduce((s,i)=>s+i.qty,0);
   document.getElementById('cart-count').textContent=count;
@@ -913,6 +957,7 @@ function updateCartUI(){saveCart();
   if(!cart.length){el.innerHTML='<div class="cart-empty">Tu carrito est\u00e1 vac\u00edo</div>';}
   else{el.innerHTML=cart.map(item=>`<div class="cart-item"><img src="${getImg(item.imagen)}" alt="${item.nombre}" class="cart-item-img" style="object-position:${getImgPos(item.imagen)}" crossorigin="anonymous"/><div><div class="cart-item-name">${item.nombre}</div><div class="cart-item-mat">${item.material}</div><div class="cart-item-qty"><button class="qty-btn" onclick="changeQty('${item.id}',-1)">\u2212</button><span class="qty-num">${item.qty}</span><button class="qty-btn" onclick="changeQty('${item.id}',1)">+</button></div></div><div><div class="cart-item-price">${fmt(item.precio*item.qty)}</div><div class="cart-item-remove" onclick="removeFromCart('${item.id}')">Quitar</div></div></div>`).join('');}
   document.getElementById('cart-total').textContent=fmt(cartTotal());
+  updateCartShipEstimate();
 }
 
 function toggleCart(){document.getElementById('cart-overlay').classList.toggle('open');document.getElementById('cart-sidebar').classList.toggle('open');}
@@ -979,7 +1024,7 @@ function showToast(msg){const t=document.getElementById('toast');t.textContent=m
 const obs=new IntersectionObserver(entries=>{entries.forEach((e,i)=>{if(e.isIntersecting)setTimeout(()=>e.target.classList.add('in'),i*80);});},{threshold:.1});
 document.querySelectorAll('.reveal').forEach(el=>obs.observe(el));
 
-loadCart();loadProducts();loadBestsellers();loadBombillas();loadFaq();loadNosotros();loadHeroBanner();loadTestimonios();loadPriceFilters();updateCartUI();
+loadCart();loadProducts();loadBestsellers();loadBombillas();loadFaq();loadNosotros();loadHeroBanner();loadTestimonios();loadPriceFilters();loadShippingZones();updateCartUI();
 
 // ── CACHE de productos (10 min TTL) ──────────────────────────────────────────
 const CACHE_KEY='om_products';const CACHE_TTL=10*60*1000;
