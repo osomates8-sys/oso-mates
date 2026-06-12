@@ -78,11 +78,14 @@ section{padding:8rem 4rem}
 .section-title em{font-style:italic}
 .filter-row{display:flex;gap:.25rem;margin-bottom:4rem;}
 .ftab{background:none;border:none;font-family:'Montserrat',sans-serif;font-size:.62rem;letter-spacing:.2em;text-transform:uppercase;color:var(--gray);padding:.6rem 1.2rem;cursor:pointer;transition:all .2s;border-bottom:1px solid transparent;}
+.search-box{display:flex;align-items:center;gap:.6rem;border:1px solid var(--light);padding:.6rem 1rem;margin-bottom:1.5rem;max-width:320px;}
+.search-box input{flex:1;border:none;outline:none;font-family:'Montserrat',sans-serif;font-size:.78rem;background:transparent;color:var(--black);}
+.search-box svg{flex-shrink:0;width:14px;height:14px;color:var(--gray);}
 .ftab.active,.ftab:hover{color:var(--black);border-bottom-color:var(--black);}
 .catalog-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:0;}
 .product-card{border:1px solid var(--light);margin:-1px 0 0 -1px;position:relative;overflow:hidden;background:var(--white);transition:box-shadow .3s,transform .3s;}
 .product-card:hover{box-shadow:0 8px 40px rgba(0,0,0,.12);z-index:2;transform:translateY(-2px);}
-.p-img-wrap{height:280px;overflow:hidden;background:var(--light);cursor:pointer;}
+.p-img-wrap{height:280px;overflow:hidden;background:var(--light);cursor:pointer;position:relative;}
 .p-img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .6s,filter .4s;filter:grayscale(10%);}
 .product-card:hover .p-img{transform:scale(1.05);filter:grayscale(0%);}
 .p-body{padding:1.5rem;}
@@ -136,6 +139,15 @@ section{padding:8rem 4rem}
 .ig-arrow{font-size:1.5rem;color:var(--gray);transition:color .3s,transform .3s;}
 .ig-block:hover .ig-arrow{transform:translate(4px,-4px)}
 footer{background:var(--black);padding:3rem 4rem;display:flex;justify-content:space-between;align-items:center;border-top:1px solid #1a1a1a;flex-wrap:wrap;gap:1rem;}
+#newsletter-section{padding:5rem 4rem;text-align:center;background:#f0f0ee;}
+.newsletter-title{font-family:'Cormorant Garamond',serif;font-size:2.2rem;font-weight:300;margin-bottom:.8rem;}
+.newsletter-text{color:var(--gray);font-size:.8rem;max-width:420px;margin:0 auto 2rem;}
+.newsletter-form{display:flex;gap:.6rem;max-width:420px;margin:0 auto;}
+.newsletter-form input{flex:1;padding:1rem;border:1.5px solid var(--light);font-family:'Montserrat',sans-serif;font-size:.82rem;outline:none;}
+.newsletter-form button{background:var(--black);color:var(--white);border:none;padding:0 1.8rem;font-family:'Montserrat',sans-serif;font-size:.62rem;letter-spacing:.18em;text-transform:uppercase;cursor:pointer;}
+.newsletter-msg{font-size:.7rem;margin-top:1rem;min-height:1em;}
+.newsletter-msg.ok{color:var(--green);}
+.newsletter-msg.err{color:#c0392b;}
 .footer-logo{font-family:'Cormorant Garamond',serif;font-size:1rem;font-weight:300;letter-spacing:.35em;text-transform:uppercase;color:var(--white);}
 .footer-copy{font-size:.58rem;letter-spacing:.15em;color:var(--gray);}
 .cart-overlay{display:none;position:fixed;inset:0;background:rgba(10,10,10,.5);z-index:2000;}
@@ -250,6 +262,7 @@ footer{background:var(--black);padding:3rem 4rem;display:flex;justify-content:sp
   .field-group{grid-template-columns:1fr;}
 }
 @media(max-width:600px){.catalog-grid{grid-template-columns:1fr;}.values-list{grid-template-columns:1fr;}}
+@media(max-width:600px){.newsletter-form{flex-direction:column;}#newsletter-section{padding:3rem 1.5rem;}}
 
 /* WHATSAPP FLOTANTE */
 .wa-float{
@@ -338,6 +351,9 @@ footer{background:var(--black);padding:3rem 4rem;display:flex;justify-content:sp
   font-size:.55rem;letter-spacing:.15em;text-transform:uppercase;
   padding:.3rem .8rem;z-index:1;
 }
+.fav-btn{position:absolute;top:.6rem;right:.6rem;width:32px;height:32px;background:rgba(255,255,255,.85);border:none;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:5;font-size:1.1rem;line-height:1;color:#ccc;transition:transform .15s,color .15s;}
+.fav-btn:hover{transform:scale(1.12);}
+.fav-btn.active{color:#e74c3c;}
 .bs-img{width:100%;height:200px;object-fit:cover;display:block;transition:transform .5s;}
 .bs-card:hover .bs-img{transform:scale(1.05);}
 .bs-info{padding:1.2rem;}
@@ -539,12 +555,17 @@ fbq('track', 'PageView');
 
 <section id="catalogo">
   <div class="section-header reveal"><div><div class="section-num">01 — Catálogo</div><h2 class="section-title">La <em>colección</em></h2></div></div>
+  <div class="search-box">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    <input type="text" id="search-input" placeholder="Buscar productos..." oninput="searchProducts(this.value)"/>
+  </div>
   <div class="filter-row">
     <button class="ftab active" data-filter="todos" onclick="filterP('todos',this)">Todos</button>
     <button class="ftab" data-filter="madera" onclick="filterP('madera',this)">Madera</button>
     <button class="ftab" data-filter="calabaza" onclick="filterP('calabaza',this)">Calabaza</button>
     <button class="ftab" data-filter="bombillas" onclick="filterP('bombillas',this)">Bombillas</button>
     <button class="ftab" data-filter="combos" onclick="filterP('combos',this)">Combos</button>
+    <button class="ftab" data-filter="favoritos" onclick="filterP('favoritos',this)">♥ Favoritos</button>
   </div>
   <div class="price-filter-row" id="price-filter-row">
     <span class="pfab-label">Precio:</span>
@@ -617,6 +638,15 @@ fbq('track', 'PageView');
       </a>
     </div>
   </div>
+</section>
+<section id="newsletter-section">
+  <div class="newsletter-title">Sumate a la lista</div>
+  <p class="newsletter-text">Recibí novedades, descuentos exclusivos y nuevos lanzamientos directo a tu email.</p>
+  <div class="newsletter-form">
+    <input type="email" id="newsletter-email" placeholder="tu@email.com"/>
+    <button onclick="subscribeNewsletter()">Suscribirme</button>
+  </div>
+  <div class="newsletter-msg" id="newsletter-msg"></div>
 </section>
 <footer>
   <div class="footer-logo">Oso Mates</div>
@@ -695,6 +725,7 @@ async function loadCombos(){
     return '<div class="bs-card" onclick="viewProduct(\'' + p.id + '\')">'+
       '<div class="bs-badge" style="background:var(--blue)">Combo</div>'+
       '<img src="' + getImg(p.imagen) + '" alt="' + p.nombre + '" class="bs-img" style="object-position:' + getImgPos(p.imagen) + '" loading="lazy"/>'+
+      favBtnHtml(p.id)+
       '<div class="bs-info">'+
         '<div class="bs-name">' + p.nombre + '</div>'+
         '<div class="bs-mat">' + p.material + '</div>'+
@@ -717,6 +748,7 @@ async function loadBombillas(){
     return '<div class="bs-card" onclick="viewProduct(\'' + p.id + '\')">'+
       '<div class="bs-badge" style="background:var(--warm)">Bombilla</div>'+
       '<img src="' + getImg(p.imagen) + '" alt="' + p.nombre + '" class="bs-img" style="object-position:' + getImgPos(p.imagen) + '" loading="lazy"/>'+
+      favBtnHtml(p.id)+
       '<div class="bs-info">'+
         '<div class="bs-name">' + p.nombre + '</div>'+
         '<div class="bs-mat">' + p.material + '</div>'+
@@ -760,6 +792,7 @@ async function loadBestsellers() {
     return '<div class="bs-card" onclick="viewProduct(\'' + p.id + '\')">'+
       '<div class="bs-badge">Popular</div>'+
       '<img src="' + getImg(p.imagen) + '" alt="' + p.nombre + '" class="bs-img" style="object-position:' + getImgPos(p.imagen) + '" loading="lazy"/>'+
+      favBtnHtml(p.id)+
       '<div class="bs-info">'+
         '<div class="bs-name">' + p.nombre + '</div>'+
         '<div class="bs-mat">' + p.material + '</div>'+
@@ -961,6 +994,18 @@ async function loadProducts(){
   loadGallery();loadInstagramGrid();
 }
 
+function getFavs(){try{return JSON.parse(localStorage.getItem('om_favs')||'[]');}catch(e){return [];}}
+function isFav(id){return getFavs().includes(id);}
+function toggleFav(id,btn){
+  let favs=getFavs();
+  const wasFav=favs.includes(id);
+  favs=wasFav?favs.filter(x=>x!==id):[...favs,id];
+  try{localStorage.setItem('om_favs',JSON.stringify(favs));}catch(e){}
+  if(btn)btn.classList.toggle('active',!wasFav);
+  if(!wasFav)showToast('Agregado a favoritos \u2764');
+  if(currentCatFilter==='favoritos')applyFilters();
+}
+function favBtnHtml(id){return `<button class="fav-btn${isFav(id)?' active':''}" onclick="event.stopPropagation();toggleFav('${id}',this)">\u2665</button>`;}
 function renderGrid(listOrFilter){
   const g=document.getElementById('grid');
   let list;
@@ -970,7 +1015,7 @@ function renderGrid(listOrFilter){
   g.innerHTML=list.map((p,i)=>{
     const stockBadge=p.stock&&p.stock<=5?`<span class="stock-low">\u00daltimas ${p.stock}</span>`:'';
     const shipBadge=p.precio>=100000?`<span class="free-ship">Env\u00edo gratis</span>`:'';
-    return `<div class="product-card"><div class="p-img-wrap" onclick="viewProduct('${p.id}')"><img src="${getImg(p.imagen)}" alt="${p.nombre}" class="p-img" style="object-position:${getImgPos(p.imagen)}" loading="lazy" onload="this.closest('.p-img-wrap').classList.add('loaded')" crossorigin="anonymous"/></div><div class="p-body"><div class="p-num">N\u00b000${i+1}</div>${stockBadge}${shipBadge}${p.badge?`<div class="p-badge">${p.badge}</div>`:''}<div class="p-name" onclick="viewProduct('${p.id}')">${p.nombre}</div><div class="p-mat">${p.material}</div><div class="p-footer"><div><div class="p-price">${fmt(p.precio)}</div><div class="p-transfer">Transf. <strong>${fmt(p.precio_transferencia)}</strong> (\u221210%)</div></div><div class="p-btns"><button class="p-view-btn" onclick="viewProduct('${p.id}')">Ver</button><button class="p-add-btn" onclick="addToCart('${p.id}')">+ Agregar</button></div></div></div></div>`;
+    return `<div class="product-card"><div class="p-img-wrap" onclick="viewProduct('${p.id}')"><img src="${getImg(p.imagen)}" alt="${p.nombre}" class="p-img" style="object-position:${getImgPos(p.imagen)}" loading="lazy" onload="this.closest('.p-img-wrap').classList.add('loaded')" crossorigin="anonymous"/>${favBtnHtml(p.id)}</div><div class="p-body"><div class="p-num">N\u00b000${i+1}</div>${stockBadge}${shipBadge}${p.badge?`<div class="p-badge">${p.badge}</div>`:''}<div class="p-name" onclick="viewProduct('${p.id}')">${p.nombre}</div><div class="p-mat">${p.material}</div><div class="p-footer"><div><div class="p-price">${fmt(p.precio)}</div><div class="p-transfer">Transf. <strong>${fmt(p.precio_transferencia)}</strong> (\u221210%)</div></div><div class="p-btns"><button class="p-view-btn" onclick="viewProduct('${p.id}')">Ver</button><button class="p-add-btn" onclick="addToCart('${p.id}')">+ Agregar</button></div></div></div></div>`;
   }).join('');
 }
 
@@ -1137,6 +1182,35 @@ async function confirmOrder(){
 
 function copyCBU(){navigator.clipboard.writeText('0170090940000048482721');showToast('CBU copiado \u2713');}
 function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3000);}
+async function subscribeNewsletter(){
+  const input=document.getElementById('newsletter-email');
+  const msg=document.getElementById('newsletter-msg');
+  const email=(input.value||'').trim().toLowerCase();
+  if(!email||!email.includes('@')){
+    msg.textContent='Ingresá un email válido.';
+    msg.className='newsletter-msg err';
+    return;
+  }
+  try{
+    const {data}=await sb.from('config').select('*').eq('clave','newsletter_emails').limit(1);
+    let emails=[];
+    if(data&&data[0]&&data[0].valor){emails=JSON.parse(data[0].valor)||[];}
+    if(emails.includes(email)){
+      msg.textContent='¡Ya estás suscripto! Gracias 🧉';
+      msg.className='newsletter-msg ok';
+      input.value='';
+      return;
+    }
+    emails.push(email);
+    await sb.from('config').upsert({clave:'newsletter_emails',valor:JSON.stringify(emails)},{onConflict:'clave'});
+    msg.textContent='¡Listo! Te vamos a mantener al tanto 🧉';
+    msg.className='newsletter-msg ok';
+    input.value='';
+  }catch(e){
+    msg.textContent='Hubo un error, intentá de nuevo.';
+    msg.className='newsletter-msg err';
+  }
+}
 function acceptCookies(){
   try{localStorage.setItem('om_cookie_consent','1');}catch(e){}
   const b=document.getElementById('cookie-banner');if(b)b.classList.remove('show');
@@ -1170,7 +1244,7 @@ function setCachedProducts(data){
 }
 
 // ── FILTRO DE PRECIO ──────────────────────────────────────────────────────────
-let currentCatFilter='todos', currentPriceFilter='todos';
+let currentCatFilter='todos', currentPriceFilter='todos', currentSearchTerm='';
 function filterPrice(range,btn){
   currentPriceFilter=range;
   document.querySelectorAll('.pfab').forEach(b=>b.classList.remove('active'));
@@ -1183,14 +1257,30 @@ function filterP(f,btn){
   btn.classList.add('active');
   applyFilters();
 }
+function searchProducts(val){
+  currentSearchTerm=(val||'').trim().toLowerCase();
+  applyFilters();
+}
 function applyFilters(){
   const g=document.getElementById('grid');
-  let list=currentCatFilter==='todos'?allProds:allProds.filter(p=>p.categoria===currentCatFilter);
+  let list;
+  if(currentCatFilter==='favoritos'){
+    const favs=getFavs();
+    list=allProds.filter(p=>favs.includes(p.id));
+  }else{
+    list=currentCatFilter==='todos'?allProds:allProds.filter(p=>p.categoria===currentCatFilter);
+  }
   if(currentPriceFilter!=='todos'){
     const [min,max]=currentPriceFilter.split('-').map(Number);
     list=list.filter(p=>p.precio>=min&&p.precio<=max);
   }
-  if(!list.length){g.innerHTML='<div class="loading">Sin productos en este rango</div>';return;}
+  if(currentSearchTerm){
+    list=list.filter(p=>(p.nombre||'').toLowerCase().includes(currentSearchTerm));
+  }
+  if(!list.length){
+    g.innerHTML=currentCatFilter==='favoritos'?'<div class="loading">Todavía no tenés favoritos. Toc\u00e1 el \u2665 en un producto para guardarlo.</div>':'<div class="loading">No encontramos productos con esos filtros</div>';
+    return;
+  }
   renderGrid(list);
 }
 

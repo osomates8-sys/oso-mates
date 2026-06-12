@@ -34,6 +34,8 @@ nav{position:fixed;top:0;left:0;right:0;z-index:500;display:flex;justify-content
 .product-badge{display:inline-block;font-size:.55rem;letter-spacing:.18em;text-transform:uppercase;background:var(--black);color:var(--white);padding:.3rem .8rem;margin-bottom:1.5rem;}
 .product-title{font-family:'Cormorant Garamond',serif;font-size:clamp(3rem,5vw,5rem);font-weight:300;line-height:.95;letter-spacing:-.02em;margin-bottom:.8rem;}
 .product-mat{font-size:.68rem;letter-spacing:.2em;text-transform:uppercase;color:var(--gray);margin-bottom:2rem;}
+.product-rating-top{font-size:.78rem;color:#e8a23c;margin:-1.2rem 0 1.5rem;display:flex;align-items:center;gap:.5rem;}
+.product-rating-top .prt-count{color:var(--gray);}
 .product-desc{font-size:.85rem;font-weight:300;line-height:2;color:var(--mid);margin-bottom:3rem;max-width:420px;}
 .product-price-box{border:1px solid var(--light);padding:2rem;margin-bottom:2rem;}
 .product-price{font-family:'Cormorant Garamond',serif;font-size:3rem;font-weight:300;color:var(--black);line-height:1;}
@@ -77,6 +79,8 @@ nav{position:fixed;top:0;left:0;right:0;z-index:500;display:flex;justify-content
 .btn-add{flex:1;padding:1.2rem;background:var(--black);color:var(--white);border:none;font-family:'Montserrat',sans-serif;font-size:.65rem;letter-spacing:.2em;text-transform:uppercase;cursor:pointer;transition:background .2s;}
 .btn-add:hover{background:#333}
 .btn-mp{flex:1;padding:1.2rem;background:var(--blue);color:var(--white);border:none;font-family:'Montserrat',sans-serif;font-size:.65rem;letter-spacing:.2em;text-transform:uppercase;cursor:pointer;transition:background .2s;}
+.btn-fav{width:100%;margin-top:1rem;padding:1rem;background:none;border:1px solid var(--light);font-family:'Montserrat',sans-serif;font-size:.65rem;letter-spacing:.2em;text-transform:uppercase;cursor:pointer;color:var(--mid);transition:all .2s;}
+.btn-fav.active{border-color:#e74c3c;color:#e74c3c;}
 .btn-mp:hover{background:#0077b0}
 .related-section{padding:6rem 4rem;border-top:1px solid var(--light);}
 .related-title{font-family:'Cormorant Garamond',serif;font-size:2rem;font-weight:300;margin-bottom:3rem;}
@@ -168,6 +172,31 @@ nav{position:fixed;top:0;left:0;right:0;z-index:500;display:flex;justify-content
 .field-note{font-size:.65rem;color:var(--gray);margin-bottom:1.2rem;}
 .confirm-btn{display:block;width:100%;padding:1.1rem;background:var(--black);color:var(--white);border:none;font-family:'Montserrat',sans-serif;font-size:.65rem;letter-spacing:.2em;text-transform:uppercase;cursor:pointer;transition:background .2s;}
 .confirm-btn:hover{background:#333}
+.reviews-section{padding:6rem 4rem;border-top:1px solid var(--light);}
+#newsletter-section{padding:5rem 4rem;text-align:center;background:#f0f0ee;border-top:1px solid var(--light);}
+.newsletter-title{font-family:'Cormorant Garamond',serif;font-size:2.2rem;font-weight:300;margin-bottom:.8rem;}
+.newsletter-text{color:var(--gray);font-size:.8rem;max-width:420px;margin:0 auto 2rem;}
+.newsletter-form{display:flex;gap:.6rem;max-width:420px;margin:0 auto;}
+.newsletter-form input{flex:1;padding:1rem;border:1.5px solid var(--light);font-family:'Montserrat',sans-serif;font-size:.82rem;outline:none;}
+.newsletter-form button{background:var(--black);color:var(--white);border:none;padding:0 1.8rem;font-family:'Montserrat',sans-serif;font-size:.62rem;letter-spacing:.18em;text-transform:uppercase;cursor:pointer;}
+.newsletter-msg{font-size:.7rem;margin-top:1rem;min-height:1em;}
+.newsletter-msg.ok{color:var(--green);}
+.newsletter-msg.err{color:#c0392b;}
+.reviews-header{display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:1rem;margin-bottom:2rem;}
+.reviews-summary{font-size:.8rem;color:var(--gray);}
+.reviews-summary strong{color:var(--black);font-size:1rem;}
+.review-item{border-bottom:1px solid var(--light);padding:1.5rem 0;}
+.review-item:last-child{border-bottom:none;}
+.review-item-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:.5rem;gap:1rem;}
+.review-item-name{font-size:.78rem;font-weight:600;}
+.review-item-date{font-size:.65rem;color:var(--gray);white-space:nowrap;}
+.review-item-stars{color:#e8a23c;font-size:.85rem;margin-bottom:.5rem;}
+.review-item-text{font-size:.8rem;color:var(--mid);line-height:1.7;}
+.review-form{max-width:480px;margin-top:3rem;border:1px solid var(--light);padding:2rem;}
+.review-form-title{font-family:'Cormorant Garamond',serif;font-size:1.4rem;margin-bottom:1.2rem;}
+.review-stars{font-size:1.6rem;color:#ccc;cursor:pointer;margin-bottom:1.2rem;letter-spacing:.2rem;}
+.review-stars span.sel{color:#e8a23c;}
+.review-textarea{width:100%;padding:.8rem;border:1.5px solid var(--light);font-family:'Montserrat',sans-serif;font-size:.82rem;outline:none;resize:vertical;min-height:90px;margin-bottom:1rem;}
 .confirm-btn.mp-btn{background:var(--blue);}
 .confirm-btn:disabled{opacity:.5;cursor:not-allowed;}
 .success-overlay{display:none;position:fixed;inset:0;background:rgba(10,10,10,.8);z-index:4000;align-items:center;justify-content:center;padding:2rem;}
@@ -184,6 +213,9 @@ nav{position:fixed;top:0;left:0;right:0;z-index:500;display:flex;justify-content
   .product-info-section{padding:3rem 1.5rem;}
   .related-grid{grid-template-columns:1fr 1fr;}
   .related-section{padding:3rem 1.5rem;}
+  .reviews-section{padding:3rem 1.5rem;}
+  .newsletter-form{flex-direction:column;}
+  #newsletter-section{padding:3rem 1.5rem;}
   .product-actions{flex-direction:column;}
   .field-group{grid-template-columns:1fr;}
   .pay-options{grid-template-columns:1fr;}
@@ -410,6 +442,62 @@ function sizeGuideText(cat){
   if(cat==='combos')return 'Mate: <strong>10–12 cm</strong> de altura · Bombilla: <strong>17–19 cm</strong> de largo. Las medidas pueden variar levemente.';
   return 'Altura aprox.: <strong>10–12 cm</strong> · Diámetro aprox.: <strong>7–8 cm</strong>. Cada pieza es artesanal, las medidas pueden variar levemente.';
 }
+let _reviewRating=0;
+function setReviewRating(n){
+  _reviewRating=n;
+  document.querySelectorAll('#review-stars span').forEach(function(s){
+    s.classList.toggle('sel', parseInt(s.dataset.val,10)<=n);
+  });
+}
+function escapeHtml(str){
+  const d=document.createElement('div');
+  d.textContent=str||'';
+  return d.innerHTML;
+}
+async function loadReviews(productId){
+  const listEl=document.getElementById('reviews-list');
+  const sumEl=document.getElementById('reviews-summary');
+  if(!listEl)return;
+  let reviews=[];
+  try{
+    const {data}=await sb.from('config').select('*').eq('clave','resenas_'+productId).limit(1);
+    if(data&&data[0]&&data[0].valor){reviews=JSON.parse(data[0].valor)||[];}
+  }catch(e){}
+  window._reviews=reviews;
+  const topEl=document.getElementById('product-rating-top');
+  if(!reviews.length){
+    listEl.innerHTML='<div class="loading">Todavía no hay opiniones. ¡Sé el primero en dejar la tuya!</div>';
+    if(sumEl)sumEl.innerHTML='';
+    if(topEl)topEl.innerHTML='';
+    return;
+  }
+  const avg=reviews.reduce((s,r)=>s+r.rating,0)/reviews.length;
+  if(sumEl)sumEl.innerHTML='<strong>'+avg.toFixed(1)+'</strong> / 5 \u00b7 '+reviews.length+' opini\u00f3n'+(reviews.length===1?'':'es');
+  if(topEl)topEl.innerHTML='\u2605'.repeat(Math.round(avg))+'\u2606'.repeat(5-Math.round(avg))+' <span class="prt-count">'+avg.toFixed(1)+' \u00b7 '+reviews.length+' opini\u00f3n'+(reviews.length===1?'':'es')+'</span>';
+  listEl.innerHTML=reviews.slice().reverse().map(function(r){
+    return '<div class="review-item">'+
+      '<div class="review-item-head"><span class="review-item-name">'+escapeHtml(r.nombre)+'</span><span class="review-item-date">'+(r.fecha||'')+'</span></div>'+
+      '<div class="review-item-stars">'+'\u2605'.repeat(r.rating)+'\u2606'.repeat(5-r.rating)+'</div>'+
+      '<div class="review-item-text">'+escapeHtml(r.comentario)+'</div>'+
+    '</div>';
+  }).join('');
+}
+async function submitReview(productId){
+  const name=document.getElementById('review-name').value.trim();
+  const text=document.getElementById('review-text').value.trim();
+  if(!name){showToast('Ingres\u00e1 tu nombre \ud83d\udc46');return;}
+  if(!_reviewRating){showToast('Eleg\u00ed una calificaci\u00f3n \ud83d\udc46');return;}
+  if(!text){showToast('Cont\u00e1nos tu experiencia \ud83d\udc46');return;}
+  const reviews=window._reviews||[];
+  reviews.push({nombre:name,rating:_reviewRating,comentario:text,fecha:new Date().toLocaleDateString('es-AR')});
+  await sb.from('config').upsert({clave:'resenas_'+productId,valor:JSON.stringify(reviews)},{onConflict:'clave'});
+  window._reviews=reviews;
+  document.getElementById('review-name').value='';
+  document.getElementById('review-text').value='';
+  setReviewRating(0);
+  loadReviews(productId);
+  showToast('\u00a1Gracias por tu opini\u00f3n! \ud83e\udd49');
+}
 function renderProduct(p, related){
   var imgs = (p.imagenes && p.imagenes.length > 0) ? p.imagenes : [p.imagen];
   window._galleryImgs = imgs;
@@ -429,6 +517,7 @@ function renderProduct(p, related){
         <div>${stockBadge}${shipBadge}${p.badge?`<div class="product-badge" style="display:inline-block">${p.badge}</div>`:''}</div>
         <h1 class="product-title">${p.nombre}</h1>
         <div class="product-mat">${p.material}</div>
+        <div class="product-rating-top" id="product-rating-top"></div>
         <p class="product-desc">${p.descripcion} Cada pieza es tallada a mano y lista para usar desde el primer día.</p>
         <div class="product-price-box">
           <div class="product-price">${fmt(p.precio)}</div>
@@ -455,11 +544,41 @@ function renderProduct(p, related){
           <button class="btn-add" onclick="addToCartAndOpen()">Agregar al carrito</button>
           <button class="btn-mp" onclick="window.open('${p.link_mp}','_blank')">Comprar ahora</button>
         </div>
+        <button class="btn-fav${isFav(p.id)?' active':''}" id="fav-btn" onclick="toggleProductFav('${p.id}')">${isFav(p.id)?'\u2665 En tus favoritos':'\u2661 Agregar a favoritos'}</button>
       </div>
     </div>
     ${related.length?`<div class="related-section"><div class="related-title">También te puede gustar</div><div class="related-grid">${related.map(r=>`<div class="related-card" onclick="window.location.href='producto.html?id=${r.id}'"><img src="${getImg(r.imagen)}" alt="${r.nombre}" class="related-img" style="object-position:${getImgPos(r.imagen)}" loading="lazy"/><div class="related-name">${r.nombre}</div><div class="related-price">${fmt(r.precio)}</div></div>`).join('')}</div></div>`:''}
+    <section class="reviews-section">
+      <div class="reviews-header">
+        <div class="related-title">Opiniones</div>
+        <div class="reviews-summary" id="reviews-summary"></div>
+      </div>
+      <div class="reviews-list" id="reviews-list"><div class="loading">Cargando opiniones...</div></div>
+      <div class="review-form">
+        <div class="review-form-title">Dejá tu opinión</div>
+        <div class="review-stars" id="review-stars">
+          <span data-val="1" onclick="setReviewRating(1)">★</span><span data-val="2" onclick="setReviewRating(2)">★</span><span data-val="3" onclick="setReviewRating(3)">★</span><span data-val="4" onclick="setReviewRating(4)">★</span><span data-val="5" onclick="setReviewRating(5)">★</span>
+        </div>
+        <div class="field-group">
+          <div class="field-wrap" style="grid-column:1/-1"><label>Nombre *</label><input id="review-name" type="text" placeholder="Tu nombre"/></div>
+        </div>
+        <textarea id="review-text" class="review-textarea" placeholder="Contanos tu experiencia con este producto..."></textarea>
+        <button class="confirm-btn" onclick="submitReview('${p.id}')">Enviar opinión</button>
+      </div>
+    </section>
+    <section id="newsletter-section">
+      <div class="newsletter-title">Sumate a la lista</div>
+      <p class="newsletter-text">Recibí novedades, descuentos exclusivos y nuevos lanzamientos directo a tu email.</p>
+      <div class="newsletter-form">
+        <input type="email" id="newsletter-email" placeholder="tu@email.com"/>
+        <button onclick="subscribeNewsletter()">Suscribirme</button>
+      </div>
+      <div class="newsletter-msg" id="newsletter-msg"></div>
+    </section>
   `;
   loadShippingZones(p.precio);
+  setReviewRating(0);
+  loadReviews(p.id);
   const metaDesc = document.getElementById('meta-desc');
   const metaOgTitle = document.getElementById('meta-og-title');
   const metaOgDesc = document.getElementById('meta-og-desc');
@@ -542,6 +661,20 @@ function applyCoupon(){
   }
   buildCheckoutTotal();
 }
+function getFavs(){try{return JSON.parse(localStorage.getItem('om_favs')||'[]');}catch(e){return [];}}
+function isFav(id){return getFavs().includes(id);}
+function toggleProductFav(id){
+  let favs=getFavs();
+  const wasFav=favs.includes(id);
+  favs=wasFav?favs.filter(x=>x!==id):[...favs,id];
+  try{localStorage.setItem('om_favs',JSON.stringify(favs));}catch(e){}
+  const btn=document.getElementById('fav-btn');
+  if(btn){
+    btn.classList.toggle('active',!wasFav);
+    btn.textContent=!wasFav?'\u2665 En tus favoritos':'\u2661 Agregar a favoritos';
+  }
+  if(!wasFav)showToast('Agregado a favoritos \u2764');
+}
 function cartTotal(){return cart.reduce((s,i)=>s+i.precio*i.qty,0);}
 function cartTransferTotal(){return cart.reduce((s,i)=>s+i.precio_transferencia*i.qty,0);}
 function updateCartUI(){saveCart();
@@ -607,6 +740,35 @@ async function confirmOrder(){
 }
 function copyCBU(){navigator.clipboard.writeText('0170090940000048482721');showToast('CBU copiado ✓');}
 function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3000);}
+async function subscribeNewsletter(){
+  const input=document.getElementById('newsletter-email');
+  const msg=document.getElementById('newsletter-msg');
+  const email=(input.value||'').trim().toLowerCase();
+  if(!email||!email.includes('@')){
+    msg.textContent='Ingresá un email válido.';
+    msg.className='newsletter-msg err';
+    return;
+  }
+  try{
+    const {data}=await sb.from('config').select('*').eq('clave','newsletter_emails').limit(1);
+    let emails=[];
+    if(data&&data[0]&&data[0].valor){emails=JSON.parse(data[0].valor)||[];}
+    if(emails.includes(email)){
+      msg.textContent='¡Ya estás suscripto! Gracias 🧉';
+      msg.className='newsletter-msg ok';
+      input.value='';
+      return;
+    }
+    emails.push(email);
+    await sb.from('config').upsert({clave:'newsletter_emails',valor:JSON.stringify(emails)},{onConflict:'clave'});
+    msg.textContent='¡Listo! Te vamos a mantener al tanto 🧉';
+    msg.className='newsletter-msg ok';
+    input.value='';
+  }catch(e){
+    msg.textContent='Hubo un error, intentá de nuevo.';
+    msg.className='newsletter-msg err';
+  }
+}
 function acceptCookies(){
   try{localStorage.setItem('om_cookie_consent','1');}catch(e){}
   const b=document.getElementById('cookie-banner');if(b)b.classList.remove('show');
