@@ -9,6 +9,7 @@
 <meta property="og:description" content="Mates artesanales tallados a mano en Mar del Plata." id="meta-og-desc"/>
 <meta property="og:type" content="product"/>
 <meta property="og:image" content="https://osomates8-sys.github.io/oso-mates/imperial_algarrobo.jpg" id="meta-og-image"/>
+<script type="application/ld+json" id="product-ld">{}</script>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧉</text></svg>"/>
 <title>OSO MATES — Producto</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
@@ -63,6 +64,12 @@ nav{position:fixed;top:0;left:0;right:0;z-index:500;display:flex;justify-content
 .ship-est select{width:100%;padding:.6rem;font-size:.75rem;font-family:'Montserrat',sans-serif;border:1px solid var(--light);background:var(--white);color:var(--black);}
 .ship-est-result{font-size:.75rem;color:var(--mid);margin-top:.6rem;}
 .ship-est-result strong{color:var(--black);}
+.size-guide{border:1px solid var(--light);padding:1.2rem 1.6rem;margin-bottom:2rem;}
+.size-guide-title{font-size:.62rem;letter-spacing:.15em;text-transform:uppercase;color:var(--gray);margin-bottom:.8rem;}
+.size-guide-body{display:flex;align-items:center;gap:1.5rem;}
+.size-guide-svg{flex-shrink:0;width:70px;height:100px;}
+.size-guide-text{font-size:.75rem;color:var(--mid);line-height:1.7;}
+.size-guide-text strong{color:var(--black);}
 .product-features{list-style:none;margin-bottom:2.5rem;}
 .product-features li{font-size:.78rem;color:var(--mid);padding:.7rem 0;border-bottom:1px solid var(--light);display:flex;align-items:center;gap:.8rem;}
 .product-features li::before{content:'';width:16px;height:1px;background:var(--black);flex-shrink:0;}
@@ -127,6 +134,17 @@ nav{position:fixed;top:0;left:0;right:0;z-index:500;display:flex;justify-content
 .co-total{display:flex;justify-content:space-between;align-items:center;padding:1.2rem 0;margin-bottom:1.5rem;}
 .co-total-label{font-size:.65rem;letter-spacing:.15em;text-transform:uppercase;}
 .co-total-amount{font-family:'Cormorant Garamond',serif;font-size:2rem;font-weight:300;}
+.coupon-box{display:flex;gap:.6rem;margin-bottom:.4rem;}
+.coupon-input{flex:1;padding:.8rem;border:1.5px solid var(--light);font-family:'Montserrat',sans-serif;font-size:.78rem;outline:none;text-transform:uppercase;}
+.coupon-btn{background:var(--black);color:var(--white);border:none;padding:0 1.4rem;font-family:'Montserrat',sans-serif;font-size:.62rem;letter-spacing:.15em;text-transform:uppercase;cursor:pointer;}
+.coupon-msg{font-size:.68rem;margin-bottom:1rem;min-height:1em;}
+.coupon-msg.ok{color:var(--green);}
+.coupon-msg.err{color:#c0392b;}
+.cookie-banner{position:fixed;left:0;right:0;bottom:0;background:var(--black);color:var(--white);padding:1.2rem 2rem;display:none;align-items:center;justify-content:center;gap:1.5rem;z-index:5000;flex-wrap:wrap;}
+.cookie-banner.show{display:flex;}
+.cookie-banner p{font-size:.75rem;font-weight:300;line-height:1.6;max-width:700px;text-align:center;}
+.cookie-banner a{color:inherit;text-decoration:underline;}
+.cookie-banner-btn{background:var(--white);color:var(--black);border:none;padding:.8rem 1.8rem;font-family:'Montserrat',sans-serif;font-size:.62rem;letter-spacing:.15em;text-transform:uppercase;cursor:pointer;white-space:nowrap;}
 .pay-options{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1.5rem;}
 .pay-opt{border:1.5px solid var(--light);padding:1.5rem;cursor:pointer;transition:all .2s;text-align:center;}
 .pay-opt:hover,.pay-opt.sel{border-color:var(--black);background:var(--black);color:var(--white);}
@@ -206,6 +224,8 @@ nav{position:fixed;top:0;left:0;right:0;z-index:500;display:flex;justify-content
       <div class="co-sec">Productos</div>
       <div id="co-items"></div>
       <div class="co-total"><span class="co-total-label" id="co-total-label">Total</span><span class="co-total-amount" id="co-total-amount"></span></div>
+      <div class="coupon-box"><input id="coupon-input" type="text" placeholder="Código de cupón"/><button class="coupon-btn" onclick="applyCoupon()">Aplicar</button></div>
+      <div class="coupon-msg" id="coupon-msg"></div>
       <div class="pay-options">
         <div class="pay-opt" id="opt-mp" onclick="selectPay('mp')"><span class="pay-opt-icon">💳</span><div class="pay-opt-label">Mercado Pago</div><div class="pay-opt-desc">Tarjeta, débito o saldo</div></div>
         <div class="pay-opt" id="opt-tr" onclick="selectPay('transfer')"><span class="pay-opt-icon">🏦</span><div class="pay-opt-label">Transferencia</div><div class="pay-opt-desc">10% de descuento</div></div>
@@ -233,6 +253,10 @@ nav{position:fixed;top:0;left:0;right:0;z-index:500;display:flex;justify-content
     <p class="success-text" id="success-text"></p>
     <button class="success-close" onclick="document.getElementById('success-overlay').classList.remove('open')">Cerrar</button>
   </div>
+</div>
+<div class="cookie-banner" id="cookie-banner">
+  <p>Usamos cookies para mejorar tu experiencia y analizar el tráfico del sitio. Al continuar navegando aceptás nuestra <a href="legales.html">política de privacidad</a>.</p>
+  <button class="cookie-banner-btn" onclick="acceptCookies()">Aceptar</button>
 </div>
 <div class="toast" id="toast"></div>
 <script>
@@ -351,6 +375,41 @@ async function loadProduct(){
     document.getElementById('product-content').innerHTML='<div class="loading" style="padding:6rem 2rem">Error al cargar el producto. <a href="index.html" style="color:var(--black)">← Volver al catálogo</a></div>';
   }
 }
+function sizeGuideSvg(cat){
+  if(cat==='bombillas'){
+    return '<svg class="size-guide-svg" viewBox="0 0 70 100" xmlns="http://www.w3.org/2000/svg">'+
+      '<line x1="12" y1="10" x2="12" y2="90" stroke="#ccc" stroke-width="1"/>'+
+      '<line x1="8" y1="10" x2="16" y2="10" stroke="#ccc" stroke-width="1"/>'+
+      '<line x1="8" y1="90" x2="16" y2="90" stroke="#ccc" stroke-width="1"/>'+
+      '<line x1="30" y1="85" x2="55" y2="15" stroke="#0a0a0a" stroke-width="2"/>'+
+      '<circle cx="55" cy="13" r="3" fill="#0a0a0a"/>'+
+      '<ellipse cx="30" cy="87" rx="6" ry="3" fill="none" stroke="#0a0a0a" stroke-width="2"/>'+
+    '</svg>';
+  }
+  if(cat==='combos'){
+    return '<svg class="size-guide-svg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">'+
+      '<line x1="10" y1="35" x2="10" y2="90" stroke="#ccc" stroke-width="1"/>'+
+      '<line x1="6" y1="35" x2="14" y2="35" stroke="#ccc" stroke-width="1"/>'+
+      '<line x1="6" y1="90" x2="14" y2="90" stroke="#ccc" stroke-width="1"/>'+
+      '<path d="M25,90 C21,68 21,52 29,40 C33,34 49,34 53,40 C61,52 61,68 57,90 Z" fill="none" stroke="#0a0a0a" stroke-width="2"/>'+
+      '<line x1="48" y1="40" x2="70" y2="12" stroke="#0a0a0a" stroke-width="2"/>'+
+      '<circle cx="70" cy="10" r="3" fill="#0a0a0a"/>'+
+    '</svg>';
+  }
+  return '<svg class="size-guide-svg" viewBox="0 0 100 130" xmlns="http://www.w3.org/2000/svg">'+
+    '<line x1="14" y1="35" x2="14" y2="115" stroke="#ccc" stroke-width="1"/>'+
+    '<line x1="10" y1="35" x2="18" y2="35" stroke="#ccc" stroke-width="1"/>'+
+    '<line x1="10" y1="115" x2="18" y2="115" stroke="#ccc" stroke-width="1"/>'+
+    '<path d="M32,115 C27,90 27,70 37,55 C42,48 62,48 67,55 C77,70 77,90 72,115 Z" fill="none" stroke="#0a0a0a" stroke-width="2"/>'+
+    '<line x1="62" y1="55" x2="88" y2="22" stroke="#0a0a0a" stroke-width="2"/>'+
+    '<circle cx="88" cy="20" r="3" fill="#0a0a0a"/>'+
+  '</svg>';
+}
+function sizeGuideText(cat){
+  if(cat==='bombillas')return 'Largo aprox.: <strong>17–19 cm</strong>. Cada pieza es artesanal, las medidas pueden variar levemente.';
+  if(cat==='combos')return 'Mate: <strong>10–12 cm</strong> de altura · Bombilla: <strong>17–19 cm</strong> de largo. Las medidas pueden variar levemente.';
+  return 'Altura aprox.: <strong>10–12 cm</strong> · Diámetro aprox.: <strong>7–8 cm</strong>. Cada pieza es artesanal, las medidas pueden variar levemente.';
+}
 function renderProduct(p, related){
   var imgs = (p.imagenes && p.imagenes.length > 0) ? p.imagenes : [p.imagen];
   window._galleryImgs = imgs;
@@ -380,6 +439,13 @@ function renderProduct(p, related){
           <select id="ship-zone-select" onchange="updateShipEstimate(${p.precio})"></select>
           <div class="ship-est-result" id="ship-est-result"></div>
         </div>
+        <div class="size-guide" id="size-guide">
+          <div class="size-guide-title">Guía de tamaños</div>
+          <div class="size-guide-body">
+            ${sizeGuideSvg(p.categoria)}
+            <p class="size-guide-text">${sizeGuideText(p.categoria)}</p>
+          </div>
+        </div>
         <ul class="product-features">
           <li>Tallado artesanal a mano</li>
           <li>Envío a todo el país</li>
@@ -402,6 +468,28 @@ function renderProduct(p, related){
   if(metaOgTitle) metaOgTitle.setAttribute('content', p.nombre + ' — Oso Mates');
   if(metaOgDesc) metaOgDesc.setAttribute('content', (p.descripcion||'').slice(0,160));
   if(metaOgImg) metaOgImg.setAttribute('content', getImg(imgs[0]));
+  const ldEl = document.getElementById('product-ld');
+  if(ldEl){
+    const availability = (p.stock===0) ? 'https://schema.org/OutOfStock' : 'https://schema.org/InStock';
+    const ld = {
+      "@context":"https://schema.org",
+      "@type":"Product",
+      "name":p.nombre,
+      "image":[getImg(imgs[0])],
+      "description":(p.descripcion||'').slice(0,300),
+      "sku":p.id,
+      "brand":{"@type":"Brand","name":"Oso Mates"},
+      "offers":{
+        "@type":"Offer",
+        "url":"https://osomates8-sys.github.io/oso-mates/producto.html?id="+p.id,
+        "priceCurrency":"ARS",
+        "price":p.precio,
+        "availability":availability,
+        "itemCondition":"https://schema.org/NewCondition"
+      }
+    };
+    ldEl.textContent = JSON.stringify(ld);
+  }
 }
 function addToCartAndOpen(){
   if(!currentProd)return;
@@ -417,6 +505,43 @@ function addToCart(id){
 }
 function removeFromCart(id){cart=cart.filter(x=>x.id!==id);updateCartUI();}
 function changeQty(id,d){const item=cart.find(x=>x.id===id);if(item){item.qty+=d;if(item.qty<=0)removeFromCart(id);}updateCartUI();}
+const DEFAULT_COUPON={code:'',percent:0,active:false};
+let _coupon=DEFAULT_COUPON;
+let _couponApplied=false;
+async function loadCoupon(){
+  try{
+    const {data}=await sb.from('config').select('*').eq('clave','coupon').limit(1);
+    if(data&&data[0]&&data[0].valor){
+      const parsed=JSON.parse(data[0].valor);
+      if(parsed&&typeof parsed==='object')_coupon=parsed;
+    }
+  }catch(e){}
+}
+function getCheckoutTotal(){
+  const isT=payMethod==='transfer';
+  let total=isT?cartTransferTotal():cartTotal();
+  if(_couponApplied&&_coupon.percent>0)total=total*(1-_coupon.percent/100);
+  return total;
+}
+function applyCoupon(){
+  const msg=document.getElementById('coupon-msg');
+  const input=document.getElementById('coupon-input');
+  const code=(input.value||'').trim().toUpperCase();
+  if(!_coupon.active||!_coupon.code){
+    _couponApplied=false;
+    msg.textContent='No hay cupones disponibles en este momento.';
+    msg.className='coupon-msg err';
+  }else if(code&&code===_coupon.code.toUpperCase()){
+    _couponApplied=true;
+    msg.textContent='¡Cupón aplicado! '+_coupon.percent+'% de descuento.';
+    msg.className='coupon-msg ok';
+  }else{
+    _couponApplied=false;
+    msg.textContent='Código inválido.';
+    msg.className='coupon-msg err';
+  }
+  buildCheckoutTotal();
+}
 function cartTotal(){return cart.reduce((s,i)=>s+i.precio*i.qty,0);}
 function cartTransferTotal(){return cart.reduce((s,i)=>s+i.precio_transferencia*i.qty,0);}
 function updateCartUI(){saveCart();
@@ -442,12 +567,17 @@ function selectPay(m){
 }
 function buildCheckout(){
   document.getElementById('co-items').innerHTML=cart.map(item=>`<div class="co-item"><span class="co-item-name">${item.nombre} × ${item.qty}</span><span>${fmt(item.precio*item.qty)}</span></div>`).join('');
+  _couponApplied=false;
+  const ci=document.getElementById('coupon-input');if(ci)ci.value='';
+  const cm=document.getElementById('coupon-msg');if(cm){cm.textContent='';cm.className='coupon-msg';}
   selectPay(payMethod);
 }
 function buildCheckoutTotal(){
   const isT=payMethod==='transfer';
-  const total=isT?cartTransferTotal():cartTotal();
-  document.getElementById('co-total-label').textContent=isT?'Total (con 10% dcto.)':'Total';
+  const total=getCheckoutTotal();
+  let label=isT?'Total (con 10% dcto.)':'Total';
+  if(_couponApplied&&_coupon.percent>0)label+=' (cup\u00f3n -'+_coupon.percent+'%)';
+  document.getElementById('co-total-label').textContent=label;
   document.getElementById('co-total-amount').textContent=fmt(total);
 }
 async function confirmOrder(){
@@ -456,8 +586,9 @@ async function confirmOrder(){
   if(!name){showToast('Ingresá tu nombre 👆');return;}
   if(!email||!email.includes('@')){showToast('Ingresá un email válido 👆');return;}
   const isT=payMethod==='transfer';
-  const total=isT?cartTransferTotal():cartTotal();
-  const detalle=cart.map(i=>i.nombre+' x'+i.qty+' = '+fmt(isT?i.precio_transferencia*i.qty:i.precio*i.qty)).join(' | ');
+  const total=getCheckoutTotal();
+  let detalle=cart.map(i=>i.nombre+' x'+i.qty+' = '+fmt(isT?i.precio_transferencia*i.qty:i.precio*i.qty)).join(' | ');
+  if(_couponApplied&&_coupon.percent>0)detalle+=' | Cup\u00f3n '+_coupon.code+' (-'+_coupon.percent+'%)';
   const datosT=isT?'DATOS: Banco Frances BBVA | CBU: 0170090940000048482721 | Total: '+fmt(total):'';
   const metodo=isT?'Transferencia (10% dcto.)':'Mercado Pago';
   const btn=document.getElementById('confirm-btn');
@@ -476,7 +607,18 @@ async function confirmOrder(){
 }
 function copyCBU(){navigator.clipboard.writeText('0170090940000048482721');showToast('CBU copiado ✓');}
 function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3000);}
-loadCart();loadProduct();updateCartUI();
+function acceptCookies(){
+  try{localStorage.setItem('om_cookie_consent','1');}catch(e){}
+  const b=document.getElementById('cookie-banner');if(b)b.classList.remove('show');
+}
+(function(){
+  try{
+    if(!localStorage.getItem('om_cookie_consent')){
+      setTimeout(function(){const b=document.getElementById('cookie-banner');if(b)b.classList.add('show');},800);
+    }
+  }catch(e){}
+})();
+loadCart();loadProduct();loadCoupon();updateCartUI();
 </script>
 
 <!-- WHATSAPP FLOTANTE -->

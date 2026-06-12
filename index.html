@@ -186,6 +186,17 @@ footer{background:var(--black);padding:3rem 4rem;display:flex;justify-content:sp
 .co-total{display:flex;justify-content:space-between;align-items:center;padding:1.2rem 0;margin-bottom:1.5rem;}
 .co-total-label{font-size:.65rem;letter-spacing:.15em;text-transform:uppercase;}
 .co-total-amount{font-family:'Cormorant Garamond',serif;font-size:2rem;font-weight:300;}
+.coupon-box{display:flex;gap:.6rem;margin-bottom:.4rem;}
+.coupon-input{flex:1;padding:.8rem;border:1.5px solid var(--light);font-family:'Montserrat',sans-serif;font-size:.78rem;outline:none;text-transform:uppercase;}
+.coupon-btn{background:var(--black);color:var(--white);border:none;padding:0 1.4rem;font-family:'Montserrat',sans-serif;font-size:.62rem;letter-spacing:.15em;text-transform:uppercase;cursor:pointer;}
+.coupon-msg{font-size:.68rem;margin-bottom:1rem;min-height:1em;}
+.coupon-msg.ok{color:var(--green);}
+.coupon-msg.err{color:#c0392b;}
+.cookie-banner{position:fixed;left:0;right:0;bottom:0;background:var(--black);color:var(--white);padding:1.2rem 2rem;display:none;align-items:center;justify-content:center;gap:1.5rem;z-index:5000;flex-wrap:wrap;}
+.cookie-banner.show{display:flex;}
+.cookie-banner p{font-size:.75rem;font-weight:300;line-height:1.6;max-width:700px;text-align:center;}
+.cookie-banner a{color:inherit;text-decoration:underline;}
+.cookie-banner-btn{background:var(--white);color:var(--black);border:none;padding:.8rem 1.8rem;font-family:'Montserrat',sans-serif;font-size:.62rem;letter-spacing:.15em;text-transform:uppercase;cursor:pointer;white-space:nowrap;}
 .pay-options{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1.5rem;}
 .pay-opt{border:1.5px solid var(--light);padding:1.5rem;cursor:pointer;transition:all .2s;text-align:center;}
 .pay-opt:hover,.pay-opt.sel{border-color:var(--black);background:var(--black);color:var(--white);}
@@ -358,6 +369,14 @@ footer{background:var(--black);padding:3rem 4rem;display:flex;justify-content:sp
 .gallery-item:hover .gallery-item-overlay{background:rgba(10,10,10,.35);}
 .gallery-item-name{color:var(--white);font-size:.65rem;letter-spacing:.2em;text-transform:uppercase;opacity:0;transform:translateY(6px);transition:all .3s;}
 .gallery-item:hover .gallery-item-name{opacity:1;transform:translateY(0);}
+#instagram-section{background:var(--black);padding:6rem 4rem;text-align:center;}
+.ig-cta-icon{font-size:2.2rem;margin-bottom:1rem;}
+#instagram-section .section-title{color:var(--white);}
+.ig-cta-sub{color:var(--gray);margin:1rem auto 2.5rem;font-size:.8rem;max-width:420px;}
+.ig-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:.6rem;max-width:900px;margin:0 auto 2.5rem;}
+.ig-grid img{width:100%;aspect-ratio:1;object-fit:cover;cursor:pointer;transition:opacity .3s;}
+.ig-grid img:hover{opacity:.7;}
+.ig-follow-btn{display:inline-flex;align-items:center;gap:.6rem;background:var(--white);color:var(--black);padding:1rem 2.4rem;font-size:.65rem;letter-spacing:.2em;text-transform:uppercase;text-decoration:none;}
 
 /* ── STOCK BADGE ─────────────────────────────── */
 .stock-low{display:inline-block;background:#e74c3c;color:#fff;font-size:.55rem;letter-spacing:.15em;text-transform:uppercase;padding:.2rem .5rem;margin-bottom:.4rem;font-weight:600;}
@@ -398,6 +417,7 @@ footer{background:var(--black);padding:3rem 4rem;display:flex;justify-content:sp
   .testimonios-grid{grid-template-columns:1fr;}
   .gallery-grid{grid-template-columns:repeat(2,1fr);}
   .gallery-item:first-child{grid-column:span 2;grid-row:span 1;}
+  .ig-grid{grid-template-columns:repeat(3,1fr);}
   .price-filter-row{padding:.8rem 1.5rem;}
 }
 @media(max-width:600px){
@@ -431,6 +451,7 @@ fbq('track', 'PageView');
   <ul class="nav-links">
     <li><a href="#catalogo">Catálogo</a></li>
     <li><a href="#bombillas-section">Bombillas</a></li>
+    <li><a href="#combos-section">Combos</a></li>
     
     <li><a href="#nosotros">Nosotros</a></li>
     <li><a href="#contacto">Contacto</a></li>
@@ -442,6 +463,7 @@ fbq('track', 'PageView');
   <div class="mobile-nav-sub">Oso Mates</div>
   <a href="#catalogo" onclick="toggleMobileNav()">Catálogo</a>
   <a href="#bombillas-section" onclick="toggleMobileNav()">Bombillas</a>
+  <a href="#combos-section" onclick="toggleMobileNav()">Combos</a>
   <a href="#nosotros" onclick="toggleMobileNav()">Nosotros</a>
   <a href="#contacto" onclick="toggleMobileNav()">Contacto</a>
 </div>
@@ -487,6 +509,20 @@ fbq('track', 'PageView');
 </section>
 </section>
 
+<!-- SECCIÓN COMBOS -->
+<section id="combos-section" style="display:none;background:#f8f8f6;padding:6rem 4rem;">
+  <div class="section-header reveal">
+    <div>
+      <div class="section-num">★ Combos</div>
+      <h2 class="section-title">Combos <em>especiales</em></h2>
+    </div>
+    <a href="#catalogo" onclick="filterP('combos',document.querySelector('[data-filter=combos]'))" style="font-size:.62rem;letter-spacing:.2em;text-transform:uppercase;color:var(--gray);text-decoration:none;display:flex;align-items:center;gap:1rem;">Ver todos &#x2192;</a>
+  </div>
+  <div class="bestsellers-grid" id="combos-grid">
+    <div class="loading">Cargando...</div>
+  </div>
+</section>
+
 <!-- SECCIÓN BOMBILLAS -->
 <section id="bombillas-section" style="display:none;background:#f0f0ee;padding:6rem 4rem;">
   <div class="section-header reveal">
@@ -508,6 +544,7 @@ fbq('track', 'PageView');
     <button class="ftab" data-filter="madera" onclick="filterP('madera',this)">Madera</button>
     <button class="ftab" data-filter="calabaza" onclick="filterP('calabaza',this)">Calabaza</button>
     <button class="ftab" data-filter="bombillas" onclick="filterP('bombillas',this)">Bombillas</button>
+    <button class="ftab" data-filter="combos" onclick="filterP('combos',this)">Combos</button>
   </div>
   <div class="price-filter-row" id="price-filter-row">
     <span class="pfab-label">Precio:</span>
@@ -529,6 +566,15 @@ fbq('track', 'PageView');
   <div class="gallery-grid" id="gallery-grid">
     <div class="loading" style="grid-column:1/-1">Cargando galería...</div>
   </div>
+</section>
+
+<!-- INSTAGRAM -->
+<section id="instagram-section">
+  <div class="ig-cta-icon">📷</div>
+  <h2 class="section-title">Seguinos en <em>Instagram</em></h2>
+  <p class="ig-cta-sub">Mirá nuestras últimas creaciones, novedades y el detrás de escena del taller.</p>
+  <div class="ig-grid" id="ig-grid"></div>
+  <a href="https://www.instagram.com/oso_mates" target="_blank" class="ig-follow-btn">@oso_mates &#x2197;</a>
 </section>
 
 <!-- FAQ -->
@@ -600,6 +646,8 @@ fbq('track', 'PageView');
       <div class="co-sec">Productos</div>
       <div id="co-items"></div>
       <div class="co-total"><span class="co-total-label" id="co-total-label">Total</span><span class="co-total-amount" id="co-total-amount"></span></div>
+      <div class="coupon-box"><input id="coupon-input" type="text" placeholder="Código de cupón"/><button class="coupon-btn" onclick="applyCoupon()">Aplicar</button></div>
+      <div class="coupon-msg" id="coupon-msg"></div>
       <div class="pay-options">
         <div class="pay-opt" id="opt-mp" onclick="selectPay('mp')"><span class="pay-opt-icon">💳</span><div class="pay-opt-label">Mercado Pago</div><div class="pay-opt-desc">Tarjeta, débito o saldo MP</div></div>
         <div class="pay-opt" id="opt-tr" onclick="selectPay('transfer')"><span class="pay-opt-icon">🏦</span><div class="pay-opt-label">Transferencia</div><div class="pay-opt-desc">10% de descuento</div></div>
@@ -628,10 +676,36 @@ fbq('track', 'PageView');
     <button class="success-close" onclick="document.getElementById('success-overlay').classList.remove('open')">Cerrar</button>
   </div>
 </div>
+<div class="cookie-banner" id="cookie-banner">
+  <p>Usamos cookies para mejorar tu experiencia y analizar el tráfico del sitio. Al continuar navegando aceptás nuestra <a href="legales.html">política de privacidad</a>.</p>
+  <button class="cookie-banner-btn" onclick="acceptCookies()">Aceptar</button>
+</div>
 <div class="toast" id="toast"></div>
 <script>
 
 
+async function loadCombos(){
+  var res=await sb.from('productos').select('*').eq('activo',true).eq('categoria','combos');
+  var data=res.data||[];
+  var sec=document.getElementById('combos-section');
+  var grid=document.getElementById('combos-grid');
+  if(!data.length){sec.style.display='none';return;}
+  sec.style.display='block';
+  grid.innerHTML=data.map(function(p){
+    return '<div class="bs-card" onclick="viewProduct(\'' + p.id + '\')">'+
+      '<div class="bs-badge" style="background:var(--blue)">Combo</div>'+
+      '<img src="' + getImg(p.imagen) + '" alt="' + p.nombre + '" class="bs-img" style="object-position:' + getImgPos(p.imagen) + '" loading="lazy"/>'+
+      '<div class="bs-info">'+
+        '<div class="bs-name">' + p.nombre + '</div>'+
+        '<div class="bs-mat">' + p.material + '</div>'+
+        '<div class="bs-footer">'+
+          '<div class="bs-price">' + fmt(p.precio) + '</div>'+
+          '<button class="bs-btn" onclick="event.stopPropagation();addToCart(\'' + p.id + '\')">+ Agregar</button>'+
+        '</div>'+
+      '</div>'+
+    '</div>';
+  }).join('');
+}
 async function loadBombillas(){
   var res=await sb.from('productos').select('*').eq('activo',true).eq('categoria','bombillas');
   var data=res.data||[];
@@ -878,13 +952,13 @@ function fmt(n){return '$'+parseInt(n).toLocaleString('es-AR');}
 
 async function loadProducts(){
   const cached=getCachedProducts();
-  if(cached){allProds=cached;renderGrid(allProds);loadGallery();}
+  if(cached){allProds=cached;renderGrid(allProds);loadGallery();loadInstagramGrid();}
   const {data,error}=await sb.from('productos').select('*').eq('activo',true).order('created_at');
   if(error){if(!cached)console.error(error);return;}
   allProds=data;
   setCachedProducts(data);
   renderGrid(allProds);
-  loadGallery();
+  loadGallery();loadInstagramGrid();
 }
 
 function renderGrid(listOrFilter){
@@ -913,6 +987,43 @@ function addToCart(id){
 }
 function removeFromCart(id){cart=cart.filter(x=>x.id!==id);updateCartUI();}
 function changeQty(id,d){const item=cart.find(x=>x.id===id);if(item){item.qty+=d;if(item.qty<=0)removeFromCart(id);}updateCartUI();}
+const DEFAULT_COUPON={code:'',percent:0,active:false};
+let _coupon=DEFAULT_COUPON;
+let _couponApplied=false;
+async function loadCoupon(){
+  try{
+    const {data}=await sb.from('config').select('*').eq('clave','coupon').limit(1);
+    if(data&&data[0]&&data[0].valor){
+      const parsed=JSON.parse(data[0].valor);
+      if(parsed&&typeof parsed==='object')_coupon=parsed;
+    }
+  }catch(e){}
+}
+function getCheckoutTotal(){
+  const isT=payMethod==='transfer';
+  let total=isT?cartTransferTotal():cartTotal();
+  if(_couponApplied&&_coupon.percent>0)total=total*(1-_coupon.percent/100);
+  return total;
+}
+function applyCoupon(){
+  const msg=document.getElementById('coupon-msg');
+  const input=document.getElementById('coupon-input');
+  const code=(input.value||'').trim().toUpperCase();
+  if(!_coupon.active||!_coupon.code){
+    _couponApplied=false;
+    msg.textContent='No hay cupones disponibles en este momento.';
+    msg.className='coupon-msg err';
+  }else if(code&&code===_coupon.code.toUpperCase()){
+    _couponApplied=true;
+    msg.textContent='¡Cupón aplicado! '+_coupon.percent+'% de descuento.';
+    msg.className='coupon-msg ok';
+  }else{
+    _couponApplied=false;
+    msg.textContent='Código inválido.';
+    msg.className='coupon-msg err';
+  }
+  buildCheckoutTotal();
+}
 function cartTotal(){return cart.reduce((s,i)=>s+i.precio*i.qty,0);}
 function cartTransferTotal(){return cart.reduce((s,i)=>s+i.precio_transferencia*i.qty,0);}
 
@@ -977,13 +1088,18 @@ function selectPay(m){
 
 function buildCheckout(){
   document.getElementById('co-items').innerHTML=cart.map(item=>`<div class="co-item"><span class="co-item-name">${item.nombre} \xd7 ${item.qty}</span><span>${fmt(item.precio*item.qty)}</span></div>`).join('');
+  _couponApplied=false;
+  const ci=document.getElementById('coupon-input');if(ci)ci.value='';
+  const cm=document.getElementById('coupon-msg');if(cm){cm.textContent='';cm.className='coupon-msg';}
   selectPay(payMethod);
 }
 
 function buildCheckoutTotal(){
   const isT=payMethod==='transfer';
-  const total=isT?cartTransferTotal():cartTotal();
-  document.getElementById('co-total-label').textContent=isT?'Total (con 10% dcto.)':'Total';
+  const total=getCheckoutTotal();
+  let label=isT?'Total (con 10% dcto.)':'Total';
+  if(_couponApplied&&_coupon.percent>0)label+=' (cup\u00f3n -'+_coupon.percent+'%)';
+  document.getElementById('co-total-label').textContent=label;
   document.getElementById('co-total-amount').textContent=fmt(total);
 }
 
@@ -993,8 +1109,9 @@ async function confirmOrder(){
   if(!name){showToast('Ingres\u00e1 tu nombre \ud83d\udc46');return;}
   if(!email||!email.includes('@')){showToast('Ingres\u00e1 un email v\u00e1lido \ud83d\udc46');return;}
   const isT=payMethod==='transfer';
-  const total=isT?cartTransferTotal():cartTotal();
-  const detalle=cart.map(i=>i.nombre+' x'+i.qty+' = '+fmt(isT?i.precio_transferencia*i.qty:i.precio*i.qty)).join(' | ');
+  const total=getCheckoutTotal();
+  let detalle=cart.map(i=>i.nombre+' x'+i.qty+' = '+fmt(isT?i.precio_transferencia*i.qty:i.precio*i.qty)).join(' | ');
+  if(_couponApplied&&_coupon.percent>0)detalle+=' | Cup\u00f3n '+_coupon.code+' (-'+_coupon.percent+'%)';
   const datosT=isT?'DATOS: Banco Frances BBVA | CBU: 0170090940000048482721 | Total: '+fmt(total):'';
   const metodo=isT?'Transferencia (10% dcto.)':'Mercado Pago';
   const btn=document.getElementById('confirm-btn');
@@ -1020,11 +1137,22 @@ async function confirmOrder(){
 
 function copyCBU(){navigator.clipboard.writeText('0170090940000048482721');showToast('CBU copiado \u2713');}
 function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3000);}
+function acceptCookies(){
+  try{localStorage.setItem('om_cookie_consent','1');}catch(e){}
+  const b=document.getElementById('cookie-banner');if(b)b.classList.remove('show');
+}
+(function(){
+  try{
+    if(!localStorage.getItem('om_cookie_consent')){
+      setTimeout(function(){const b=document.getElementById('cookie-banner');if(b)b.classList.add('show');},800);
+    }
+  }catch(e){}
+})();
 
 const obs=new IntersectionObserver(entries=>{entries.forEach((e,i)=>{if(e.isIntersecting)setTimeout(()=>e.target.classList.add('in'),i*80);});},{threshold:.1});
 document.querySelectorAll('.reveal').forEach(el=>obs.observe(el));
 
-loadCart();loadProducts();loadBestsellers();loadBombillas();loadFaq();loadNosotros();loadHeroBanner();loadTestimonios();loadPriceFilters();loadShippingZones();updateCartUI();
+loadCart();loadProducts();loadBestsellers();loadBombillas();loadCombos();loadFaq();loadNosotros();loadHeroBanner();loadTestimonios();loadPriceFilters();loadShippingZones();loadCoupon();updateCartUI();
 
 // ── CACHE de productos (10 min TTL) ──────────────────────────────────────────
 const CACHE_KEY='om_products';const CACHE_TTL=10*60*1000;
@@ -1093,6 +1221,22 @@ async function loadGallery(){
       <div class="gallery-item-overlay"><span class="gallery-item-name">${p.nombre}</span></div>
     </div>
   `).join('');
+}
+async function loadInstagramGrid(){
+  const grid=document.getElementById('ig-grid');
+  if(!grid)return;
+  let galImgs=[];
+  try{
+    const {data}=await sb.from('config').select('*').eq('clave','galeria_imgs').limit(1);
+    if(data&&data[0]&&data[0].valor){galImgs=JSON.parse(data[0].valor)||[];}
+  }catch(e){}
+  if(galImgs.length){
+    grid.innerHTML=galImgs.slice(0,6).map(name=>`<img src="${getImg(name)}" alt="Oso Mates" loading="lazy"/>`).join('');
+    return;
+  }
+  if(!allProds.length)return;
+  const items=allProds.filter(p=>p.imagen).slice(0,6);
+  grid.innerHTML=items.map(p=>`<img src="${getImg(p.imagen)}" alt="${p.nombre}" loading="lazy" onclick="viewProduct('${p.id}')"/>`).join('');
 }
 
 // ── EXIT INTENT ───────────────────────────────────────────────────────────────

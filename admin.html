@@ -250,6 +250,19 @@ body{font-family:Montserrat,sans-serif;background:#f0f0ee;color:#0a0a0a;}
         <button class="save-page-btn" id="save-shipz-btn">Guardar zonas de envio</button>
       </div>
       <div class="page-section">
+        <div class="page-section-title">Cupon de descuento</div>
+        <p style="font-size:.62rem;color:#888;margin-bottom:.8rem">Codigo que los clientes pueden ingresar en el checkout para obtener un descuento adicional sobre el total.</p>
+        <div class="fg2">
+          <div class="fg"><label class="fl">Codigo</label><input class="fi" id="coupon-code" placeholder="Ej: BIENVENIDA10" style="text-transform:uppercase"/></div>
+          <div class="fg"><label class="fl">Porcentaje de descuento</label><input class="fi" type="number" id="coupon-percent" placeholder="10"/></div>
+        </div>
+        <div class="fg" style="display:flex;align-items:center;gap:.6rem">
+          <input type="checkbox" id="coupon-active" style="width:auto"/>
+          <label class="fl" style="margin:0">Cupon activo</label>
+        </div>
+        <button class="save-page-btn" id="save-coupon-btn">Guardar cupon</button>
+      </div>
+      <div class="page-section">
         <div class="page-section-title">Preguntas frecuentes</div>
         <div id="faq-editor"></div>
         <button class="faq-add-btn" id="faq-add-btn">+ Agregar pregunta</button>
@@ -306,7 +319,7 @@ body{font-family:Montserrat,sans-serif;background:#f0f0ee;color:#0a0a0a;}
       </div>
       <div class="fg2">
         <div class="fg"><label class="fl">Categoria</label>
-          <select class="fi" id="f-cat"><option value="madera">Madera</option><option value="calabaza">Calabaza</option><option value="bombillas">Bombillas</option></select>
+          <select class="fi" id="f-cat"><option value="madera">Madera</option><option value="calabaza">Calabaza</option><option value="bombillas">Bombillas</option><option value="combos">Combos</option></select>
         </div>
         <div class="fg"><label class="fl">Badge</label><input class="fi" id="f-badge" placeholder="Popular, Nuevo..."/></div>
       </div>
@@ -372,6 +385,7 @@ body{font-family:Montserrat,sans-serif;background:#f0f0ee;color:#0a0a0a;}
   var testiItems = [];
   var pricefItems = [];
   var shipzItems = [];
+  var couponData = {code: '', percent: 10, active: false};
   var sbClient = supabase.createClient('https://dkyfaeqcbeyhibqjztwa.supabase.co', 'sb_publishable_zzsZ-7Upi-SAUD78wx0CJQ_skroMzF4');
 
   function fmt(n) { return '$' + parseInt(n).toLocaleString('es-AR'); }
@@ -715,6 +729,12 @@ body{font-family:Montserrat,sans-serif;background:#f0f0ee;color:#0a0a0a;}
             if (Array.isArray(parsedSz) && parsedSz.length) shipzItems = parsedSz;
           } catch(e) {}
         }
+        if (item.clave === 'coupon') {
+          try {
+            var parsedCp = JSON.parse(item.valor);
+            if (parsedCp && typeof parsedCp === 'object') couponData = parsedCp;
+          } catch(e) {}
+        }
       });
       if (!faqLoaded) faqItems = JSON.parse(JSON.stringify(DEFAULT_FAQ));
       if (!nosotrosData) nosotrosData = JSON.parse(JSON.stringify(DEFAULT_NOSOTROS));
@@ -726,6 +746,9 @@ body{font-family:Montserrat,sans-serif;background:#f0f0ee;color:#0a0a0a;}
       renderTestiEditor();
       renderPricefEditor();
       renderShipzEditor();
+      document.getElementById('coupon-code').value = couponData.code || '';
+      document.getElementById('coupon-percent').value = couponData.percent || '';
+      document.getElementById('coupon-active').checked = !!couponData.active;
       loadGalleryImageSelector();
     });
   }
@@ -995,6 +1018,15 @@ body{font-family:Montserrat,sans-serif;background:#f0f0ee;color:#0a0a0a;}
     var clean = shipzItems.filter(function(it) { return (it.label || '').trim(); });
     saveSetting('shipping_zones', JSON.stringify(clean));
     showToast('Zonas de envio guardadas');
+  });
+  document.getElementById('save-coupon-btn').addEventListener('click', function() {
+    var data = {
+      code: (document.getElementById('coupon-code').value || '').trim().toUpperCase(),
+      percent: parseInt(document.getElementById('coupon-percent').value, 10) || 0,
+      active: document.getElementById('coupon-active').checked
+    };
+    saveSetting('coupon', JSON.stringify(data));
+    showToast('Cupon guardado');
   });
 
   function openEdit(idx) {
