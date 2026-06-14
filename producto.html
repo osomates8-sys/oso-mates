@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
+<script>(function(){try{var t=localStorage.getItem('om_theme');if(t==='dark')document.documentElement.setAttribute('data-theme','dark');}catch(e){}})();</script>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <!-- SEO -->
@@ -20,8 +21,12 @@
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{--black:#0a0a0a;--white:#f8f8f6;--gray:#888;--light:#ebebeb;--mid:#444;--blue:#009ee3;--green:#2a9d5c;--warm:#c8956c;}
-body{font-family:'Montserrat',sans-serif;background:var(--white);color:var(--black);}
-nav{position:fixed;top:0;left:0;right:0;z-index:500;display:flex;justify-content:space-between;align-items:center;padding:1.5rem 4rem;background:rgba(248,248,246,0.97);backdrop-filter:blur(8px);border-bottom:1px solid var(--light);}
+[data-theme="dark"]{--black:#f0f0ee;--white:#15151a;--light:#2a2a30;--mid:#bbb;--gray:#999;}
+body{font-family:'Montserrat',sans-serif;background:var(--white);color:var(--black);transition:background-color .3s ease,color .3s ease;}
+nav{position:fixed;top:0;left:0;right:0;z-index:500;display:flex;justify-content:space-between;align-items:center;padding:1.5rem 4rem;background:rgba(248,248,246,0.97);backdrop-filter:blur(8px);border-bottom:1px solid var(--light);transition:background-color .3s ease,border-color .3s ease;}
+[data-theme="dark"] nav{background:rgba(21,21,26,0.97);}
+.theme-toggle{background:none;border:1px solid var(--light);width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:1rem;transition:border-color .2s,background-color .3s;flex-shrink:0;}
+.theme-toggle:hover{border-color:var(--gray);}
 .logo{font-family:'Cormorant Garamond',serif;font-size:1.3rem;font-weight:300;letter-spacing:.35em;text-transform:uppercase;color:var(--black);text-decoration:none;}
 .back-btn{font-size:.62rem;letter-spacing:.2em;text-transform:uppercase;color:var(--gray);text-decoration:none;display:flex;align-items:center;gap:.5rem;transition:color .2s;}
 .back-btn:hover{color:var(--black)}
@@ -68,8 +73,16 @@ nav{position:fixed;top:0;left:0;right:0;z-index:500;display:flex;justify-content
 .ship-est-result strong{color:var(--black);}
 .size-guide{border:1px solid var(--light);padding:1.2rem 1.6rem;margin-bottom:2rem;}
 .size-guide-title{font-size:.62rem;letter-spacing:.15em;text-transform:uppercase;color:var(--gray);margin-bottom:.8rem;}
+.engrave-box{border:1px solid var(--light);padding:1.2rem 1.6rem;margin-bottom:2rem;}
+.engrave-title{font-size:.62rem;letter-spacing:.15em;text-transform:uppercase;color:var(--gray);margin-bottom:.8rem;}
+.engrave-toggle{display:flex;align-items:center;gap:.6rem;font-size:.78rem;cursor:pointer;}
+.engrave-toggle input{width:auto;}
+.engrave-input-wrap{margin-top:.8rem;display:none;}
+.engrave-input-wrap.show{display:block;}
+.engrave-input{width:100%;padding:.8rem;border:1.5px solid var(--light);font-family:'Montserrat',sans-serif;font-size:.8rem;outline:none;}
+.engrave-count{font-size:.62rem;color:var(--gray);margin-top:.4rem;text-align:right;}
 .size-guide-body{display:flex;align-items:center;gap:1.5rem;}
-.size-guide-svg{flex-shrink:0;width:70px;height:100px;}
+.size-guide-svg{flex-shrink:0;width:70px;height:100px;background:#fff;border-radius:4px;}
 .size-guide-text{font-size:.75rem;color:var(--mid);line-height:1.7;}
 .size-guide-text strong{color:var(--black);}
 .product-features{list-style:none;margin-bottom:2.5rem;}
@@ -225,8 +238,10 @@ nav{position:fixed;top:0;left:0;right:0;z-index:500;display:flex;justify-content
 .gallery-main{flex:1;overflow:hidden;position:relative;}
 .gallery-main-img{width:100%;height:100%;object-fit:cover;display:block;transition:opacity .3s;}
 .gallery-thumbs{display:flex;gap:.5rem;padding:.8rem;background:rgba(248,248,246,.95);overflow-x:auto;}
+[data-theme="dark"] .gallery-thumbs{background:rgba(21,21,26,.95);}
 .gallery-thumb{width:60px;height:60px;object-fit:cover;cursor:pointer;opacity:.5;transition:opacity .2s;flex-shrink:0;border:2px solid transparent;}
 .gallery-thumb.active{opacity:1;border-color:#0a0a0a;}
+[data-theme="dark"] .gallery-thumb.active{border-color:#f0f0ee;}
 .gallery-nav{position:absolute;top:50%;transform:translateY(-50%);background:rgba(10,10,10,.5);color:white;border:none;width:40px;height:40px;font-size:1.2rem;cursor:pointer;display:flex;align-items:center;justify-content:center;}
 .gallery-nav-prev{left:1rem;}
 .gallery-nav-next{right:1rem;}
@@ -234,61 +249,65 @@ nav{position:fixed;top:0;left:0;right:0;z-index:500;display:flex;justify-content
 </head>
 <body>
 <nav>
-  <a href="index.html" class="back-btn">&#x2190; Volver</a>
+  <a href="index.html" class="back-btn" data-i18n="back_btn">&#x2190; Volver</a>
   <a href="index.html" class="logo">Oso <em style="font-style:italic">Mates</em></a>
-  <button class="cart-btn" onclick="toggleCart()">Carrito <span class="cart-count" id="cart-count">0</span></button>
+  <div style="display:flex;align-items:center;gap:.8rem;">
+    <button class="theme-toggle" id="theme-toggle" onclick="toggleTheme()" aria-label="Cambiar tema" title="Cambiar tema"></button>
+    <button class="theme-toggle" id="lang-toggle" onclick="toggleLang()" aria-label="Cambiar idioma" title="Cambiar idioma" style="font-size:.6rem;letter-spacing:.05em;font-weight:600;">EN</button>
+    <button class="cart-btn" onclick="toggleCart()"><span data-i18n="cart_btn">Carrito</span> <span class="cart-count" id="cart-count">0</span></button>
+  </div>
 </nav>
 <div id="product-content"><div class="loading">Cargando producto...</div></div>
 <div class="cart-overlay" id="cart-overlay" onclick="toggleCart()"></div>
 <div class="cart-sidebar" id="cart-sidebar">
-  <div class="cart-header"><div class="cart-header-title">Tu carrito</div><button class="cart-close" onclick="toggleCart()">&#x2715; Cerrar</button></div>
+  <div class="cart-header"><div class="cart-header-title" data-i18n="cart_title">Tu carrito</div><button class="cart-close" onclick="toggleCart()" data-i18n="cart_close">&#x2715; Cerrar</button></div>
   <div class="cart-items" id="cart-items"></div>
   <div class="cart-footer">
-    <div class="cart-subtotal"><span class="cart-subtotal-label">Total</span><span class="cart-subtotal-amount" id="cart-total">$0</span></div>
-    <button class="checkout-btn mp" onclick="openCheckout('mp')">Pagar con Mercado Pago</button>
-    <button class="checkout-btn" onclick="openCheckout('transfer')">Transferencia (&#x2212;10%)</button>
+    <div class="cart-subtotal"><span class="cart-subtotal-label" data-i18n="cart_total">Total</span><span class="cart-subtotal-amount" id="cart-total">$0</span></div>
+    <button class="checkout-btn mp" onclick="openCheckout('mp')" data-i18n="cart_pay_mp">Pagar con Mercado Pago</button>
+    <button class="checkout-btn" onclick="openCheckout('transfer')" data-i18n="cart_pay_transfer">Transferencia (&#x2212;10%)</button>
   </div>
 </div>
 <div class="co-overlay" id="co-overlay">
   <div class="co-modal">
-    <div class="co-header"><div class="co-title">Resumen de compra</div><button class="co-close" onclick="closeCheckout()">&#x2715; Volver</button></div>
+    <div class="co-header"><div class="co-title" data-i18n="co_title">Resumen de compra</div><button class="co-close" onclick="closeCheckout()" data-i18n="co_close">&#x2715; Volver</button></div>
     <div class="co-body">
-      <div class="co-sec">Productos</div>
+      <div class="co-sec" data-i18n="co_productos">Productos</div>
       <div id="co-items"></div>
-      <div class="co-total"><span class="co-total-label" id="co-total-label">Total</span><span class="co-total-amount" id="co-total-amount"></span></div>
-      <div class="coupon-box"><input id="coupon-input" type="text" placeholder="Código de cupón"/><button class="coupon-btn" onclick="applyCoupon()">Aplicar</button></div>
+      <div class="co-total"><span class="co-total-label" id="co-total-label" data-i18n="co_total">Total</span><span class="co-total-amount" id="co-total-amount"></span></div>
+      <div class="coupon-box"><input id="coupon-input" type="text" placeholder="Código de cupón" data-i18n-ph="coupon_ph"/><button class="coupon-btn" onclick="applyCoupon()" data-i18n="coupon_btn">Aplicar</button></div>
       <div class="coupon-msg" id="coupon-msg"></div>
       <div class="pay-options">
-        <div class="pay-opt" id="opt-mp" onclick="selectPay('mp')"><span class="pay-opt-icon">💳</span><div class="pay-opt-label">Mercado Pago</div><div class="pay-opt-desc">Tarjeta, débito o saldo</div></div>
-        <div class="pay-opt" id="opt-tr" onclick="selectPay('transfer')"><span class="pay-opt-icon">🏦</span><div class="pay-opt-label">Transferencia</div><div class="pay-opt-desc">10% de descuento</div></div>
+        <div class="pay-opt" id="opt-mp" onclick="selectPay('mp')"><span class="pay-opt-icon">💳</span><div class="pay-opt-label" data-i18n="pay_mp_label">Mercado Pago</div><div class="pay-opt-desc" data-i18n="pay_mp_desc">Tarjeta, débito o saldo</div></div>
+        <div class="pay-opt" id="opt-tr" onclick="selectPay('transfer')"><span class="pay-opt-icon">🏦</span><div class="pay-opt-label" data-i18n="pay_tr_label">Transferencia</div><div class="pay-opt-desc" data-i18n="pay_tr_desc">10% de descuento</div></div>
       </div>
       <div class="transfer-box" id="transfer-box">
-        <div class="transfer-box-title">&#x2713; Datos para transferir</div>
-        <div class="trow"><span class="tlabel">Banco</span><span class="tval">Francés (BBVA)</span></div>
-        <div class="trow"><span class="tlabel">CBU</span><span class="tval">0170090940000048482721 <button class="copy-btn" onclick="copyCBU()">Copiar</button></span></div>
-        <div class="dcto-banner">10% DE DESCUENTO APLICADO</div>
+        <div class="transfer-box-title" data-i18n="transfer_title">&#x2713; Datos para transferir</div>
+        <div class="trow"><span class="tlabel" data-i18n="transfer_banco">Banco</span><span class="tval" data-i18n="transfer_banco_val">Francés (BBVA)</span></div>
+        <div class="trow"><span class="tlabel" data-i18n="transfer_cbu">CBU</span><span class="tval">0170090940000048482721 <button class="copy-btn" onclick="copyCBU()" data-i18n="copy_btn">Copiar</button></span></div>
+        <div class="dcto-banner" data-i18n="dcto_banner">10% DE DESCUENTO APLICADO</div>
       </div>
-      <div class="co-sec" style="margin-top:1.5rem">Tus datos</div>
+      <div class="co-sec" style="margin-top:1.5rem" data-i18n="co_datos">Tus datos</div>
       <div class="field-group">
-        <div class="field-wrap"><label>Nombre *</label><input id="client-name" type="text" placeholder="Tu nombre completo"/></div>
-        <div class="field-wrap"><label>Email *</label><input id="client-email" type="email" placeholder="tu@email.com"/></div>
+        <div class="field-wrap"><label data-i18n="field_nombre">Nombre *</label><input id="client-name" type="text" placeholder="Tu nombre completo" data-i18n-ph="field_nombre_ph"/></div>
+        <div class="field-wrap"><label data-i18n="field_email">Email *</label><input id="client-email" type="email" placeholder="tu@email.com" data-i18n-ph="field_email_ph"/></div>
       </div>
-      <p class="field-note">Te enviaremos la confirmación a tu email.</p>
-      <button class="confirm-btn" id="confirm-btn" onclick="confirmOrder()">Confirmar pedido</button>
+      <p class="field-note" data-i18n="field_note">Te enviaremos la confirmación a tu email.</p>
+      <button class="confirm-btn" id="confirm-btn" onclick="confirmOrder()" data-i18n="confirm_btn">Confirmar pedido</button>
     </div>
   </div>
 </div>
 <div class="success-overlay" id="success-overlay">
   <div class="success-modal">
     <span class="success-icon">🧉</span>
-    <div class="success-title">¡Pedido confirmado!</div>
+    <div class="success-title" data-i18n="success_title">¡Pedido confirmado!</div>
     <p class="success-text" id="success-text"></p>
-    <button class="success-close" onclick="document.getElementById('success-overlay').classList.remove('open')">Cerrar</button>
+    <button class="success-close" onclick="document.getElementById('success-overlay').classList.remove('open')" data-i18n="success_close">Cerrar</button>
   </div>
 </div>
 <div class="cookie-banner" id="cookie-banner">
-  <p>Usamos cookies para mejorar tu experiencia y analizar el tráfico del sitio. Al continuar navegando aceptás nuestra <a href="legales.html">política de privacidad</a>.</p>
-  <button class="cookie-banner-btn" onclick="acceptCookies()">Aceptar</button>
+  <p data-i18n="cookie_text">Usamos cookies para mejorar tu experiencia y analizar el tráfico del sitio. Al continuar navegando aceptás nuestra <a href="legales.html">política de privacidad</a>.</p>
+  <button class="cookie-banner-btn" onclick="acceptCookies()" data-i18n="cookie_btn">Aceptar</button>
 </div>
 <div class="toast" id="toast"></div>
 <script>
@@ -298,6 +317,62 @@ function loadCart(){try{var d=localStorage.getItem('om_cart');if(d)cart=JSON.par
 const {createClient} = supabase;
 const sb = createClient('https://dkyfaeqcbeyhibqjztwa.supabase.co','sb_publishable_zzsZ-7Upi-SAUD78wx0CJQ_skroMzF4');
 emailjs.init('pr1E8ccHpaDtcv1Ml');
+
+const I18N = {
+  es: {
+    back_btn:'← Volver', cart_btn:'Carrito',
+    cart_title:'Tu carrito', cart_close:'✕ Cerrar', cart_total:'Total', cart_pay_mp:'Pagar con Mercado Pago', cart_pay_transfer:'Transferencia (−10%)', cart_empty:'Tu carrito está vacío', cart_item_remove:'Quitar', cart_item_grabado:'Grabado',
+    co_title:'Resumen de compra', co_close:'✕ Volver', co_productos:'Productos', co_total:'Total', coupon_ph:'Código de cupón', coupon_btn:'Aplicar',
+    pay_mp_label:'Mercado Pago', pay_mp_desc:'Tarjeta, débito o saldo', pay_tr_label:'Transferencia', pay_tr_desc:'10% de descuento',
+    transfer_title:'✓ Datos para transferir', transfer_banco:'Banco', transfer_banco_val:'Francés (BBVA)', transfer_cbu:'CBU', copy_btn:'Copiar', dcto_banner:'10% DE DESCUENTO APLICADO',
+    co_datos:'Tus datos', field_nombre:'Nombre *', field_nombre_ph:'Tu nombre completo', field_email:'Email *', field_email_ph:'tu@email.com', field_note:'Te enviaremos la confirmación a tu email.', confirm_btn:'Confirmar pedido', confirm_btn_mp:'Ir a Mercado Pago',
+    success_title:'¡Pedido confirmado!', success_close:'Cerrar',
+    cookie_text:'Usamos cookies para mejorar tu experiencia y analizar el tráfico del sitio. Al continuar navegando aceptás nuestra <a href="legales.html">política de privacidad</a>.', cookie_btn:'Aceptar',
+    ship_est_title:'Calculá tu envío', size_guide_title:'Guía de tamaños',
+    engrave_title:'Personalización', engrave_label:'Agregar grabado personalizado', engrave_ph:'Texto a grabar',
+    feat1:'Tallado artesanal a mano', feat2:'Envío a todo el país', feat3:'Garantía de satisfacción',
+    btn_add:'Agregar al carrito', btn_buy:'Comprar ahora',
+    fav_added:'♥ En tus favoritos', fav_add:'♡ Agregar a favoritos',
+    related_title:'También te puede gustar', reviews_title:'Opiniones', cargando_opiniones:'Cargando opiniones...',
+    review_form_title:'Dejá tu opinión', review_name_ph:'Tu nombre', review_text_ph:'Contanos tu experiencia con este producto...', review_submit:'Enviar opinión',
+    newsletter_title:'Sumate a la lista', newsletter_text:'Recibí novedades, descuentos exclusivos y nuevos lanzamientos directo a tu email.', newsletter_ph:'tu@email.com', newsletter_btn:'Suscribirme',
+    product_transfer_label:'Por transferencia:'
+  },
+  en: {
+    back_btn:'← Back', cart_btn:'Cart',
+    cart_title:'Your cart', cart_close:'✕ Close', cart_total:'Total', cart_pay_mp:'Pay with Mercado Pago', cart_pay_transfer:'Bank transfer (−10%)', cart_empty:'Your cart is empty', cart_item_remove:'Remove', cart_item_grabado:'Engraving',
+    co_title:'Order summary', co_close:'✕ Back', co_productos:'Products', co_total:'Total', coupon_ph:'Coupon code', coupon_btn:'Apply',
+    pay_mp_label:'Mercado Pago', pay_mp_desc:'Card, debit or balance', pay_tr_label:'Bank transfer', pay_tr_desc:'10% discount',
+    transfer_title:'✓ Transfer details', transfer_banco:'Bank', transfer_banco_val:'Francés (BBVA)', transfer_cbu:'CBU', copy_btn:'Copy', dcto_banner:'10% DISCOUNT APPLIED',
+    co_datos:'Your details', field_nombre:'Name *', field_nombre_ph:'Your full name', field_email:'Email *', field_email_ph:'you@email.com', field_note:'We\'ll send your confirmation by email.', confirm_btn:'Confirm order', confirm_btn_mp:'Go to Mercado Pago',
+    success_title:'Order confirmed!', success_close:'Close',
+    cookie_text:'We use cookies to improve your experience and analyze site traffic. By continuing to browse you accept our <a href="legales.html">privacy policy</a>.', cookie_btn:'Accept',
+    ship_est_title:'Calculate your shipping', size_guide_title:'Size guide',
+    engrave_title:'Personalization', engrave_label:'Add custom engraving', engrave_ph:'Text to engrave',
+    feat1:'Hand-carved craftsmanship', feat2:'Nationwide shipping', feat3:'Satisfaction guarantee',
+    btn_add:'Add to cart', btn_buy:'Buy now',
+    fav_added:'♥ In your favorites', fav_add:'♡ Add to favorites',
+    related_title:'You might also like', reviews_title:'Reviews', cargando_opiniones:'Loading reviews...',
+    review_form_title:'Leave your review', review_name_ph:'Your name', review_text_ph:'Tell us about your experience with this product...', review_submit:'Submit review',
+    newsletter_title:'Join our list', newsletter_text:'Get news, exclusive discounts and new releases straight to your inbox.', newsletter_ph:'you@email.com', newsletter_btn:'Subscribe',
+    product_transfer_label:'Bank transfer:'
+  }
+};
+let LANG = 'es';
+try{LANG = localStorage.getItem('om_lang')||'es';}catch(e){}
+function t(key){return (I18N[LANG]&&I18N[LANG][key])||I18N.es[key]||key;}
+function applyLang(){
+  document.querySelectorAll('[data-i18n]').forEach(function(el){el.innerHTML=t(el.getAttribute('data-i18n'));});
+  document.querySelectorAll('[data-i18n-ph]').forEach(function(el){el.placeholder=t(el.getAttribute('data-i18n-ph'));});
+  const btn=document.getElementById('lang-toggle');
+  if(btn)btn.textContent=LANG==='es'?'EN':'ES';
+}
+function toggleLang(){
+  LANG=LANG==='es'?'en':'es';
+  try{localStorage.setItem('om_lang',LANG);}catch(e){}
+  location.reload();
+}
+
 const IMG_MAP = {
   "camionero.jpg": "camionero.webp",
   "foto_camionero_v2.jpg": "camionero.webp",
@@ -521,57 +596,65 @@ function renderProduct(p, related){
         <p class="product-desc">${p.descripcion} Cada pieza es tallada a mano y lista para usar desde el primer día.</p>
         <div class="product-price-box">
           <div class="product-price">${fmt(p.precio)}</div>
-          <div class="product-transfer">Por transferencia: <strong>${fmt(p.precio_transferencia)}</strong> (&#x2212;10%)</div>
+          <div class="product-transfer">${t('product_transfer_label')} <strong>${fmt(p.precio_transferencia)}</strong> (&#x2212;10%)</div>
         </div>
         <div class="ship-est" id="ship-est">
-          <div class="ship-est-title">Calculá tu envío</div>
+          <div class="ship-est-title">${t('ship_est_title')}</div>
           <select id="ship-zone-select" onchange="updateShipEstimate(${p.precio})"></select>
           <div class="ship-est-result" id="ship-est-result"></div>
         </div>
         <div class="size-guide" id="size-guide">
-          <div class="size-guide-title">Guía de tamaños</div>
+          <div class="size-guide-title">${t('size_guide_title')}</div>
           <div class="size-guide-body">
             ${sizeGuideSvg(p.categoria)}
             <p class="size-guide-text">${sizeGuideText(p.categoria)}</p>
           </div>
         </div>
+        ${_grabado.active?`<div class="engrave-box">
+          <div class="engrave-title">${t('engrave_title')}</div>
+          <label class="engrave-toggle"><input type="checkbox" id="engrave-check" onchange="toggleEngraveInput()"/> ${t('engrave_label')} (+${fmt(_grabado.price)})</label>
+          <div class="engrave-input-wrap" id="engrave-input-wrap">
+            <input type="text" class="engrave-input" id="engrave-text" maxlength="${_grabado.maxChars}" placeholder="${t('engrave_ph')}" oninput="updateEngraveCount()"/>
+            <div class="engrave-count" id="engrave-count">0 / ${_grabado.maxChars}</div>
+          </div>
+        </div>`:''}
         <ul class="product-features">
-          <li>Tallado artesanal a mano</li>
-          <li>Envío a todo el país</li>
-          <li>Garantía de satisfacción</li>
+          <li>${t('feat1')}</li>
+          <li>${t('feat2')}</li>
+          <li>${t('feat3')}</li>
         </ul>
         <div class="product-actions">
-          <button class="btn-add" onclick="addToCartAndOpen()">Agregar al carrito</button>
-          <button class="btn-mp" onclick="window.open('${p.link_mp}','_blank')">Comprar ahora</button>
+          <button class="btn-add" onclick="addToCartAndOpen()">${t('btn_add')}</button>
+          <button class="btn-mp" onclick="window.open('${p.link_mp}','_blank')">${t('btn_buy')}</button>
         </div>
-        <button class="btn-fav${isFav(p.id)?' active':''}" id="fav-btn" onclick="toggleProductFav('${p.id}')">${isFav(p.id)?'\u2665 En tus favoritos':'\u2661 Agregar a favoritos'}</button>
+        <button class="btn-fav${isFav(p.id)?' active':''}" id="fav-btn" onclick="toggleProductFav('${p.id}')">${isFav(p.id)?t('fav_added'):t('fav_add')}</button>
       </div>
     </div>
-    ${related.length?`<div class="related-section"><div class="related-title">También te puede gustar</div><div class="related-grid">${related.map(r=>`<div class="related-card" onclick="window.location.href='producto.html?id=${r.id}'"><img src="${getImg(r.imagen)}" alt="${r.nombre}" class="related-img" style="object-position:${getImgPos(r.imagen)}" loading="lazy"/><div class="related-name">${r.nombre}</div><div class="related-price">${fmt(r.precio)}</div></div>`).join('')}</div></div>`:''}
+    ${related.length?`<div class="related-section"><div class="related-title">${t('related_title')}</div><div class="related-grid">${related.map(r=>`<div class="related-card" onclick="window.location.href='producto.html?id=${r.id}'"><img src="${getImg(r.imagen)}" alt="${r.nombre}" class="related-img" style="object-position:${getImgPos(r.imagen)}" loading="lazy"/><div class="related-name">${r.nombre}</div><div class="related-price">${fmt(r.precio)}</div></div>`).join('')}</div></div>`:''}
     <section class="reviews-section">
       <div class="reviews-header">
-        <div class="related-title">Opiniones</div>
+        <div class="related-title">${t('reviews_title')}</div>
         <div class="reviews-summary" id="reviews-summary"></div>
       </div>
-      <div class="reviews-list" id="reviews-list"><div class="loading">Cargando opiniones...</div></div>
+      <div class="reviews-list" id="reviews-list"><div class="loading">${t('cargando_opiniones')}</div></div>
       <div class="review-form">
-        <div class="review-form-title">Dejá tu opinión</div>
+        <div class="review-form-title">${t('review_form_title')}</div>
         <div class="review-stars" id="review-stars">
           <span data-val="1" onclick="setReviewRating(1)">★</span><span data-val="2" onclick="setReviewRating(2)">★</span><span data-val="3" onclick="setReviewRating(3)">★</span><span data-val="4" onclick="setReviewRating(4)">★</span><span data-val="5" onclick="setReviewRating(5)">★</span>
         </div>
         <div class="field-group">
-          <div class="field-wrap" style="grid-column:1/-1"><label>Nombre *</label><input id="review-name" type="text" placeholder="Tu nombre"/></div>
+          <div class="field-wrap" style="grid-column:1/-1"><label>${t('field_nombre')}</label><input id="review-name" type="text" placeholder="${t('review_name_ph')}"/></div>
         </div>
-        <textarea id="review-text" class="review-textarea" placeholder="Contanos tu experiencia con este producto..."></textarea>
-        <button class="confirm-btn" onclick="submitReview('${p.id}')">Enviar opinión</button>
+        <textarea id="review-text" class="review-textarea" placeholder="${t('review_text_ph')}"></textarea>
+        <button class="confirm-btn" onclick="submitReview('${p.id}')">${t('review_submit')}</button>
       </div>
     </section>
     <section id="newsletter-section">
-      <div class="newsletter-title">Sumate a la lista</div>
-      <p class="newsletter-text">Recibí novedades, descuentos exclusivos y nuevos lanzamientos directo a tu email.</p>
+      <div class="newsletter-title">${t('newsletter_title')}</div>
+      <p class="newsletter-text">${t('newsletter_text')}</p>
       <div class="newsletter-form">
-        <input type="email" id="newsletter-email" placeholder="tu@email.com"/>
-        <button onclick="subscribeNewsletter()">Suscribirme</button>
+        <input type="email" id="newsletter-email" placeholder="${t('newsletter_ph')}"/>
+        <button onclick="subscribeNewsletter()">${t('newsletter_btn')}</button>
       </div>
       <div class="newsletter-msg" id="newsletter-msg"></div>
     </section>
@@ -612,18 +695,56 @@ function renderProduct(p, related){
 }
 function addToCartAndOpen(){
   if(!currentProd)return;
-  const ex=cart.find(x=>x.id===currentProd.id);
-  if(ex){ex.qty++;}else{cart.push({...currentProd,qty:1});}
+  const eng=getEngraveData();
+  if(eng.grabado){
+    const ex=cart.find(x=>x.id===currentProd.id&&x.grabado===eng.grabado);
+    if(ex){ex.qty++;}else{cart.push({...currentProd,qty:1,...eng,lineId:currentProd.id+'_eng_'+Date.now()});}
+  }else{
+    const ex=cart.find(x=>x.id===currentProd.id&&!x.grabado);
+    if(ex){ex.qty++;}else{cart.push({...currentProd,qty:1,grabado:'',grabadoPrecio:0});}
+  }
   updateCartUI();toggleCart();
 }
 function addToCart(id){
   const p=allProds.find(x=>x.id===id);if(!p)return;
-  const ex=cart.find(x=>x.id===id);
-  if(ex){ex.qty++;}else{cart.push({...p,qty:1});}
+  const ex=cart.find(x=>x.id===id&&!x.grabado);
+  if(ex){ex.qty++;}else{cart.push({...p,qty:1,grabado:'',grabadoPrecio:0});}
   updateCartUI();showToast(p.nombre+' agregado 🛒');
 }
-function removeFromCart(id){cart=cart.filter(x=>x.id!==id);updateCartUI();}
-function changeQty(id,d){const item=cart.find(x=>x.id===id);if(item){item.qty+=d;if(item.qty<=0)removeFromCart(id);}updateCartUI();}
+function removeFromCart(key){cart=cart.filter(x=>lineKey(x)!==key);updateCartUI();}
+function changeQty(key,d){const item=cart.find(x=>lineKey(x)===key);if(item){item.qty+=d;if(item.qty<=0)removeFromCart(key);}updateCartUI();}
+const DEFAULT_GRABADO={active:false,price:0,maxChars:20};
+let _grabado=DEFAULT_GRABADO;
+async function loadGrabado(){
+  try{
+    const {data}=await sb.from('config').select('*').eq('clave','grabado').limit(1);
+    if(data&&data[0]&&data[0].valor){
+      const parsed=JSON.parse(data[0].valor);
+      if(parsed&&typeof parsed==='object')_grabado={...DEFAULT_GRABADO,...parsed};
+    }
+  }catch(e){}
+}
+function toggleEngraveInput(){
+  const checked=document.getElementById('engrave-check').checked;
+  document.getElementById('engrave-input-wrap').classList.toggle('show',checked);
+}
+function updateEngraveCount(){
+  const el=document.getElementById('engrave-text');
+  document.getElementById('engrave-count').textContent=el.value.length+' / '+_grabado.maxChars;
+}
+function getEngraveData(){
+  const check=document.getElementById('engrave-check');
+  if(check&&check.checked){
+    const text=(document.getElementById('engrave-text').value||'').trim();
+    if(text)return {grabado:text,grabadoPrecio:_grabado.price};
+  }
+  return {grabado:'',grabadoPrecio:0};
+}
+function lineKey(item){return item.lineId||item.id;}
+function itemUnitPrice(item,isTransfer){
+  const base=isTransfer?item.precio_transferencia:item.precio;
+  return base+(item.grabado?(item.grabadoPrecio||0):0);
+}
 const DEFAULT_COUPON={code:'',percent:0,active:false};
 let _coupon=DEFAULT_COUPON;
 let _couponApplied=false;
@@ -675,14 +796,14 @@ function toggleProductFav(id){
   }
   if(!wasFav)showToast('Agregado a favoritos \u2764');
 }
-function cartTotal(){return cart.reduce((s,i)=>s+i.precio*i.qty,0);}
-function cartTransferTotal(){return cart.reduce((s,i)=>s+i.precio_transferencia*i.qty,0);}
+function cartTotal(){return cart.reduce((s,i)=>s+itemUnitPrice(i,false)*i.qty,0);}
+function cartTransferTotal(){return cart.reduce((s,i)=>s+itemUnitPrice(i,true)*i.qty,0);}
 function updateCartUI(){saveCart();
   const count=cart.reduce((s,i)=>s+i.qty,0);
   document.getElementById('cart-count').textContent=count;
   const el=document.getElementById('cart-items');
-  if(!cart.length){el.innerHTML='<div class="cart-empty">Tu carrito está vacío</div>';}
-  else{el.innerHTML=cart.map(item=>`<div class="cart-item"><img src="${getImg(item.imagen)}" alt="${item.nombre}" class="cart-item-img" style="object-position:${getImgPos(item.imagen)}"/><div><div class="cart-item-name">${item.nombre}</div><div class="cart-item-mat">${item.material}</div><div class="cart-item-qty"><button class="qty-btn" onclick="changeQty('${item.id}',-1)">&#x2212;</button><span class="qty-num">${item.qty}</span><button class="qty-btn" onclick="changeQty('${item.id}',1)">+</button></div></div><div><div class="cart-item-price">${fmt(item.precio*item.qty)}</div><div class="cart-item-remove" onclick="removeFromCart('${item.id}')">Quitar</div></div></div>`).join('');}
+  if(!cart.length){el.innerHTML='<div class="cart-empty">'+t('cart_empty')+'</div>';}
+  else{el.innerHTML=cart.map(item=>`<div class="cart-item"><img src="${getImg(item.imagen)}" alt="${item.nombre}" class="cart-item-img" style="object-position:${getImgPos(item.imagen)}"/><div><div class="cart-item-name">${item.nombre}</div><div class="cart-item-mat">${item.material}</div>${item.grabado?`<div class="cart-item-mat">${t('cart_item_grabado')}: "${escapeHtml(item.grabado)}"</div>`:''}<div class="cart-item-qty"><button class="qty-btn" onclick="changeQty('${lineKey(item)}',-1)">&#x2212;</button><span class="qty-num">${item.qty}</span><button class="qty-btn" onclick="changeQty('${lineKey(item)}',1)">+</button></div></div><div><div class="cart-item-price">${fmt(itemUnitPrice(item,false)*item.qty)}</div><div class="cart-item-remove" onclick="removeFromCart('${lineKey(item)}')">${t('cart_item_remove')}</div></div></div>`).join('');}
   document.getElementById('cart-total').textContent=fmt(cartTotal());
 }
 function toggleCart(){document.getElementById('cart-overlay').classList.toggle('open');document.getElementById('cart-sidebar').classList.toggle('open');}
@@ -695,11 +816,11 @@ function selectPay(m){
   document.getElementById('transfer-box').classList.toggle('show',m==='transfer');
   buildCheckoutTotal();
   const btn=document.getElementById('confirm-btn');
-  if(m==='mp'){btn.textContent='Ir a Mercado Pago';btn.className='confirm-btn mp-btn';}
-  else{btn.textContent='Confirmar pedido';btn.className='confirm-btn';}
+  if(m==='mp'){btn.textContent=t('confirm_btn_mp');btn.className='confirm-btn mp-btn';}
+  else{btn.textContent=t('confirm_btn');btn.className='confirm-btn';}
 }
 function buildCheckout(){
-  document.getElementById('co-items').innerHTML=cart.map(item=>`<div class="co-item"><span class="co-item-name">${item.nombre} × ${item.qty}</span><span>${fmt(item.precio*item.qty)}</span></div>`).join('');
+  document.getElementById('co-items').innerHTML=cart.map(item=>`<div class="co-item"><span class="co-item-name">${item.nombre}${item.grabado?` (${t('cart_item_grabado')}: "${escapeHtml(item.grabado)}")`:''} × ${item.qty}</span><span>${fmt(itemUnitPrice(item,payMethod==='transfer')*item.qty)}</span></div>`).join('');
   _couponApplied=false;
   const ci=document.getElementById('coupon-input');if(ci)ci.value='';
   const cm=document.getElementById('coupon-msg');if(cm){cm.textContent='';cm.className='coupon-msg';}
@@ -720,7 +841,7 @@ async function confirmOrder(){
   if(!email||!email.includes('@')){showToast('Ingresá un email válido 👆');return;}
   const isT=payMethod==='transfer';
   const total=getCheckoutTotal();
-  let detalle=cart.map(i=>i.nombre+' x'+i.qty+' = '+fmt(isT?i.precio_transferencia*i.qty:i.precio*i.qty)).join(' | ');
+  let detalle=cart.map(i=>i.nombre+(i.grabado?' (Grabado: "'+i.grabado+'")':'')+' x'+i.qty+' = '+fmt(itemUnitPrice(i,isT)*i.qty)).join(' | ');
   if(_couponApplied&&_coupon.percent>0)detalle+=' | Cup\u00f3n '+_coupon.code+' (-'+_coupon.percent+'%)';
   const datosT=isT?'DATOS: Banco Frances BBVA | CBU: 0170090940000048482721 | Total: '+fmt(total):'';
   const metodo=isT?'Transferencia (10% dcto.)':'Mercado Pago';
@@ -780,7 +901,21 @@ function acceptCookies(){
     }
   }catch(e){}
 })();
-loadCart();loadProduct();loadCoupon();updateCartUI();
+function applyTheme(theme){
+  document.documentElement.setAttribute('data-theme',theme);
+  const btn=document.getElementById('theme-toggle');
+  if(btn)btn.textContent=theme==='dark'?'☀':'☽';
+}
+function toggleTheme(){
+  const current=document.documentElement.getAttribute('data-theme')==='dark'?'dark':'light';
+  const next=current==='dark'?'light':'dark';
+  try{localStorage.setItem('om_theme',next);}catch(e){}
+  applyTheme(next);
+}
+applyTheme(document.documentElement.getAttribute('data-theme')==='dark'?'dark':'light');
+applyLang();
+
+loadCart();loadGrabado().then(loadProduct);loadCoupon();updateCartUI();
 </script>
 
 <!-- WHATSAPP FLOTANTE -->

@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
+<script>(function(){try{var t=localStorage.getItem('om_theme');if(t==='dark')document.documentElement.setAttribute('data-theme','dark');}catch(e){}})();</script>
 <meta charset="UTF-8"/>
 <!-- SEO -->
 <meta name="description" content="Oso Mates - Mates artesanales tallados a mano en Mar del Plata. Algarrobo, calabaza, cuero. Envios a todo el pais. Calidad artesanal unica."/>
@@ -27,6 +28,18 @@
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{--black:#0a0a0a;--white:#f8f8f6;--gray:#888;--light:#ebebeb;--mid:#444;--blue:#009ee3;--green:#2a9d5c;--warm:#c8956c;}
+[data-theme="dark"]{--black:#f0f0ee;--white:#15151a;--light:#2a2a30;--mid:#bbb;--gray:#999;}
+body,nav,.co-modal,.confirm-page,.cart-panel,.modal-overlay,footer,.hero-left,.hero-right{transition:background-color .3s ease,color .3s ease,border-color .3s ease;}
+.theme-toggle{background:none;border:1px solid var(--light);width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:1rem;transition:border-color .2s,background-color .3s;flex-shrink:0;}
+.theme-toggle:hover{border-color:var(--gray);}
+[data-theme="dark"] nav{background:rgba(21,21,26,0.97);}
+[data-theme="dark"] #faq{background:#1a1a1f;}
+[data-theme="dark"] #newsletter-section{background:#1a1a1f;}
+[data-theme="dark"] #bestsellers{background:#1a1a1f;}
+[data-theme="dark"] #galeria{background:#1a1a1f;}
+[data-theme="dark"] #combos-section{background:#1a1a1f!important;}
+[data-theme="dark"] #bombillas-section{background:#1a1a1f!important;}
+[data-theme="dark"] .ig-grid img{opacity:.85;}
 html{scroll-behavior:smooth}
 body{font-family:'Montserrat',sans-serif;background:var(--white);color:var(--black);overflow-x:hidden;}
 .cursor{position:fixed;width:10px;height:10px;background:var(--black);border-radius:50%;pointer-events:none;z-index:99999;transform:translate(-50%,-50%);mix-blend-mode:difference;}
@@ -300,6 +313,16 @@ footer{background:var(--black);padding:3rem 4rem;display:flex;justify-content:sp
 }
 .faq-item.open .faq-answer{max-height:300px;padding-bottom:1.5rem;}
 
+/* CUIDADO DEL MATE */
+#cuidado{padding:8rem 4rem;border-top:1px solid var(--light);}
+.care-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--light);border:1px solid var(--light);margin-top:3rem;}
+.care-item{background:var(--white);padding:2rem 1.6rem;}
+.care-icon{font-size:1.4rem;margin-bottom:1rem;display:block;}
+.care-title{font-family:'Cormorant Garamond',serif;font-size:1.2rem;font-weight:400;margin-bottom:.6rem;}
+.care-desc{font-size:.76rem;color:var(--gray);font-weight:300;line-height:1.8;}
+@media(max-width:900px){.care-grid{grid-template-columns:1fr 1fr;}}
+@media(max-width:600px){#cuidado{padding:3rem 1.5rem;}.care-grid{grid-template-columns:1fr;}}
+
 /* CONFIRMACION */
 .confirm-page{display:none;position:fixed;inset:0;background:var(--white);z-index:6000;align-items:center;justify-content:center;padding:2rem;}
 .confirm-page.show{display:flex;}
@@ -465,31 +488,33 @@ fbq('track', 'PageView');
 <nav>
   <a href="#hero" class="logo">Oso <em style="font-style:italic">Mates</em></a>
   <ul class="nav-links">
-    <li><a href="#catalogo">Catálogo</a></li>
-    <li><a href="#bombillas-section">Bombillas</a></li>
-    <li><a href="#combos-section">Combos</a></li>
+    <li><a href="#catalogo" data-i18n="nav_catalogo">Catálogo</a></li>
+    <li><a href="#bombillas-section" data-i18n="nav_bombillas">Bombillas</a></li>
+    <li><a href="#combos-section" data-i18n="nav_combos">Combos</a></li>
     
-    <li><a href="#nosotros">Nosotros</a></li>
-    <li><a href="#contacto">Contacto</a></li>
+    <li><a href="#nosotros" data-i18n="nav_nosotros">Nosotros</a></li>
+    <li><a href="#contacto" data-i18n="nav_contacto">Contacto</a></li>
   </ul>
+  <button class="theme-toggle" id="theme-toggle" onclick="toggleTheme()" aria-label="Cambiar tema" title="Cambiar tema"></button>
+  <button class="theme-toggle" id="lang-toggle" onclick="toggleLang()" aria-label="Cambiar idioma" title="Cambiar idioma" style="font-size:.6rem;letter-spacing:.05em;font-weight:600;">EN</button>
   <button class="hamburger" id="hamburger" onclick="toggleMobileNav()" aria-label="Menú"><span></span><span></span><span></span></button>
-  <button class="cart-btn" onclick="toggleCart()">Carrito <span class="cart-count" id="cart-count">0</span></button>
+  <button class="cart-btn" onclick="toggleCart()"><span data-i18n="cart_btn">Carrito</span> <span class="cart-count" id="cart-count">0</span></button>
 </nav>
 <div class="mobile-nav" id="mobile-nav">
   <div class="mobile-nav-sub">Oso Mates</div>
-  <a href="#catalogo" onclick="toggleMobileNav()">Catálogo</a>
-  <a href="#bombillas-section" onclick="toggleMobileNav()">Bombillas</a>
-  <a href="#combos-section" onclick="toggleMobileNav()">Combos</a>
-  <a href="#nosotros" onclick="toggleMobileNav()">Nosotros</a>
-  <a href="#contacto" onclick="toggleMobileNav()">Contacto</a>
+  <a href="#catalogo" onclick="toggleMobileNav()" data-i18n="nav_catalogo">Catálogo</a>
+  <a href="#bombillas-section" onclick="toggleMobileNav()" data-i18n="nav_bombillas">Bombillas</a>
+  <a href="#combos-section" onclick="toggleMobileNav()" data-i18n="nav_combos">Combos</a>
+  <a href="#nosotros" onclick="toggleMobileNav()" data-i18n="nav_nosotros">Nosotros</a>
+  <a href="#contacto" onclick="toggleMobileNav()" data-i18n="nav_contacto">Contacto</a>
 </div>
 <section id="hero">
   <div class="hero-left">
     <div>
-      <div class="hero-eyebrow">Argentina — Artesanal — Mar del Plata</div>
+      <div class="hero-eyebrow" data-i18n="hero_eyebrow">Argentina — Artesanal — Mar del Plata</div>
       <h1 class="hero-title" id="hero-title">Mates<br/><em>que se<br/>recuerdan</em></h1>
       <p class="hero-desc" id="hero-desc">Cada pieza tallada a mano. Sin moldes, sin máquinas. Solo madera, tiempo y oficio.</p>
-      <a href="#catalogo" class="hero-cta"><span class="hero-cta-text">Ver colección</span><span class="hero-cta-line"></span></a>
+      <a href="#catalogo" class="hero-cta"><span class="hero-cta-text" data-i18n="hero_cta">Ver colección</span><span class="hero-cta-line"></span></a>
     </div>
   </div>
   <div class="hero-right">
@@ -502,10 +527,10 @@ fbq('track', 'PageView');
 <section id="bestsellers">
   <div class="section-header reveal">
     <div>
-      <div class="section-num">&#x2605; Destacados</div>
-      <h2 class="section-title">Los m&#225;s <em>vendidos</em></h2>
+      <div class="section-num" data-i18n="sec_destacados_num">&#x2605; Destacados</div>
+      <h2 class="section-title" data-i18n="sec_destacados_title">Los m&#225;s <em>vendidos</em></h2>
     </div>
-    <a href="#catalogo" style="font-size:.62rem;letter-spacing:.2em;text-transform:uppercase;color:var(--gray);text-decoration:none;display:flex;align-items:center;gap:1rem;">Ver todos &#x2192;</a>
+    <a href="#catalogo" data-i18n="ver_todos" style="font-size:.62rem;letter-spacing:.2em;text-transform:uppercase;color:var(--gray);text-decoration:none;display:flex;align-items:center;gap:1rem;">Ver todos &#x2192;</a>
   </div>
   <div class="bestsellers-grid" id="bestsellers-grid">
     <div class="loading">Cargando...</div>
@@ -515,8 +540,8 @@ fbq('track', 'PageView');
 <section id="testimonios" class="reveal">
   <div class="section-header">
     <div>
-      <div class="section-num">★ Clientes</div>
-      <h2 class="section-title">Lo que dicen <em>nuestros clientes</em></h2>
+      <div class="section-num" data-i18n="sec_clientes_num">★ Clientes</div>
+      <h2 class="section-title" data-i18n="sec_clientes_title">Lo que dicen <em>nuestros clientes</em></h2>
     </div>
   </div>
   <div class="testimonios-grid" id="testimonios-grid">
@@ -529,10 +554,10 @@ fbq('track', 'PageView');
 <section id="combos-section" style="display:none;background:#f8f8f6;padding:6rem 4rem;">
   <div class="section-header reveal">
     <div>
-      <div class="section-num">★ Combos</div>
-      <h2 class="section-title">Combos <em>especiales</em></h2>
+      <div class="section-num" data-i18n="sec_combos_num">★ Combos</div>
+      <h2 class="section-title" data-i18n="sec_combos_title">Combos <em>especiales</em></h2>
     </div>
-    <a href="#catalogo" onclick="filterP('combos',document.querySelector('[data-filter=combos]'))" style="font-size:.62rem;letter-spacing:.2em;text-transform:uppercase;color:var(--gray);text-decoration:none;display:flex;align-items:center;gap:1rem;">Ver todos &#x2192;</a>
+    <a href="#catalogo" onclick="filterP('combos',document.querySelector('[data-filter=combos]'))" data-i18n="ver_todos" style="font-size:.62rem;letter-spacing:.2em;text-transform:uppercase;color:var(--gray);text-decoration:none;display:flex;align-items:center;gap:1rem;">Ver todos &#x2192;</a>
   </div>
   <div class="bestsellers-grid" id="combos-grid">
     <div class="loading">Cargando...</div>
@@ -543,10 +568,10 @@ fbq('track', 'PageView');
 <section id="bombillas-section" style="display:none;background:#f0f0ee;padding:6rem 4rem;">
   <div class="section-header reveal">
     <div>
-      <div class="section-num">★ Bombillas</div>
-      <h2 class="section-title">Nuestras <em>bombillas</em></h2>
+      <div class="section-num" data-i18n="sec_bombillas_num">★ Bombillas</div>
+      <h2 class="section-title" data-i18n="sec_bombillas_title">Nuestras <em>bombillas</em></h2>
     </div>
-    <a href="#catalogo" onclick="filterP('bombillas',document.querySelector('[data-filter=bombillas]'))" style="font-size:.62rem;letter-spacing:.2em;text-transform:uppercase;color:var(--gray);text-decoration:none;display:flex;align-items:center;gap:1rem;">Ver todas &#x2192;</a>
+    <a href="#catalogo" onclick="filterP('bombillas',document.querySelector('[data-filter=bombillas]'))" data-i18n="ver_todas" style="font-size:.62rem;letter-spacing:.2em;text-transform:uppercase;color:var(--gray);text-decoration:none;display:flex;align-items:center;gap:1rem;">Ver todas &#x2192;</a>
   </div>
   <div class="bestsellers-grid" id="bombillas-grid">
     <div class="loading">Cargando...</div>
@@ -554,22 +579,22 @@ fbq('track', 'PageView');
 </section>
 
 <section id="catalogo">
-  <div class="section-header reveal"><div><div class="section-num">01 — Catálogo</div><h2 class="section-title">La <em>colección</em></h2></div></div>
+  <div class="section-header reveal"><div><div class="section-num" data-i18n="sec_catalogo_num">01 — Catálogo</div><h2 class="section-title" data-i18n="sec_catalogo_title">La <em>colección</em></h2></div></div>
   <div class="search-box">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-    <input type="text" id="search-input" placeholder="Buscar productos..." oninput="searchProducts(this.value)"/>
+    <input type="text" id="search-input" placeholder="Buscar productos..." data-i18n-ph="search_ph" oninput="searchProducts(this.value)"/>
   </div>
   <div class="filter-row">
-    <button class="ftab active" data-filter="todos" onclick="filterP('todos',this)">Todos</button>
-    <button class="ftab" data-filter="madera" onclick="filterP('madera',this)">Madera</button>
-    <button class="ftab" data-filter="calabaza" onclick="filterP('calabaza',this)">Calabaza</button>
-    <button class="ftab" data-filter="bombillas" onclick="filterP('bombillas',this)">Bombillas</button>
-    <button class="ftab" data-filter="combos" onclick="filterP('combos',this)">Combos</button>
-    <button class="ftab" data-filter="favoritos" onclick="filterP('favoritos',this)">♥ Favoritos</button>
+    <button class="ftab active" data-filter="todos" onclick="filterP('todos',this)" data-i18n="f_todos">Todos</button>
+    <button class="ftab" data-filter="madera" onclick="filterP('madera',this)" data-i18n="f_madera">Madera</button>
+    <button class="ftab" data-filter="calabaza" onclick="filterP('calabaza',this)" data-i18n="f_calabaza">Calabaza</button>
+    <button class="ftab" data-filter="bombillas" onclick="filterP('bombillas',this)" data-i18n="f_bombillas">Bombillas</button>
+    <button class="ftab" data-filter="combos" onclick="filterP('combos',this)" data-i18n="f_combos">Combos</button>
+    <button class="ftab" data-filter="favoritos" onclick="filterP('favoritos',this)" data-i18n="f_favoritos">♥ Favoritos</button>
   </div>
   <div class="price-filter-row" id="price-filter-row">
-    <span class="pfab-label">Precio:</span>
-    <button class="pfab active" data-price="todos" onclick="filterPrice('todos',this)">Todos</button>
+    <span class="pfab-label" data-i18n="precio_label">Precio:</span>
+    <button class="pfab active" data-price="todos" onclick="filterPrice('todos',this)" data-i18n="f_todos">Todos</button>
   </div>
   <div class="catalog-grid" id="grid"><div class="loading">Cargando productos...</div></div>
 </section>
@@ -579,8 +604,8 @@ fbq('track', 'PageView');
 <section id="galeria">
   <div class="section-header reveal">
     <div>
-      <div class="section-num">02 — Galería</div>
-      <h2 class="section-title">Cada mate, <em>una historia</em></h2>
+      <div class="section-num" data-i18n="sec_galeria_num">02 — Galería</div>
+      <h2 class="section-title" data-i18n="sec_galeria_title">Cada mate, <em>una historia</em></h2>
     </div>
     <a href="https://www.instagram.com/oso_mates" target="_blank" style="font-size:.62rem;letter-spacing:.2em;text-transform:uppercase;color:var(--gray);text-decoration:none;display:flex;align-items:center;gap:1rem;">@oso_mates ↗</a>
   </div>
@@ -592,8 +617,8 @@ fbq('track', 'PageView');
 <!-- INSTAGRAM -->
 <section id="instagram-section">
   <div class="ig-cta-icon">📷</div>
-  <h2 class="section-title">Seguinos en <em>Instagram</em></h2>
-  <p class="ig-cta-sub">Mirá nuestras últimas creaciones, novedades y el detrás de escena del taller.</p>
+  <h2 class="section-title" data-i18n="sec_instagram_title">Seguinos en <em>Instagram</em></h2>
+  <p class="ig-cta-sub" data-i18n="ig_sub">Mirá nuestras últimas creaciones, novedades y el detrás de escena del taller.</p>
   <div class="ig-grid" id="ig-grid"></div>
   <a href="https://www.instagram.com/oso_mates" target="_blank" class="ig-follow-btn">@oso_mates &#x2197;</a>
 </section>
@@ -602,12 +627,43 @@ fbq('track', 'PageView');
 <section id="faq">
   <div class="section-header reveal">
     <div>
-      <div class="section-num">03 — Preguntas frecuentes</div>
-      <h2 class="section-title">Todo lo que <em>necesitas saber</em></h2>
+      <div class="section-num" data-i18n="sec_faq_num">03 — Preguntas frecuentes</div>
+      <h2 class="section-title" data-i18n="sec_faq_title">Todo lo que <em>necesitas saber</em></h2>
     </div>
   </div>
   <div class="faq-grid" id="faq-grid">
     <div class="loading">Cargando...</div>
+  </div>
+</section>
+<!-- CUIDADO DEL MATE -->
+<section id="cuidado">
+  <div class="section-header reveal">
+    <div>
+      <div class="section-num" data-i18n="sec_cuidado_num">04 — Guía</div>
+      <h2 class="section-title" data-i18n="sec_cuidado_title">Cuidá tu <em>mate</em></h2>
+    </div>
+  </div>
+  <div class="care-grid">
+    <div class="care-item">
+      <span class="care-icon">&#x1F392;</span>
+      <div class="care-title" data-i18n="care1_title">Curado inicial</div>
+      <div class="care-desc" data-i18n="care1_desc">Antes de usarlo por primera vez, llená el mate de calabaza con yerba usada y agua hasta el borde. Dejalo reposar 24 horas y repetí el proceso 2 o 3 veces para sellar los poros y eliminar el sabor a madera.</div>
+    </div>
+    <div class="care-item">
+      <span class="care-icon">&#x1F4A7;</span>
+      <div class="care-title" data-i18n="care2_title">Uso diario</div>
+      <div class="care-desc" data-i18n="care2_desc">Después de cada uso, vaciá la yerba húmeda y enjuagá con agua tibia, sin jabón. Dejalo secar boca abajo en un lugar ventilado y lejos del sol directo para que no se agriete.</div>
+    </div>
+    <div class="care-item">
+      <span class="care-icon">&#x2728;</span>
+      <div class="care-title" data-i18n="care3_title">Limpieza</div>
+      <div class="care-desc" data-i18n="care3_desc">Nunca uses detergente ni lavavajillas en mates de calabaza: arruina el curado. La bombilla de metal podés lavarla con agua tibia y un poco de bicarbonato cada tanto.</div>
+    </div>
+    <div class="care-item">
+      <span class="care-icon">&#x267B;</span>
+      <div class="care-title" data-i18n="care4_title">Mantenimiento</div>
+      <div class="care-desc" data-i18n="care4_desc">Si notás olor a humedad o moho, repetí el curado con yerba y agua caliente. Guardá el mate destapado entre usos para que respire y se conserve por años.</div>
+    </div>
   </div>
 </section>
 <section id="nosotros" style="padding:0">
@@ -616,22 +672,22 @@ fbq('track', 'PageView');
   </div>
 </section>
 <section id="contacto">
-  <div class="section-header reveal"><div><div class="section-num">05 — Contacto</div><h2 class="section-title">Habla<em>mos</em></h2></div></div>
+  <div class="section-header reveal"><div><div class="section-num" data-i18n="sec_contacto_num">05 — Contacto</div><h2 class="section-title" data-i18n="sec_contacto_title">Habla<em>mos</em></h2></div></div>
   <div class="contact-layout">
     <div class="reveal">
-      <p class="contact-sub">Estamos para ayudarte a elegir el mate perfecto. Respondemos todos los mensajes en el día.</p>
+      <p class="contact-sub" data-i18n="contact_sub">Estamos para ayudarte a elegir el mate perfecto. Respondemos todos los mensajes en el día.</p>
       <ul class="contact-items">
-        <li><span class="ci-label">WhatsApp</span><span class="ci-val">+54 9 223 306-1168</span></li>
-        <li><span class="ci-label">Instagram</span><span class="ci-val">@oso_mates</span></li>
-        <li><span class="ci-label">Email</span><span class="ci-val">osomates8@gmail.com</span></li>
-        <li><span class="ci-label">Envíos</span><span class="ci-val">Todo Argentina</span></li>
+        <li><span class="ci-label" data-i18n="ci_whatsapp">WhatsApp</span><span class="ci-val">+54 9 223 306-1168</span></li>
+        <li><span class="ci-label" data-i18n="ci_instagram">Instagram</span><span class="ci-val">@oso_mates</span></li>
+        <li><span class="ci-label" data-i18n="ci_email">Email</span><span class="ci-val">osomates8@gmail.com</span></li>
+        <li><span class="ci-label" data-i18n="ci_envios">Envíos</span><span class="ci-val" data-i18n="ci_envios_val">Todo Argentina</span></li>
       </ul>
     </div>
     <div class="reveal">
       <div class="wa-block">
-        <span class="wa-label">WhatsApp directo</span>
+        <span class="wa-label" data-i18n="wa_label">WhatsApp directo</span>
         <span class="wa-num">+54 9 223 306-1168</span>
-        <a href="https://wa.me/542233061168?text=Hola!%20Vi%20sus%20mates%20y%20me%20gustar%C3%ADa%20consultar." target="_blank" class="wa-btn">Escribir ahora &#x2192;</a>
+        <a href="https://wa.me/542233061168?text=Hola!%20Vi%20sus%20mates%20y%20me%20gustar%C3%ADa%20consultar." target="_blank" class="wa-btn" data-i18n="wa_btn">Escribir ahora &#x2192;</a>
       </div>
       <a href="https://www.instagram.com/oso_mates" target="_blank" class="ig-block">
         <span class="ig-handle">@oso_mates</span><span class="ig-arrow">&#x2197;</span>
@@ -640,75 +696,75 @@ fbq('track', 'PageView');
   </div>
 </section>
 <section id="newsletter-section">
-  <div class="newsletter-title">Sumate a la lista</div>
-  <p class="newsletter-text">Recibí novedades, descuentos exclusivos y nuevos lanzamientos directo a tu email.</p>
+  <div class="newsletter-title" data-i18n="newsletter_title">Sumate a la lista</div>
+  <p class="newsletter-text" data-i18n="newsletter_text">Recibí novedades, descuentos exclusivos y nuevos lanzamientos directo a tu email.</p>
   <div class="newsletter-form">
-    <input type="email" id="newsletter-email" placeholder="tu@email.com"/>
-    <button onclick="subscribeNewsletter()">Suscribirme</button>
+    <input type="email" id="newsletter-email" placeholder="tu@email.com" data-i18n-ph="newsletter_ph"/>
+    <button onclick="subscribeNewsletter()" data-i18n="newsletter_btn">Suscribirme</button>
   </div>
   <div class="newsletter-msg" id="newsletter-msg"></div>
 </section>
 <footer>
   <div class="footer-logo">Oso Mates</div>
-  <div class="footer-copy">&#169; 2026 &#8212; Hecho en Argentina</div>
-  <div class="footer-copy">Todos los derechos reservados</div>
-  <div class="footer-copy" style="margin-top:.6rem"><a href="legales.html" style="color:inherit;text-decoration:underline">Politica de privacidad y terminos</a></div>
+  <div class="footer-copy" data-i18n="footer_copy1">&#169; 2026 &#8212; Hecho en Argentina</div>
+  <div class="footer-copy" data-i18n="footer_copy2">Todos los derechos reservados</div>
+  <div class="footer-copy" style="margin-top:.6rem"><a href="legales.html" style="color:inherit;text-decoration:underline" data-i18n="footer_legal">Politica de privacidad y terminos</a></div>
 </footer>
 <div class="cart-overlay" id="cart-overlay" onclick="toggleCart()"></div>
 <div class="cart-sidebar" id="cart-sidebar">
-  <div class="cart-header"><div class="cart-header-title">Tu carrito</div><button class="cart-close" onclick="toggleCart()">&#x2715; Cerrar</button></div>
+  <div class="cart-header"><div class="cart-header-title" data-i18n="cart_title">Tu carrito</div><button class="cart-close" onclick="toggleCart()" data-i18n="cart_close">&#x2715; Cerrar</button></div>
   <div class="cart-items" id="cart-items"></div>
   <div class="cart-footer">
     <div class="cart-ship-est" id="cart-ship-est">
-      <div class="cart-ship-est-title">Calculá tu envío</div>
+      <div class="cart-ship-est-title" data-i18n="cart_ship_title">Calculá tu envío</div>
       <select id="cart-ship-zone-select" onchange="updateCartShipEstimate()"></select>
       <div class="cart-ship-est-result" id="cart-ship-est-result"></div>
     </div>
-    <div class="cart-subtotal"><span class="cart-subtotal-label">Total</span><span class="cart-subtotal-amount" id="cart-total">$0</span></div>
-    <button class="checkout-btn mp" onclick="openCheckout('mp')">Pagar con Mercado Pago</button>
-    <button class="checkout-btn" onclick="openCheckout('transfer')">Transferencia (&#x2212;10%)</button>
+    <div class="cart-subtotal"><span class="cart-subtotal-label" data-i18n="cart_total">Total</span><span class="cart-subtotal-amount" id="cart-total">$0</span></div>
+    <button class="checkout-btn mp" onclick="openCheckout('mp')" data-i18n="cart_pay_mp">Pagar con Mercado Pago</button>
+    <button class="checkout-btn" onclick="openCheckout('transfer')" data-i18n="cart_pay_transfer">Transferencia (&#x2212;10%)</button>
   </div>
 </div>
 <div class="co-overlay" id="co-overlay">
   <div class="co-modal">
-    <div class="co-header"><div class="co-title">Resumen de compra</div><button class="co-close" onclick="closeCheckout()">&#x2715; Volver</button></div>
+    <div class="co-header"><div class="co-title" data-i18n="co_title">Resumen de compra</div><button class="co-close" onclick="closeCheckout()" data-i18n="co_close">&#x2715; Volver</button></div>
     <div class="co-body">
-      <div class="co-sec">Productos</div>
+      <div class="co-sec" data-i18n="co_productos">Productos</div>
       <div id="co-items"></div>
-      <div class="co-total"><span class="co-total-label" id="co-total-label">Total</span><span class="co-total-amount" id="co-total-amount"></span></div>
-      <div class="coupon-box"><input id="coupon-input" type="text" placeholder="Código de cupón"/><button class="coupon-btn" onclick="applyCoupon()">Aplicar</button></div>
+      <div class="co-total"><span class="co-total-label" id="co-total-label" data-i18n="co_total">Total</span><span class="co-total-amount" id="co-total-amount"></span></div>
+      <div class="coupon-box"><input id="coupon-input" type="text" placeholder="Código de cupón" data-i18n-ph="coupon_ph"/><button class="coupon-btn" onclick="applyCoupon()" data-i18n="coupon_btn">Aplicar</button></div>
       <div class="coupon-msg" id="coupon-msg"></div>
       <div class="pay-options">
-        <div class="pay-opt" id="opt-mp" onclick="selectPay('mp')"><span class="pay-opt-icon">💳</span><div class="pay-opt-label">Mercado Pago</div><div class="pay-opt-desc">Tarjeta, débito o saldo MP</div></div>
-        <div class="pay-opt" id="opt-tr" onclick="selectPay('transfer')"><span class="pay-opt-icon">🏦</span><div class="pay-opt-label">Transferencia</div><div class="pay-opt-desc">10% de descuento</div></div>
+        <div class="pay-opt" id="opt-mp" onclick="selectPay('mp')"><span class="pay-opt-icon">💳</span><div class="pay-opt-label" data-i18n="pay_mp_label">Mercado Pago</div><div class="pay-opt-desc" data-i18n="pay_mp_desc">Tarjeta, débito o saldo MP</div></div>
+        <div class="pay-opt" id="opt-tr" onclick="selectPay('transfer')"><span class="pay-opt-icon">🏦</span><div class="pay-opt-label" data-i18n="pay_tr_label">Transferencia</div><div class="pay-opt-desc" data-i18n="pay_tr_desc">10% de descuento</div></div>
       </div>
       <div class="transfer-box" id="transfer-box">
-        <div class="transfer-box-title">&#x2713; Datos para transferir</div>
-        <div class="trow"><span class="tlabel">Banco</span><span class="tval">Francés (BBVA)</span></div>
-        <div class="trow"><span class="tlabel">CBU</span><span class="tval">0170090940000048482721 <button class="copy-btn" onclick="copyCBU()">Copiar</button></span></div>
-        <div class="dcto-banner">10% DE DESCUENTO APLICADO</div>
+        <div class="transfer-box-title" data-i18n="transfer_title">&#x2713; Datos para transferir</div>
+        <div class="trow"><span class="tlabel" data-i18n="transfer_banco">Banco</span><span class="tval" data-i18n="transfer_banco_val">Francés (BBVA)</span></div>
+        <div class="trow"><span class="tlabel" data-i18n="transfer_cbu">CBU</span><span class="tval">0170090940000048482721 <button class="copy-btn" onclick="copyCBU()" data-i18n="copy_btn">Copiar</button></span></div>
+        <div class="dcto-banner" data-i18n="dcto_banner">10% DE DESCUENTO APLICADO</div>
       </div>
-      <div class="co-sec" style="margin-top:1.5rem">Tus datos</div>
+      <div class="co-sec" style="margin-top:1.5rem" data-i18n="co_datos">Tus datos</div>
       <div class="field-group">
-        <div class="field-wrap"><label>Nombre *</label><input id="client-name" type="text" placeholder="Tu nombre completo"/></div>
-        <div class="field-wrap"><label>Email *</label><input id="client-email" type="email" placeholder="tu@email.com"/></div>
+        <div class="field-wrap"><label data-i18n="field_nombre">Nombre *</label><input id="client-name" type="text" placeholder="Tu nombre completo" data-i18n-ph="field_nombre_ph"/></div>
+        <div class="field-wrap"><label data-i18n="field_email">Email *</label><input id="client-email" type="email" placeholder="tu@email.com" data-i18n-ph="field_email_ph"/></div>
       </div>
-      <p class="field-note">Te enviaremos la confirmación a tu email.</p>
-      <button class="confirm-btn" id="confirm-btn" onclick="confirmOrder()">Confirmar pedido</button>
+      <p class="field-note" data-i18n="field_note">Te enviaremos la confirmación a tu email.</p>
+      <button class="confirm-btn" id="confirm-btn" onclick="confirmOrder()" data-i18n="confirm_btn">Confirmar pedido</button>
     </div>
   </div>
 </div>
 <div class="success-overlay" id="success-overlay">
   <div class="success-modal">
     <span class="success-icon">🧉</span>
-    <div class="success-title">¡Pedido confirmado!</div>
+    <div class="success-title" data-i18n="success_title">¡Pedido confirmado!</div>
     <p class="success-text" id="success-text"></p>
-    <button class="success-close" onclick="document.getElementById('success-overlay').classList.remove('open')">Cerrar</button>
+    <button class="success-close" onclick="document.getElementById('success-overlay').classList.remove('open')" data-i18n="success_close">Cerrar</button>
   </div>
 </div>
 <div class="cookie-banner" id="cookie-banner">
-  <p>Usamos cookies para mejorar tu experiencia y analizar el tráfico del sitio. Al continuar navegando aceptás nuestra <a href="legales.html">política de privacidad</a>.</p>
-  <button class="cookie-banner-btn" onclick="acceptCookies()">Aceptar</button>
+  <p data-i18n="cookie_text">Usamos cookies para mejorar tu experiencia y analizar el tráfico del sitio. Al continuar navegando aceptás nuestra <a href="legales.html">política de privacidad</a>.</p>
+  <button class="cookie-banner-btn" onclick="acceptCookies()" data-i18n="cookie_btn">Aceptar</button>
 </div>
 <div class="toast" id="toast"></div>
 <script>
@@ -731,7 +787,7 @@ async function loadCombos(){
         '<div class="bs-mat">' + p.material + '</div>'+
         '<div class="bs-footer">'+
           '<div class="bs-price">' + fmt(p.precio) + '</div>'+
-          '<button class="bs-btn" onclick="event.stopPropagation();addToCart(\'' + p.id + '\')">+ Agregar</button>'+
+          '<button class="bs-btn" onclick="event.stopPropagation();addToCart(\'' + p.id + '\')">' + t('add_btn') + '</button>'+
         '</div>'+
       '</div>'+
     '</div>';
@@ -754,7 +810,7 @@ async function loadBombillas(){
         '<div class="bs-mat">' + p.material + '</div>'+
         '<div class="bs-footer">'+
           '<div class="bs-price">' + fmt(p.precio) + '</div>'+
-          '<button class="bs-btn" onclick="event.stopPropagation();addToCart(\'' + p.id + '\')">+ Agregar</button>'+
+          '<button class="bs-btn" onclick="event.stopPropagation();addToCart(\'' + p.id + '\')">' + t('add_btn') + '</button>'+
         '</div>'+
       '</div>'+
     '</div>';
@@ -770,6 +826,96 @@ function toggleMobileNav(){
 const {createClient} = supabase;
 const sb = createClient('https://dkyfaeqcbeyhibqjztwa.supabase.co','sb_publishable_zzsZ-7Upi-SAUD78wx0CJQ_skroMzF4');
 emailjs.init('pr1E8ccHpaDtcv1Ml');
+
+const I18N = {
+  es: {
+    nav_catalogo:'Catálogo', nav_bombillas:'Bombillas', nav_combos:'Combos', nav_nosotros:'Nosotros', nav_contacto:'Contacto',
+    cart_btn:'Carrito',
+    hero_eyebrow:'Argentina — Artesanal — Mar del Plata',
+    hero_cta:'Ver colección',
+    sec_destacados_num:'★ Destacados', sec_destacados_title:'Los más <em>vendidos</em>', ver_todos:'Ver todos →', ver_todas:'Ver todas →',
+    sec_clientes_num:'★ Clientes', sec_clientes_title:'Lo que dicen <em>nuestros clientes</em>',
+    sec_combos_num:'★ Combos', sec_combos_title:'Combos <em>especiales</em>',
+    sec_bombillas_num:'★ Bombillas', sec_bombillas_title:'Nuestras <em>bombillas</em>',
+    sec_catalogo_num:'01 — Catálogo', sec_catalogo_title:'La <em>colección</em>',
+    search_ph:'Buscar productos...',
+    f_todos:'Todos', f_madera:'Madera', f_calabaza:'Calabaza', f_bombillas:'Bombillas', f_combos:'Combos', f_favoritos:'♥ Favoritos',
+    precio_label:'Precio:',
+    sec_galeria_num:'02 — Galería', sec_galeria_title:'Cada mate, <em>una historia</em>',
+    sec_instagram_title:'Seguinos en <em>Instagram</em>', ig_sub:'Mirá nuestras últimas creaciones, novedades y el detrás de escena del taller.',
+    sec_faq_num:'03 — Preguntas frecuentes', sec_faq_title:'Todo lo que <em>necesitas saber</em>',
+    sec_cuidado_num:'04 — Guía', sec_cuidado_title:'Cuidá tu <em>mate</em>',
+    care1_title:'Curado inicial', care1_desc:'Antes de usarlo por primera vez, llená el mate de calabaza con yerba usada y agua hasta el borde. Dejalo reposar 24 horas y repetí el proceso 2 o 3 veces para sellar los poros y eliminar el sabor a madera.',
+    care2_title:'Uso diario', care2_desc:'Después de cada uso, vaciá la yerba húmeda y enjuagá con agua tibia, sin jabón. Dejalo secar boca abajo en un lugar ventilado y lejos del sol directo para que no se agriete.',
+    care3_title:'Limpieza', care3_desc:'Nunca uses detergente ni lavavajillas en mates de calabaza: arruina el curado. La bombilla de metal podés lavarla con agua tibia y un poco de bicarbonato cada tanto.',
+    care4_title:'Mantenimiento', care4_desc:'Si notás olor a humedad o moho, repetí el curado con yerba y agua caliente. Guardá el mate destapado entre usos para que respire y se conserve por años.',
+    sec_contacto_num:'05 — Contacto', sec_contacto_title:'Habla<em>mos</em>',
+    contact_sub:'Estamos para ayudarte a elegir el mate perfecto. Respondemos todos los mensajes en el día.',
+    ci_whatsapp:'WhatsApp', ci_instagram:'Instagram', ci_email:'Email', ci_envios:'Envíos', ci_envios_val:'Todo Argentina',
+    wa_label:'WhatsApp directo', wa_btn:'Escribir ahora →',
+    newsletter_title:'Sumate a la lista', newsletter_text:'Recibí novedades, descuentos exclusivos y nuevos lanzamientos directo a tu email.', newsletter_ph:'tu@email.com', newsletter_btn:'Suscribirme',
+    footer_copy1:'© 2026 — Hecho en Argentina', footer_copy2:'Todos los derechos reservados', footer_legal:'Política de privacidad y términos',
+    cart_title:'Tu carrito', cart_close:'✕ Cerrar', cart_ship_title:'Calculá tu envío', cart_total:'Total', cart_pay_mp:'Pagar con Mercado Pago', cart_pay_transfer:'Transferencia (−10%)', cart_empty:'Tu carrito está vacío',
+    co_title:'Resumen de compra', co_close:'✕ Volver', co_productos:'Productos', co_total:'Total', coupon_ph:'Código de cupón', coupon_btn:'Aplicar',
+    pay_mp_label:'Mercado Pago', pay_mp_desc:'Tarjeta, débito o saldo MP', pay_tr_label:'Transferencia', pay_tr_desc:'10% de descuento',
+    transfer_title:'✓ Datos para transferir', transfer_banco:'Banco', transfer_banco_val:'Francés (BBVA)', transfer_cbu:'CBU', copy_btn:'Copiar', dcto_banner:'10% DE DESCUENTO APLICADO',
+    co_datos:'Tus datos', field_nombre:'Nombre *', field_nombre_ph:'Tu nombre completo', field_email:'Email *', field_email_ph:'tu@email.com', field_note:'Te enviaremos la confirmación a tu email.', confirm_btn:'Confirmar pedido',
+    success_title:'¡Pedido confirmado!', success_close:'Cerrar',
+    cookie_text:'Usamos cookies para mejorar tu experiencia y analizar el tráfico del sitio. Al continuar navegando aceptás nuestra <a href="legales.html">política de privacidad</a>.', cookie_btn:'Aceptar',
+    add_btn:'+ Agregar', ver_btn:'Ver', transf_label:'Transf.', free_ship:'Envío gratis', ultimas:'Últimas', cart_item_remove:'Quitar', cart_item_grabado:'Grabado'
+  },
+  en: {
+    nav_catalogo:'Catalog', nav_bombillas:'Straws', nav_combos:'Combos', nav_nosotros:'About', nav_contacto:'Contact',
+    cart_btn:'Cart',
+    hero_eyebrow:'Argentina — Handmade — Mar del Plata',
+    hero_cta:'View collection',
+    sec_destacados_num:'★ Bestsellers', sec_destacados_title:'Best <em>sellers</em>', ver_todos:'View all →', ver_todas:'View all →',
+    sec_clientes_num:'★ Customers', sec_clientes_title:'What <em>our customers say</em>',
+    sec_combos_num:'★ Combos', sec_combos_title:'Special <em>combos</em>',
+    sec_bombillas_num:'★ Straws', sec_bombillas_title:'Our <em>straws</em>',
+    sec_catalogo_num:'01 — Catalog', sec_catalogo_title:'The <em>collection</em>',
+    search_ph:'Search products...',
+    f_todos:'All', f_madera:'Wood', f_calabaza:'Gourd', f_bombillas:'Straws', f_combos:'Combos', f_favoritos:'♥ Favorites',
+    precio_label:'Price:',
+    sec_galeria_num:'02 — Gallery', sec_galeria_title:'Every mate, <em>a story</em>',
+    sec_instagram_title:'Follow us on <em>Instagram</em>', ig_sub:'Check out our latest creations, news and behind-the-scenes from the workshop.',
+    sec_faq_num:'03 — FAQ', sec_faq_title:'Everything you <em>need to know</em>',
+    sec_cuidado_num:'04 — Guide', sec_cuidado_title:'Care for your <em>mate</em>',
+    care1_title:'Initial curing', care1_desc:'Before using it for the first time, fill the gourd mate with used yerba and water to the brim. Let it sit for 24 hours and repeat the process 2 or 3 times to seal the pores and remove the wood taste.',
+    care2_title:'Daily use', care2_desc:'After each use, empty the wet yerba and rinse with warm water, no soap. Let it dry upside down in a ventilated spot away from direct sun so it doesn\'t crack.',
+    care3_title:'Cleaning', care3_desc:'Never use dish soap or detergent on gourd mates: it ruins the curing. The metal straw can be washed with warm water and a bit of baking soda every now and then.',
+    care4_title:'Maintenance', care4_desc:'If you notice a damp or musty smell, repeat the curing with yerba and hot water. Store the mate uncovered between uses so it can breathe and last for years.',
+    sec_contacto_num:'05 — Contact', sec_contacto_title:'Let\'s <em>talk</em>',
+    contact_sub:'We\'re here to help you choose the perfect mate. We reply to every message the same day.',
+    ci_whatsapp:'WhatsApp', ci_instagram:'Instagram', ci_email:'Email', ci_envios:'Shipping', ci_envios_val:'All of Argentina',
+    wa_label:'Direct WhatsApp', wa_btn:'Message us →',
+    newsletter_title:'Join our list', newsletter_text:'Get news, exclusive discounts and new releases straight to your inbox.', newsletter_ph:'you@email.com', newsletter_btn:'Subscribe',
+    footer_copy1:'© 2026 — Made in Argentina', footer_copy2:'All rights reserved', footer_legal:'Privacy policy and terms',
+    cart_title:'Your cart', cart_close:'✕ Close', cart_ship_title:'Calculate your shipping', cart_total:'Total', cart_pay_mp:'Pay with Mercado Pago', cart_pay_transfer:'Bank transfer (−10%)', cart_empty:'Your cart is empty',
+    co_title:'Order summary', co_close:'✕ Back', co_productos:'Products', co_total:'Total', coupon_ph:'Coupon code', coupon_btn:'Apply',
+    pay_mp_label:'Mercado Pago', pay_mp_desc:'Card, debit or MP balance', pay_tr_label:'Bank transfer', pay_tr_desc:'10% discount',
+    transfer_title:'✓ Transfer details', transfer_banco:'Bank', transfer_banco_val:'Francés (BBVA)', transfer_cbu:'CBU', copy_btn:'Copy', dcto_banner:'10% DISCOUNT APPLIED',
+    co_datos:'Your details', field_nombre:'Name *', field_nombre_ph:'Your full name', field_email:'Email *', field_email_ph:'you@email.com', field_note:'We\'ll send your confirmation by email.', confirm_btn:'Confirm order',
+    success_title:'Order confirmed!', success_close:'Close',
+    cookie_text:'We use cookies to improve your experience and analyze site traffic. By continuing to browse you accept our <a href="legales.html">privacy policy</a>.', cookie_btn:'Accept',
+    add_btn:'+ Add', ver_btn:'View', transf_label:'Transfer', free_ship:'Free shipping', ultimas:'Only', cart_item_remove:'Remove', cart_item_grabado:'Engraving'
+  }
+};
+let LANG = 'es';
+try{LANG = localStorage.getItem('om_lang')||'es';}catch(e){}
+function t(key){return (I18N[LANG]&&I18N[LANG][key])||I18N.es[key]||key;}
+function applyLang(){
+  document.querySelectorAll('[data-i18n]').forEach(function(el){el.innerHTML=t(el.getAttribute('data-i18n'));});
+  document.querySelectorAll('[data-i18n-ph]').forEach(function(el){el.placeholder=t(el.getAttribute('data-i18n-ph'));});
+  const btn=document.getElementById('lang-toggle');
+  if(btn)btn.textContent=LANG==='es'?'EN':'ES';
+}
+function toggleLang(){
+  LANG=LANG==='es'?'en':'es';
+  try{localStorage.setItem('om_lang',LANG);}catch(e){}
+  location.reload();
+}
+
 const IMG_MAP = {
   'camionero.jpg': 'camionero.webp',
   'imperial_algarrobo.jpg': 'imperial_algarrobo.webp',
@@ -798,7 +944,7 @@ async function loadBestsellers() {
         '<div class="bs-mat">' + p.material + '</div>'+
         '<div class="bs-footer">'+
           '<div class="bs-price">' + fmt(p.precio) + '</div>'+
-          '<button class="bs-btn" onclick="event.stopPropagation();addToCart(\'' + p.id + '\')">+ Agregar</button>'+
+          '<button class="bs-btn" onclick="event.stopPropagation();addToCart(\'' + p.id + '\')">' + t('add_btn') + '</button>'+
         '</div>'+
       '</div>'+
     '</div>';
@@ -1013,9 +1159,9 @@ function renderGrid(listOrFilter){
   else{list=listOrFilter==='todos'?allProds:allProds.filter(p=>p.categoria===listOrFilter);}
   if(!list.length){g.innerHTML='<div class="loading">No hay productos</div>';return;}
   g.innerHTML=list.map((p,i)=>{
-    const stockBadge=p.stock&&p.stock<=5?`<span class="stock-low">\u00daltimas ${p.stock}</span>`:'';
-    const shipBadge=p.precio>=100000?`<span class="free-ship">Env\u00edo gratis</span>`:'';
-    return `<div class="product-card"><div class="p-img-wrap" onclick="viewProduct('${p.id}')"><img src="${getImg(p.imagen)}" alt="${p.nombre}" class="p-img" style="object-position:${getImgPos(p.imagen)}" loading="lazy" onload="this.closest('.p-img-wrap').classList.add('loaded')" crossorigin="anonymous"/>${favBtnHtml(p.id)}</div><div class="p-body"><div class="p-num">N\u00b000${i+1}</div>${stockBadge}${shipBadge}${p.badge?`<div class="p-badge">${p.badge}</div>`:''}<div class="p-name" onclick="viewProduct('${p.id}')">${p.nombre}</div><div class="p-mat">${p.material}</div><div class="p-footer"><div><div class="p-price">${fmt(p.precio)}</div><div class="p-transfer">Transf. <strong>${fmt(p.precio_transferencia)}</strong> (\u221210%)</div></div><div class="p-btns"><button class="p-view-btn" onclick="viewProduct('${p.id}')">Ver</button><button class="p-add-btn" onclick="addToCart('${p.id}')">+ Agregar</button></div></div></div></div>`;
+    const stockBadge=p.stock&&p.stock<=5?`<span class="stock-low">${t('ultimas')} ${p.stock}</span>`:'';
+    const shipBadge=p.precio>=100000?`<span class="free-ship">${t('free_ship')}</span>`:'';
+    return `<div class="product-card"><div class="p-img-wrap" onclick="viewProduct('${p.id}')"><img src="${getImg(p.imagen)}" alt="${p.nombre}" class="p-img" style="object-position:${getImgPos(p.imagen)}" loading="lazy" onload="this.closest('.p-img-wrap').classList.add('loaded')" crossorigin="anonymous"/>${favBtnHtml(p.id)}</div><div class="p-body"><div class="p-num">N\u00b000${i+1}</div>${stockBadge}${shipBadge}${p.badge?`<div class="p-badge">${p.badge}</div>`:''}<div class="p-name" onclick="viewProduct('${p.id}')">${p.nombre}</div><div class="p-mat">${p.material}</div><div class="p-footer"><div><div class="p-price">${fmt(p.precio)}</div><div class="p-transfer">${t('transf_label')} <strong>${fmt(p.precio_transferencia)}</strong> (\u221210%)</div></div><div class="p-btns"><button class="p-view-btn" onclick="viewProduct('${p.id}')">${t('ver_btn')}</button><button class="p-add-btn" onclick="addToCart('${p.id}')">${t('add_btn')}</button></div></div></div></div>`;
   }).join('');
 }
 
@@ -1100,7 +1246,7 @@ function updateCartShipEstimate(){
   const z=_shipZones[parseInt(sel.value)||0];
   if(!z)return;
   if(cartTotal()>=100000){
-    res.innerHTML='<strong>Envío gratis</strong> a '+z.label+' · '+z.days;
+    res.innerHTML='<strong>'+t('free_ship')+'</strong> a '+z.label+' · '+z.days;
   }else{
     res.innerHTML='Costo estimado: <strong>'+fmt(z.cost)+'</strong> · '+z.days;
   }
@@ -1110,8 +1256,8 @@ function updateCartUI(){saveCart();
   const count=cart.reduce((s,i)=>s+i.qty,0);
   document.getElementById('cart-count').textContent=count;
   const el=document.getElementById('cart-items');
-  if(!cart.length){el.innerHTML='<div class="cart-empty">Tu carrito est\u00e1 vac\u00edo</div>';}
-  else{el.innerHTML=cart.map(item=>`<div class="cart-item"><img src="${getImg(item.imagen)}" alt="${item.nombre}" class="cart-item-img" style="object-position:${getImgPos(item.imagen)}" crossorigin="anonymous"/><div><div class="cart-item-name">${item.nombre}</div><div class="cart-item-mat">${item.material}</div><div class="cart-item-qty"><button class="qty-btn" onclick="changeQty('${item.id}',-1)">\u2212</button><span class="qty-num">${item.qty}</span><button class="qty-btn" onclick="changeQty('${item.id}',1)">+</button></div></div><div><div class="cart-item-price">${fmt(item.precio*item.qty)}</div><div class="cart-item-remove" onclick="removeFromCart('${item.id}')">Quitar</div></div></div>`).join('');}
+  if(!cart.length){el.innerHTML='<div class="cart-empty">'+t('cart_empty')+'</div>';}
+  else{el.innerHTML=cart.map(item=>`<div class="cart-item"><img src="${getImg(item.imagen)}" alt="${item.nombre}" class="cart-item-img" style="object-position:${getImgPos(item.imagen)}" crossorigin="anonymous"/><div><div class="cart-item-name">${item.nombre}</div><div class="cart-item-mat">${item.material}</div>${item.grabado?`<div class="cart-item-mat">${t('cart_item_grabado')}: "${escapeHtml(item.grabado)}"</div>`:''}<div class="cart-item-qty"><button class="qty-btn" onclick="changeQty('${lineKey(item)}',-1)">\u2212</button><span class="qty-num">${item.qty}</span><button class="qty-btn" onclick="changeQty('${lineKey(item)}',1)">+</button></div></div><div><div class="cart-item-price">${fmt(itemUnitPrice(item,false)*item.qty)}</div><div class="cart-item-remove" onclick="removeFromCart('${lineKey(item)}')">${t('cart_item_remove')}</div></div></div>`).join('');}
   document.getElementById('cart-total').textContent=fmt(cartTotal());
   updateCartShipEstimate();
 }
@@ -1132,7 +1278,7 @@ function selectPay(m){
 }
 
 function buildCheckout(){
-  document.getElementById('co-items').innerHTML=cart.map(item=>`<div class="co-item"><span class="co-item-name">${item.nombre} \xd7 ${item.qty}</span><span>${fmt(item.precio*item.qty)}</span></div>`).join('');
+  document.getElementById('co-items').innerHTML=cart.map(item=>`<div class="co-item"><span class="co-item-name">${item.nombre}${item.grabado?` (${t('cart_item_grabado')}: "${escapeHtml(item.grabado)}")`:''} \xd7 ${item.qty}</span><span>${fmt(itemUnitPrice(item,payMethod==='transfer')*item.qty)}</span></div>`).join('');
   _couponApplied=false;
   const ci=document.getElementById('coupon-input');if(ci)ci.value='';
   const cm=document.getElementById('coupon-msg');if(cm){cm.textContent='';cm.className='coupon-msg';}
@@ -1155,7 +1301,7 @@ async function confirmOrder(){
   if(!email||!email.includes('@')){showToast('Ingres\u00e1 un email v\u00e1lido \ud83d\udc46');return;}
   const isT=payMethod==='transfer';
   const total=getCheckoutTotal();
-  let detalle=cart.map(i=>i.nombre+' x'+i.qty+' = '+fmt(isT?i.precio_transferencia*i.qty:i.precio*i.qty)).join(' | ');
+  let detalle=cart.map(i=>i.nombre+(i.grabado?' (Grabado: "'+i.grabado+'")':'')+' x'+i.qty+' = '+fmt(itemUnitPrice(i,isT)*i.qty)).join(' | ');
   if(_couponApplied&&_coupon.percent>0)detalle+=' | Cup\u00f3n '+_coupon.code+' (-'+_coupon.percent+'%)';
   const datosT=isT?'DATOS: Banco Frances BBVA | CBU: 0170090940000048482721 | Total: '+fmt(total):'';
   const metodo=isT?'Transferencia (10% dcto.)':'Mercado Pago';
@@ -1211,6 +1357,17 @@ async function subscribeNewsletter(){
     msg.className='newsletter-msg err';
   }
 }
+function applyTheme(theme){
+  document.documentElement.setAttribute('data-theme',theme);
+  const btn=document.getElementById('theme-toggle');
+  if(btn)btn.textContent=theme==='dark'?'☀':'☽';
+}
+function toggleTheme(){
+  const current=document.documentElement.getAttribute('data-theme')==='dark'?'dark':'light';
+  const next=current==='dark'?'light':'dark';
+  try{localStorage.setItem('om_theme',next);}catch(e){}
+  applyTheme(next);
+}
 function acceptCookies(){
   try{localStorage.setItem('om_cookie_consent','1');}catch(e){}
   const b=document.getElementById('cookie-banner');if(b)b.classList.remove('show');
@@ -1221,6 +1378,12 @@ function acceptCookies(){
       setTimeout(function(){const b=document.getElementById('cookie-banner');if(b)b.classList.add('show');},800);
     }
   }catch(e){}
+})();
+
+(function(){
+  const t=document.documentElement.getAttribute('data-theme')==='dark'?'dark':'light';
+  applyTheme(t);
+  applyLang();
 })();
 
 const obs=new IntersectionObserver(entries=>{entries.forEach((e,i)=>{if(e.isIntersecting)setTimeout(()=>e.target.classList.add('in'),i*80);});},{threshold:.1});

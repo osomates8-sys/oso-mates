@@ -263,6 +263,26 @@ body{font-family:Montserrat,sans-serif;background:#f0f0ee;color:#0a0a0a;}
         <button class="save-page-btn" id="save-coupon-btn">Guardar cupon</button>
       </div>
       <div class="page-section">
+        <div class="page-section-title">Personalizacion (grabado)</div>
+        <p style="font-size:.62rem;color:#888;margin-bottom:.8rem">Permite que los clientes agreguen un grabado personalizado a su producto desde la pagina de producto, por un costo adicional.</p>
+        <div class="fg2">
+          <div class="fg"><label class="fl">Precio adicional</label><input class="fi" type="number" id="grabado-price" placeholder="1000"/></div>
+          <div class="fg"><label class="fl">Maximo de caracteres</label><input class="fi" type="number" id="grabado-maxchars" placeholder="20"/></div>
+        </div>
+        <div class="fg" style="display:flex;align-items:center;gap:.6rem">
+          <input type="checkbox" id="grabado-active" style="width:auto"/>
+          <label class="fl" style="margin:0">Personalizacion activa</label>
+        </div>
+        <button class="save-page-btn" id="save-grabado-btn">Guardar personalizacion</button>
+      </div>
+      <div class="page-section">
+        <div class="page-section-title">Suscriptores newsletter</div>
+        <p style="font-size:.62rem;color:#888;margin-bottom:.8rem">Emails que se suscribieron desde el formulario del sitio.</p>
+        <div id="newsletter-count" style="font-size:.7rem;color:#555;margin-bottom:.6rem">Cargando...</div>
+        <div id="newsletter-list" style="font-size:.7rem;color:#333;max-height:200px;overflow-y:auto;border:1px solid #ebebeb;padding:.6rem;background:#fff;line-height:1.8"></div>
+        <button class="save-page-btn" id="copy-newsletter-btn" style="margin-top:.8rem">Copiar emails</button>
+      </div>
+      <div class="page-section">
         <div class="page-section-title">Preguntas frecuentes</div>
         <div id="faq-editor"></div>
         <button class="faq-add-btn" id="faq-add-btn">+ Agregar pregunta</button>
@@ -386,6 +406,8 @@ body{font-family:Montserrat,sans-serif;background:#f0f0ee;color:#0a0a0a;}
   var pricefItems = [];
   var shipzItems = [];
   var couponData = {code: '', percent: 10, active: false};
+  var newsletterEmails = [];
+  var grabadoData = {active: false, price: 0, maxChars: 20};
   var sbClient = supabase.createClient('https://dkyfaeqcbeyhibqjztwa.supabase.co', 'sb_publishable_zzsZ-7Upi-SAUD78wx0CJQ_skroMzF4');
 
   function fmt(n) { return '$' + parseInt(n).toLocaleString('es-AR'); }
@@ -735,6 +757,18 @@ body{font-family:Montserrat,sans-serif;background:#f0f0ee;color:#0a0a0a;}
             if (parsedCp && typeof parsedCp === 'object') couponData = parsedCp;
           } catch(e) {}
         }
+        if (item.clave === 'newsletter_emails') {
+          try {
+            var parsedNl = JSON.parse(item.valor);
+            if (Array.isArray(parsedNl)) newsletterEmails = parsedNl;
+          } catch(e) {}
+        }
+        if (item.clave === 'grabado') {
+          try {
+            var parsedGr = JSON.parse(item.valor);
+            if (parsedGr && typeof parsedGr === 'object') grabadoData = parsedGr;
+          } catch(e) {}
+        }
       });
       if (!faqLoaded) faqItems = JSON.parse(JSON.stringify(DEFAULT_FAQ));
       if (!nosotrosData) nosotrosData = JSON.parse(JSON.stringify(DEFAULT_NOSOTROS));
@@ -749,6 +783,10 @@ body{font-family:Montserrat,sans-serif;background:#f0f0ee;color:#0a0a0a;}
       document.getElementById('coupon-code').value = couponData.code || '';
       document.getElementById('coupon-percent').value = couponData.percent || '';
       document.getElementById('coupon-active').checked = !!couponData.active;
+      renderNewsletterList();
+      document.getElementById('grabado-price').value = grabadoData.price || 0;
+      document.getElementById('grabado-maxchars').value = grabadoData.maxChars || 20;
+      document.getElementById('grabado-active').checked = !!grabadoData.active;
       loadGalleryImageSelector();
     });
   }
@@ -1027,6 +1065,35 @@ body{font-family:Montserrat,sans-serif;background:#f0f0ee;color:#0a0a0a;}
     };
     saveSetting('coupon', JSON.stringify(data));
     showToast('Cupon guardado');
+  });
+
+  function renderNewsletterList() {
+    var countEl = document.getElementById('newsletter-count');
+    var listEl = document.getElementById('newsletter-list');
+    countEl.textContent = newsletterEmails.length + ' suscriptor' + (newsletterEmails.length === 1 ? '' : 'es');
+    listEl.innerHTML = newsletterEmails.length
+      ? newsletterEmails.map(function(e) { return '<div>' + e.replace(/</g, '&lt;') + '</div>'; }).join('')
+      : '<div style="color:#aaa">Todavia no hay suscriptores.</div>';
+  }
+
+  document.getElementById('copy-newsletter-btn').addEventListener('click', function() {
+    if (!newsletterEmails.length) { showToast('No hay emails para copiar'); return; }
+    var text = newsletterEmails.join(', ');
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(function() { showToast('Emails copiados'); });
+    } else {
+      showToast('No se pudo copiar');
+    }
+  });
+
+  document.getElementById('save-grabado-btn').addEventListener('click', function() {
+    var data = {
+      active: document.getElementById('grabado-active').checked,
+      price: parseInt(document.getElementById('grabado-price').value, 10) || 0,
+      maxChars: parseInt(document.getElementById('grabado-maxchars').value, 10) || 20
+    };
+    saveSetting('grabado', JSON.stringify(data));
+    showToast('Personalizacion guardada');
   });
 
   function openEdit(idx) {
