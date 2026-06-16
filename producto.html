@@ -107,6 +107,34 @@ nav{position:fixed;top:0;left:0;right:0;z-index:500;display:flex;justify-content
 .toast{position:fixed;bottom:2rem;right:2rem;background:var(--black);color:var(--white);padding:1rem 2rem;font-size:.68rem;letter-spacing:.12em;text-transform:uppercase;z-index:9999;transform:translateY(80px);opacity:0;transition:all .4s cubic-bezier(.34,1.56,.64,1);pointer-events:none;}
 .toast.show{transform:translateY(0);opacity:1}
 .loading{text-align:center;padding:6rem;font-size:.78rem;letter-spacing:.1em;text-transform:uppercase;color:var(--gray);}
+
+/* LIGHTBOX ZOOM */
+.lightbox-overlay{position:fixed;inset:0;background:rgba(0,0,0,.93);z-index:9999;display:none;align-items:center;justify-content:center;cursor:zoom-out;}
+.lightbox-overlay.open{display:flex;}
+.lightbox-overlay img{max-width:92vw;max-height:92vh;object-fit:contain;user-select:none;}
+.lightbox-close{position:absolute;top:1.5rem;right:1.5rem;background:none;border:none;color:#fff;font-size:1.4rem;cursor:pointer;line-height:1;opacity:.7;transition:opacity .2s;}
+.lightbox-close:hover{opacity:1;}
+.lightbox-prev,.lightbox-next{position:absolute;top:50%;transform:translateY(-50%);background:none;border:none;color:#fff;font-size:2rem;cursor:pointer;opacity:.6;padding:1rem;transition:opacity .2s;}
+.lightbox-prev:hover,.lightbox-next:hover{opacity:1;}
+.lightbox-prev{left:1rem;}.lightbox-next{right:1rem;}
+.product-img-main{cursor:zoom-in;}
+
+/* CHECKOUT STEPS */
+.co-steps{display:flex;align-items:center;gap:0;margin-bottom:2rem;}
+.co-step-item{display:flex;align-items:center;gap:.5rem;font-size:.6rem;letter-spacing:.15em;text-transform:uppercase;color:var(--gray);}
+.co-step-item.active{color:var(--black);}
+.co-step-num{width:22px;height:22px;border-radius:50%;border:1px solid var(--light);display:flex;align-items:center;justify-content:center;font-size:.6rem;font-weight:600;}
+.co-step-item.active .co-step-num{background:var(--black);color:var(--white);border-color:var(--black);}
+.co-step-item.done .co-step-num{background:var(--green);color:#fff;border-color:var(--green);}
+.co-step-sep{flex:0;width:2rem;height:1px;background:var(--light);margin:0 .5rem;}
+.co-step-back{font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;color:var(--gray);background:none;border:none;cursor:pointer;padding:0;margin-bottom:1.5rem;display:flex;align-items:center;gap:.4rem;}
+.co-step-back:hover{color:var(--black);}
+/* SKELETON LOADERS */
+@keyframes sk-shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+.sk{background:linear-gradient(90deg,var(--light) 25%,var(--mid) 37%,var(--light) 63%);background-size:400% 100%;animation:sk-shimmer 1.4s ease infinite;}
+[data-theme="dark"] .sk{background:linear-gradient(90deg,#2a2a30 25%,#3a3a42 37%,#2a2a30 63%);background-size:400% 100%;}
+.sk-line{margin-bottom:.7rem;border-radius:2px;}
+
 /* CART */
 .cart-overlay{display:none;position:fixed;inset:0;background:rgba(10,10,10,.5);z-index:2000;}
 .cart-overlay.open{display:block;}
@@ -257,7 +285,25 @@ nav{position:fixed;top:0;left:0;right:0;z-index:500;display:flex;justify-content
     <button class="cart-btn" onclick="toggleCart()"><span data-i18n="cart_btn">Carrito</span> <span class="cart-count" id="cart-count">0</span></button>
   </div>
 </nav>
-<div id="product-content"><div class="loading">Cargando producto...</div></div>
+<div id="product-content">
+  <div class="product-page" id="product-skeleton">
+    <div style="background:var(--light);min-height:70vh;"></div>
+    <div style="padding:5rem 4rem;display:flex;flex-direction:column;gap:1.2rem;">
+      <div class="sk sk-line" style="width:30%;height:.7rem;"></div>
+      <div class="sk sk-line" style="width:80%;height:2.2rem;margin-bottom:.4rem;"></div>
+      <div class="sk sk-line" style="width:40%;height:1rem;"></div>
+      <div class="sk sk-line" style="width:60%;height:1rem;"></div>
+      <div class="sk" style="width:100%;height:80px;margin:1rem 0;border-radius:4px;"></div>
+      <div class="sk sk-line" style="width:100%;height:3rem;border-radius:0;margin-top:1rem;"></div>
+    </div>
+  </div>
+</div>
+<div class="lightbox-overlay" id="lightbox-overlay" onclick="lightboxClose()">
+  <button class="lightbox-close" onclick="lightboxClose()">&#x2715;</button>
+  <button class="lightbox-prev" onclick="event.stopPropagation();lightboxNav(-1)">&#x2039;</button>
+  <img id="lightbox-img" src="" alt=""/>
+  <button class="lightbox-next" onclick="event.stopPropagation();lightboxNav(1)">&#x203a;</button>
+</div>
 <div class="cart-overlay" id="cart-overlay" onclick="toggleCart()"></div>
 <div class="cart-sidebar" id="cart-sidebar">
   <div class="cart-header"><div class="cart-header-title" data-i18n="cart_title">Tu carrito</div><button class="cart-close" onclick="toggleCart()" data-i18n="cart_close">&#x2715; Cerrar</button></div>
@@ -272,28 +318,39 @@ nav{position:fixed;top:0;left:0;right:0;z-index:500;display:flex;justify-content
   <div class="co-modal">
     <div class="co-header"><div class="co-title" data-i18n="co_title">Resumen de compra</div><button class="co-close" onclick="closeCheckout()" data-i18n="co_close">&#x2715; Volver</button></div>
     <div class="co-body">
-      <div class="co-sec" data-i18n="co_productos">Productos</div>
-      <div id="co-items"></div>
-      <div class="co-total"><span class="co-total-label" id="co-total-label" data-i18n="co_total">Total</span><span class="co-total-amount" id="co-total-amount"></span></div>
-      <div class="coupon-box"><input id="coupon-input" type="text" placeholder="Código de cupón" data-i18n-ph="coupon_ph"/><button class="coupon-btn" onclick="applyCoupon()" data-i18n="coupon_btn">Aplicar</button></div>
-      <div class="coupon-msg" id="coupon-msg"></div>
-      <div class="pay-options">
-        <div class="pay-opt" id="opt-mp" onclick="selectPay('mp')"><span class="pay-opt-icon">💳</span><div class="pay-opt-label" data-i18n="pay_mp_label">Mercado Pago</div><div class="pay-opt-desc" data-i18n="pay_mp_desc">Tarjeta, débito o saldo</div></div>
-        <div class="pay-opt" id="opt-tr" onclick="selectPay('transfer')"><span class="pay-opt-icon">🏦</span><div class="pay-opt-label" data-i18n="pay_tr_label">Transferencia</div><div class="pay-opt-desc" data-i18n="pay_tr_desc">10% de descuento</div></div>
+      <div class="co-steps" id="co-steps">
+        <div class="co-step-item active" id="co-step-1-ind"><div class="co-step-num">1</div><span data-i18n="co_step1_label">Resumen</span></div>
+        <div class="co-step-sep"></div>
+        <div class="co-step-item" id="co-step-2-ind"><div class="co-step-num">2</div><span data-i18n="co_step2_label">Tus datos</span></div>
       </div>
-      <div class="transfer-box" id="transfer-box">
-        <div class="transfer-box-title" data-i18n="transfer_title">&#x2713; Datos para transferir</div>
-        <div class="trow"><span class="tlabel" data-i18n="transfer_banco">Banco</span><span class="tval" data-i18n="transfer_banco_val">Francés (BBVA)</span></div>
-        <div class="trow"><span class="tlabel" data-i18n="transfer_cbu">CBU</span><span class="tval">0170090940000048482721 <button class="copy-btn" onclick="copyCBU()" data-i18n="copy_btn">Copiar</button></span></div>
-        <div class="dcto-banner" data-i18n="dcto_banner">10% DE DESCUENTO APLICADO</div>
+      <div id="co-step-1">
+        <div class="co-sec" data-i18n="co_productos">Productos</div>
+        <div id="co-items"></div>
+        <div class="co-total"><span class="co-total-label" id="co-total-label" data-i18n="co_total">Total</span><span class="co-total-amount" id="co-total-amount"></span></div>
+        <div class="coupon-box"><input id="coupon-input" type="text" placeholder="Código de cupón" data-i18n-ph="coupon_ph"/><button class="coupon-btn" onclick="applyCoupon()" data-i18n="coupon_btn">Aplicar</button></div>
+        <div class="coupon-msg" id="coupon-msg"></div>
+        <div class="pay-options">
+          <div class="pay-opt" id="opt-mp" onclick="selectPay('mp')"><span class="pay-opt-icon">💳</span><div class="pay-opt-label" data-i18n="pay_mp_label">Mercado Pago</div><div class="pay-opt-desc" data-i18n="pay_mp_desc">Tarjeta, débito o saldo</div></div>
+          <div class="pay-opt" id="opt-tr" onclick="selectPay('transfer')"><span class="pay-opt-icon">🏦</span><div class="pay-opt-label" data-i18n="pay_tr_label">Transferencia</div><div class="pay-opt-desc" data-i18n="pay_tr_desc">10% de descuento</div></div>
+        </div>
+        <div class="transfer-box" id="transfer-box">
+          <div class="transfer-box-title" data-i18n="transfer_title">&#x2713; Datos para transferir</div>
+          <div class="trow"><span class="tlabel" data-i18n="transfer_banco">Banco</span><span class="tval" data-i18n="transfer_banco_val">Francés (BBVA)</span></div>
+          <div class="trow"><span class="tlabel" data-i18n="transfer_cbu">CBU</span><span class="tval">0170090940000048482721 <button class="copy-btn" onclick="copyCBU()" data-i18n="copy_btn">Copiar</button></span></div>
+          <div class="dcto-banner" data-i18n="dcto_banner">10% DE DESCUENTO APLICADO</div>
+        </div>
+        <button class="checkout-btn" style="margin-top:1.5rem" onclick="goToStep2()" id="co-next-btn" data-i18n="co_next_btn">Continuar →</button>
       </div>
-      <div class="co-sec" style="margin-top:1.5rem" data-i18n="co_datos">Tus datos</div>
-      <div class="field-group">
-        <div class="field-wrap"><label data-i18n="field_nombre">Nombre *</label><input id="client-name" type="text" placeholder="Tu nombre completo" data-i18n-ph="field_nombre_ph"/></div>
-        <div class="field-wrap"><label data-i18n="field_email">Email *</label><input id="client-email" type="email" placeholder="tu@email.com" data-i18n-ph="field_email_ph"/></div>
+      <div id="co-step-2" style="display:none;">
+        <button class="co-step-back" onclick="goToStep1()">← <span data-i18n="co_back_btn">Volver al resumen</span></button>
+        <div class="co-sec" data-i18n="co_datos">Tus datos</div>
+        <div class="field-group">
+          <div class="field-wrap"><label data-i18n="field_nombre">Nombre *</label><input id="client-name" type="text" placeholder="Tu nombre completo" data-i18n-ph="field_nombre_ph"/></div>
+          <div class="field-wrap"><label data-i18n="field_email">Email *</label><input id="client-email" type="email" placeholder="tu@email.com" data-i18n-ph="field_email_ph"/></div>
+        </div>
+        <p class="field-note" data-i18n="field_note">Te enviaremos la confirmación a tu email.</p>
+        <button class="confirm-btn" id="confirm-btn" onclick="confirmOrder()" data-i18n="confirm_btn">Confirmar pedido</button>
       </div>
-      <p class="field-note" data-i18n="field_note">Te enviaremos la confirmación a tu email.</p>
-      <button class="confirm-btn" id="confirm-btn" onclick="confirmOrder()" data-i18n="confirm_btn">Confirmar pedido</button>
     </div>
   </div>
 </div>
@@ -336,7 +393,7 @@ const I18N = {
     related_title:'También te puede gustar', reviews_title:'Opiniones', cargando_opiniones:'Cargando opiniones...',
     review_form_title:'Dejá tu opinión', review_name_ph:'Tu nombre', review_text_ph:'Contanos tu experiencia con este producto...', review_submit:'Enviar opinión',
     newsletter_title:'Sumate a la lista', newsletter_text:'Recibí novedades, descuentos exclusivos y nuevos lanzamientos directo a tu email.', newsletter_ph:'tu@email.com', newsletter_btn:'Suscribirme',
-    product_transfer_label:'Por transferencia:'
+    product_transfer_label:'Por transferencia:', share_btn:'Compartir'
   },
   en: {
     back_btn:'← Back', cart_btn:'Cart',
@@ -355,7 +412,7 @@ const I18N = {
     related_title:'You might also like', reviews_title:'Reviews', cargando_opiniones:'Loading reviews...',
     review_form_title:'Leave your review', review_name_ph:'Your name', review_text_ph:'Tell us about your experience with this product...', review_submit:'Submit review',
     newsletter_title:'Join our list', newsletter_text:'Get news, exclusive discounts and new releases straight to your inbox.', newsletter_ph:'you@email.com', newsletter_btn:'Subscribe',
-    product_transfer_label:'Bank transfer:'
+    product_transfer_label:'Bank transfer:', share_btn:'Share'
   }
 };
 let LANG = 'es';
@@ -577,13 +634,14 @@ function renderProduct(p, related){
   var imgs = (p.imagenes && p.imagenes.length > 0) ? p.imagenes : [p.imagen];
   window._galleryImgs = imgs;
   window._galleryIdx = 0;
+  saveRecentlyViewed(p.id);
   const stockBadge = p.stock && p.stock<=5 ? `<span class="stock-low">Últimas ${p.stock}</span>` : '';
   const shipBadge = p.precio>=100000 ? `<span class="free-ship">Envío gratis</span>` : '';
   document.getElementById('product-content').innerHTML = `
     <div class="product-page">
       <div class="product-img-section" style="position:sticky;top:80px;height:calc(100vh - 80px);display:flex;flex-direction:column;">
         <div class="gallery-main" style="flex:1;overflow:hidden;position:relative;">
-          <img src="${getImg(imgs[0])}" alt="${p.nombre}" class="product-img-main" id="gallery-main-img" style="width:100%;height:100%;object-fit:cover;display:block;object-position:${getImgPos(imgs[0])}"/>
+          <img src="${getImg(imgs[0])}" alt="${p.nombre}" class="product-img-main" id="gallery-main-img" onclick="lightboxOpen(this.src)" style="width:100%;height:100%;object-fit:cover;display:block;object-position:${getImgPos(imgs[0])}"/>
           ${imgs.length>1?'<button class="gallery-nav gallery-nav-prev" onclick="galleryPrev()">&#x2039;</button><button class="gallery-nav gallery-nav-next" onclick="galleryNext()">&#x203a;</button>':''}
         </div>
         ${imgs.length>1?'<div class="gallery-thumbs" id="gallery-thumbs">' + imgs.map(function(img,i){return '<img src="'+getImg(img)+'" loading="lazy" class="gallery-thumb'+(i===0?' active':'')+'" data-idx="'+i+'" onclick="gallerySet('+i+')" alt="foto '+i+'"/>';}).join('') + '</div>':''}
@@ -628,6 +686,7 @@ function renderProduct(p, related){
           <button class="btn-mp" onclick="window.open('${p.link_mp}','_blank')">${t('btn_buy')}</button>
         </div>
         <button class="btn-fav${isFav(p.id)?' active':''}" id="fav-btn" onclick="toggleProductFav('${p.id}')">${isFav(p.id)?t('fav_added'):t('fav_add')}</button>
+        <button class="btn-share" onclick="shareProduct('${p.id}')">&#x2197; ${t('share_btn')}</button>
       </div>
     </div>
     ${related.length?`<div class="related-section"><div class="related-title">${t('related_title')}</div><div class="related-grid">${related.map(r=>`<div class="related-card" onclick="window.location.href='producto.html?id=${r.id}'"><img src="${getImg(r.imagen)}" alt="${r.nombre}" class="related-img" style="object-position:${getImgPos(r.imagen)}" loading="lazy"/><div class="related-name">${r.nombre}</div><div class="related-price">${fmt(r.precio)}</div></div>`).join('')}</div></div>`:''}
@@ -807,7 +866,27 @@ function updateCartUI(){saveCart();
   document.getElementById('cart-total').textContent=fmt(cartTotal());
 }
 function toggleCart(){document.getElementById('cart-overlay').classList.toggle('open');document.getElementById('cart-sidebar').classList.toggle('open');}
-function openCheckout(m){if(!cart.length){showToast('Agregá productos primero 👆');return;}toggleCart();payMethod=m;buildCheckout();document.getElementById('co-overlay').classList.add('open');}
+function goToStep1(){
+  document.getElementById('co-step-1').style.display='';
+  document.getElementById('co-step-2').style.display='none';
+  document.getElementById('co-step-1-ind').classList.add('active');
+  document.getElementById('co-step-1-ind').classList.remove('done');
+  document.getElementById('co-step-2-ind').classList.remove('active');
+}
+function goToStep2(){
+  document.getElementById('co-step-1').style.display='none';
+  document.getElementById('co-step-2').style.display='';
+  document.getElementById('co-step-1-ind').classList.remove('active');
+  document.getElementById('co-step-1-ind').classList.add('done');
+  document.getElementById('co-step-2-ind').classList.add('active');
+  try{
+    var saved=JSON.parse(localStorage.getItem('om_client')||'{}');
+    var n=document.getElementById('client-name');var e=document.getElementById('client-email');
+    if(n&&!n.value&&saved.name)n.value=saved.name;
+    if(e&&!e.value&&saved.email)e.value=saved.email;
+  }catch(err){}
+}
+function openCheckout(m){if(!cart.length){showToast('Agregá productos primero 👆');return;}toggleCart();payMethod=m;buildCheckout();goToStep1();document.getElementById('co-overlay').classList.add('open');}
 function closeCheckout(){document.getElementById('co-overlay').classList.remove('open');}
 function selectPay(m){
   payMethod=m;
@@ -901,6 +980,50 @@ function acceptCookies(){
     }
   }catch(e){}
 })();
+function lightboxOpen(src){
+  const ol=document.getElementById('lightbox-overlay');
+  const img=document.getElementById('lightbox-img');
+  if(!ol||!img)return;
+  img.src=src;
+  ol.classList.add('open');
+  document.body.style.overflow='hidden';
+}
+function lightboxClose(){
+  const ol=document.getElementById('lightbox-overlay');
+  if(ol)ol.classList.remove('open');
+  document.body.style.overflow='';
+}
+function lightboxNav(dir){
+  if(!window._galleryImgs)return;
+  window._galleryIdx=(window._galleryIdx+dir+window._galleryImgs.length)%window._galleryImgs.length;
+  const img=document.getElementById('lightbox-img');
+  if(img)img.src=getImg(window._galleryImgs[window._galleryIdx]);
+  gallerySet(window._galleryIdx);
+}
+document.addEventListener('keydown',function(e){
+  if(e.key==='Escape')lightboxClose();
+  if(e.key==='ArrowRight')lightboxNav(1);
+  if(e.key==='ArrowLeft')lightboxNav(-1);
+});
+function shareProduct(id,name,desc){
+  var pname=name||(typeof product!=='undefined'&&product.nombre?product.nombre:id);
+  var url=location.origin+location.pathname+'?id='+id;
+  if(navigator.share){
+    navigator.share({title:pname,text:desc||pname,url:url}).catch(function(){});
+  }else{
+    try{navigator.clipboard.writeText(url);showToast('Link copiado al portapapeles 👀');}
+    catch(e){prompt('Copiá el link:',url);}
+  }
+}
+function saveRecentlyViewed(id){
+  try{
+    var arr=JSON.parse(localStorage.getItem('om_recently_viewed')||'[]');
+    arr=arr.filter(function(x){return x!==id;});
+    arr.unshift(id);
+    arr=arr.slice(0,6);
+    localStorage.setItem('om_recently_viewed',JSON.stringify(arr));
+  }catch(e){}
+}
 function applyTheme(theme){
   document.documentElement.setAttribute('data-theme',theme);
   const btn=document.getElementById('theme-toggle');
@@ -923,4 +1046,7 @@ loadCart();loadGrabado().then(loadProduct);loadCoupon();updateCartUI();
   <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
 </a>
 </body>
-</html>
+</html
+.btn-share{background:none;border:1px solid var(--light);color:var(--gray);font-family:'Montserrat',sans-serif;font-size:.6rem;letter-spacing:.15em;text-transform:uppercase;padding:.6rem 1.2rem;cursor:pointer;display:flex;align-items:center;gap:.5rem;transition:all .2s;width:fit-content;margin-top:.6rem;}
+.btn-share:hover{border-color:var(--black);color:var(--black);}
+>
