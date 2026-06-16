@@ -31,6 +31,10 @@ nav{position:fixed;top:0;left:0;right:0;z-index:500;display:flex;justify-content
 .back-btn{font-size:.62rem;letter-spacing:.2em;text-transform:uppercase;color:var(--gray);text-decoration:none;display:flex;align-items:center;gap:.5rem;transition:color .2s;}
 .back-btn:hover{color:var(--black)}
 .cart-btn{background:var(--black);color:var(--white);border:none;padding:.6rem 1.4rem;font-family:'Montserrat',sans-serif;font-size:.62rem;letter-spacing:.18em;text-transform:uppercase;cursor:pointer;display:flex;align-items:center;gap:.6rem;}
+.fav-nav-btn{position:relative;background:none;border:none;cursor:pointer;font-size:1.2rem;color:var(--gray);padding:.3rem .5rem;line-height:1;transition:color .2s;}
+.fav-nav-btn:hover{color:#e74c3c;}
+.fav-nav-count{position:absolute;top:-2px;right:-2px;background:var(--warm);color:#fff;border-radius:50%;width:16px;height:16px;font-size:.52rem;display:flex;align-items:center;justify-content:center;font-weight:700;display:none;}
+.fav-nav-count.show{display:flex;}
 .cart-count{background:var(--blue);color:white;border-radius:50%;width:18px;height:18px;font-size:.6rem;display:flex;align-items:center;justify-content:center;font-weight:700;}
 .product-page{display:grid;grid-template-columns:1fr 1fr;min-height:100vh;padding-top:80px;}
 .product-img-section{position:sticky;top:80px;height:calc(100vh - 80px);overflow:hidden;background:var(--light);}
@@ -282,6 +286,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:500;display:flex;justify-content
   <div style="display:flex;align-items:center;gap:.8rem;">
     <button class="theme-toggle" id="theme-toggle" onclick="toggleTheme()" aria-label="Cambiar tema" title="Cambiar tema"></button>
     <button class="theme-toggle" id="lang-toggle" onclick="toggleLang()" aria-label="Cambiar idioma" title="Cambiar idioma" style="font-size:.6rem;letter-spacing:.05em;font-weight:600;">EN</button>
+    <button class="fav-nav-btn" onclick="window.location.href='index.html#catalogo'" title="Favoritos" aria-label="Favoritos">&#x2665;<span class="fav-nav-count" id="fav-nav-count">0</span></button>
     <button class="cart-btn" onclick="toggleCart()"><span data-i18n="cart_btn">Carrito</span> <span class="cart-count" id="cart-count">0</span></button>
   </div>
 </nav>
@@ -339,6 +344,10 @@ nav{position:fixed;top:0;left:0;right:0;z-index:500;display:flex;justify-content
           <div class="trow"><span class="tlabel" data-i18n="transfer_cbu">CBU</span><span class="tval">0170090940000048482721 <button class="copy-btn" onclick="copyCBU()" data-i18n="copy_btn">Copiar</button></span></div>
           <div class="dcto-banner" data-i18n="dcto_banner">10% DE DESCUENTO APLICADO</div>
         </div>
+        <div id="ord-history-box" style="margin-top:1.2rem;display:none;">
+          <div class="co-sec" data-i18n="ord_history_title" style="margin-bottom:.6rem;">Pedidos anteriores</div>
+          <div id="ord-history-list" style="font-size:.7rem;color:var(--gray);"></div>
+        </div>
         <button class="checkout-btn" style="margin-top:1.5rem" onclick="goToStep2()" id="co-next-btn" data-i18n="co_next_btn">Continuar →</button>
       </div>
       <div id="co-step-2" style="display:none;">
@@ -382,7 +391,7 @@ const I18N = {
     co_title:'Resumen de compra', co_close:'✕ Volver', co_productos:'Productos', co_total:'Total', coupon_ph:'Código de cupón', coupon_btn:'Aplicar',
     pay_mp_label:'Mercado Pago', pay_mp_desc:'Tarjeta, débito o saldo', pay_tr_label:'Transferencia', pay_tr_desc:'10% de descuento',
     transfer_title:'✓ Datos para transferir', transfer_banco:'Banco', transfer_banco_val:'Francés (BBVA)', transfer_cbu:'CBU', copy_btn:'Copiar', dcto_banner:'10% DE DESCUENTO APLICADO',
-    co_datos:'Tus datos', field_nombre:'Nombre *', field_nombre_ph:'Tu nombre completo', field_email:'Email *', field_email_ph:'tu@email.com', field_note:'Te enviaremos la confirmación a tu email.', confirm_btn:'Confirmar pedido', confirm_btn_mp:'Ir a Mercado Pago',
+    co_datos:'Tus datos', field_nombre:'Nombre *', field_nombre_ph:'Tu nombre completo', field_email:'Email *', field_email_ph:'tu@email.com', field_note:'Te enviaremos la confirmación a tu email.', confirm_btn:'Confirmar pedido', confirm_btn_mp:'Ir a Mercado Pago', ord_history_title:'Pedidos anteriores',
     success_title:'¡Pedido confirmado!', success_close:'Cerrar',
     cookie_text:'Usamos cookies para mejorar tu experiencia y analizar el tráfico del sitio. Al continuar navegando aceptás nuestra <a href="legales.html">política de privacidad</a>.', cookie_btn:'Aceptar',
     ship_est_title:'Calculá tu envío', size_guide_title:'Guía de tamaños',
@@ -401,7 +410,7 @@ const I18N = {
     co_title:'Order summary', co_close:'✕ Back', co_productos:'Products', co_total:'Total', coupon_ph:'Coupon code', coupon_btn:'Apply',
     pay_mp_label:'Mercado Pago', pay_mp_desc:'Card, debit or balance', pay_tr_label:'Bank transfer', pay_tr_desc:'10% discount',
     transfer_title:'✓ Transfer details', transfer_banco:'Bank', transfer_banco_val:'Francés (BBVA)', transfer_cbu:'CBU', copy_btn:'Copy', dcto_banner:'10% DISCOUNT APPLIED',
-    co_datos:'Your details', field_nombre:'Name *', field_nombre_ph:'Your full name', field_email:'Email *', field_email_ph:'you@email.com', field_note:'We\'ll send your confirmation by email.', confirm_btn:'Confirm order', confirm_btn_mp:'Go to Mercado Pago',
+    co_datos:'Your details', field_nombre:'Name *', field_nombre_ph:'Your full name', field_email:'Email *', field_email_ph:'you@email.com', field_note:'We\'ll send your confirmation by email.', confirm_btn:'Confirm order', confirm_btn_mp:'Go to Mercado Pago', ord_history_title:'Previous orders',
     success_title:'Order confirmed!', success_close:'Close',
     cookie_text:'We use cookies to improve your experience and analyze site traffic. By continuing to browse you accept our <a href="legales.html">privacy policy</a>.', cookie_btn:'Accept',
     ship_est_title:'Calculate your shipping', size_guide_title:'Size guide',
@@ -866,12 +875,36 @@ function updateCartUI(){saveCart();
   document.getElementById('cart-total').textContent=fmt(cartTotal());
 }
 function toggleCart(){document.getElementById('cart-overlay').classList.toggle('open');document.getElementById('cart-sidebar').classList.toggle('open');}
+function getFavsProd(){try{return JSON.parse(localStorage.getItem('om_favs')||'[]');}catch(e){return [];}}
+function updateFavBadge(){
+  const favs=getFavsProd();
+  const badge=document.getElementById('fav-nav-count');
+  if(!badge)return;
+  if(favs.length>0){badge.textContent=favs.length;badge.classList.add('show');}
+  else{badge.classList.remove('show');}
+}
+function getOrders(){try{return JSON.parse(localStorage.getItem('om_orders')||'[]');}catch(e){return [];}}
+function saveOrder(order){
+  let orders=getOrders();orders.unshift(order);
+  if(orders.length>3)orders=orders.slice(0,3);
+  try{localStorage.setItem('om_orders',JSON.stringify(orders));}catch(e){}
+}
+function renderOrderHistory(){
+  const box=document.getElementById('ord-history-box');
+  const list=document.getElementById('ord-history-list');
+  if(!box||!list)return;
+  const orders=getOrders();
+  if(!orders.length){box.style.display='none';return;}
+  box.style.display='';
+  list.innerHTML=orders.map(o=>`<div style="padding:.5rem 0;border-bottom:1px solid var(--light);"><div style="display:flex;justify-content:space-between;"><span>${o.name}</span><strong>${o.total}</strong></div><div style="color:var(--gray);font-size:.65rem;">${o.date} · ${o.metodo}</div><div style="color:var(--gray);font-size:.65rem;margin-top:.2rem;">${o.detalle}</div></div>`).join('');
+}
 function goToStep1(){
   document.getElementById('co-step-1').style.display='';
   document.getElementById('co-step-2').style.display='none';
   document.getElementById('co-step-1-ind').classList.add('active');
   document.getElementById('co-step-1-ind').classList.remove('done');
   document.getElementById('co-step-2-ind').classList.remove('active');
+  renderOrderHistory();
 }
 function goToStep2(){
   document.getElementById('co-step-1').style.display='none';
@@ -936,6 +969,9 @@ async function confirmOrder(){
   closeCheckout();
   document.getElementById('success-text').textContent=isT?'Revisá tu email ('+email+') para ver los datos de transferencia.':'Revisá tu email ('+email+'). Te redirigimos a Mercado Pago.';
   document.getElementById('success-overlay').classList.add('open');
+  const _isT2=payMethod==='transfer';
+  const _dateStr2=new Date().toLocaleDateString('es-AR',{day:'2-digit',month:'2-digit',year:'numeric'});
+  saveOrder({name,total:fmt(getCheckoutTotal()),date:_dateStr2,metodo:_isT2?'Transferencia':'Mercado Pago',detalle:cart.slice(0,2).map(i=>i.nombre+' x'+i.qty).join(', ')+(cart.length>2?' y más':'')});
   cart=[];updateCartUI();
 }
 function copyCBU(){navigator.clipboard.writeText('0170090940000048482721');showToast('CBU copiado ✓');}
@@ -1038,7 +1074,7 @@ function toggleTheme(){
 applyTheme(document.documentElement.getAttribute('data-theme')==='dark'?'dark':'light');
 applyLang();
 
-loadCart();loadGrabado().then(loadProduct);loadCoupon();updateCartUI();
+loadCart();loadGrabado().then(loadProduct);loadCoupon();updateCartUI();updateFavBadge();
 </script>
 
 <!-- WHATSAPP FLOTANTE -->
