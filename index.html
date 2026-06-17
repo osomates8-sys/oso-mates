@@ -125,6 +125,8 @@ section{padding:8rem 4rem}
 .p-price{font-family:'Cormorant Garamond',serif;font-size:1.5rem;font-weight:300;color:var(--black);}
 .p-transfer{font-size:.62rem;color:var(--gray);margin-top:2px;}
 .p-transfer strong{color:var(--green);font-weight:600;}
+.p-price-orig{font-size:.68rem;color:var(--gray);text-decoration:line-through;margin-bottom:1px;}
+.p-price-label{font-size:.55rem;letter-spacing:.1em;text-transform:uppercase;color:var(--green);font-weight:600;}
 .p-btns{display:flex;gap:.4rem;margin-top:.5rem;}
 .p-view-btn{background:none;border:1px solid var(--black);color:var(--black);font-family:'Montserrat',sans-serif;font-size:.55rem;letter-spacing:.12em;text-transform:uppercase;padding:.5rem .9rem;cursor:pointer;transition:all .2s;}
 .p-view-btn:hover{background:var(--black);color:var(--white);}
@@ -231,6 +233,31 @@ footer{background:var(--black);padding:3rem 4rem;display:flex;justify-content:sp
 .coupon-msg{font-size:.68rem;margin-bottom:1rem;min-height:1em;}
 .coupon-msg.ok{color:var(--green);}
 .coupon-msg.err{color:#c0392b;}
+
+.exit-overlay{display:none;position:fixed;inset:0;background:rgba(10,10,10,.75);z-index:9000;align-items:center;justify-content:center;padding:2rem;}
+.exit-overlay.show{display:flex;}
+.exit-modal{background:var(--white);max-width:440px;width:100%;padding:3rem;text-align:center;position:relative;}
+.exit-close{position:absolute;top:1rem;right:1.2rem;background:none;border:none;font-size:1.2rem;cursor:pointer;color:var(--gray);}
+.exit-eyebrow{font-size:.6rem;letter-spacing:.2em;text-transform:uppercase;color:var(--warm);margin-bottom:.8rem;}
+.exit-title{font-family:'Cormorant Garamond',serif;font-size:2rem;line-height:1.15;margin-bottom:1rem;}
+.exit-desc{font-size:.78rem;color:var(--gray);line-height:1.7;margin-bottom:1.5rem;}
+.exit-code{background:var(--light);padding:.6rem 1.2rem;font-size:.85rem;font-weight:700;letter-spacing:.2em;margin-bottom:1.5rem;display:inline-block;}
+.exit-cta{display:block;width:100%;padding:1rem;background:var(--black);color:var(--white);border:none;font-family:'Montserrat',sans-serif;font-size:.65rem;letter-spacing:.2em;text-transform:uppercase;cursor:pointer;transition:background .2s;}
+.exit-cta:hover{background:#333;}
+.exit-skip{font-size:.6rem;color:var(--gray);margin-top:1rem;cursor:pointer;letter-spacing:.1em;text-transform:uppercase;}
+.exit-skip:hover{color:var(--black);}
+.como-section{padding:5rem 4rem;background:var(--light);}
+[data-theme="dark"] .como-section{background:var(--light);}
+.como-steps{display:grid;grid-template-columns:repeat(3,1fr);gap:3rem;margin-top:3rem;}
+.como-step{text-align:center;}
+.como-step-num{font-family:'Cormorant Garamond',serif;font-size:3rem;color:var(--warm);line-height:1;margin-bottom:.8rem;}
+.como-step-title{font-size:.7rem;letter-spacing:.18em;text-transform:uppercase;font-weight:600;margin-bottom:.6rem;}
+.como-step-desc{font-size:.78rem;color:var(--gray);line-height:1.7;}
+@media(max-width:768px){.como-steps{grid-template-columns:1fr;gap:2rem;}}
+.nos-stats{display:flex;gap:3rem;margin-top:2rem;flex-wrap:wrap;}
+.nos-stat-num{font-family:'Cormorant Garamond',serif;font-size:2.8rem;color:var(--warm);line-height:1;}
+.nos-stat-label{font-size:.6rem;letter-spacing:.15em;text-transform:uppercase;color:var(--gray);margin-top:.2rem;}
+.counter{display:inline-block;}
 .cookie-banner{position:fixed;left:0;right:0;bottom:0;background:var(--black);color:var(--white);padding:1.2rem 2rem;display:none;align-items:center;justify-content:center;gap:1.5rem;z-index:5000;flex-wrap:wrap;}
 .cookie-banner.show{display:flex;}
 .cookie-banner p{font-size:.75rem;font-weight:300;line-height:1.6;max-width:700px;text-align:center;}
@@ -734,6 +761,29 @@ fbq('track', 'PageView');
     </div>
   </div>
 </section>
+<section class="como-section reveal" id="como-comprar">
+  <div class="section-header" style="margin-bottom:0"><div>
+    <div class="section-num" data-i18n="sec_como_num">★ Simple</div>
+    <h2 class="section-title" data-i18n="sec_como_title">¿Cómo <em>comprar</em>?</h2>
+  </div></div>
+  <div class="como-steps">
+    <div class="como-step reveal">
+      <div class="como-step-num">01</div>
+      <div class="como-step-title" data-i18n="como_step1_title">Elegís tu mate</div>
+      <div class="como-step-desc" data-i18n="como_step1_desc">Explorá el catálogo, guardá tus favoritos y agregá al carrito lo que te guste.</div>
+    </div>
+    <div class="como-step reveal">
+      <div class="como-step-num">02</div>
+      <div class="como-step-title" data-i18n="como_step2_title">Transferís</div>
+      <div class="como-step-desc" data-i18n="como_step2_desc">Confirmás el pedido y transferís al CBU. Tenés 10% de descuento por pago bancario.</div>
+    </div>
+    <div class="como-step reveal">
+      <div class="como-step-num">03</div>
+      <div class="como-step-title" data-i18n="como_step3_title">Lo recibís</div>
+      <div class="como-step-desc" data-i18n="como_step3_desc">Despachamos en 48hs hábiles a todo el país. Te avisamos por email con el número de seguimiento.</div>
+    </div>
+  </div>
+</section>
 <section id="nosotros" style="padding:0">
   <div class="nos-right reveal" id="nosotros-content">
     <div class="loading">Cargando...</div>
@@ -962,6 +1012,14 @@ const I18N = {
     sort_default:'Ordenar',sort_price_asc:'Precio: menor a mayor',sort_price_desc:'Precio: mayor a menor',sort_name_asc:'Nombre A→Z',
     ord_history_title:'Pedidos anteriores',ord_history_none:'Sin pedidos previos.',
     results_count:'Mostrando %n producto(s)', results_count_none:'Sin resultados',
+    sec_como_num:'★ Simple', sec_como_title:'¿Cómo comprar?',
+    como_step1_title:'Elegís tu mate', como_step1_desc:'Explorá el catálogo, guardá tus favoritos y agregá al carrito lo que te guste.',
+    como_step2_title:'Transferís', como_step2_desc:'Confirmás el pedido y transferís al CBU. Tenés 10% de descuento por pago bancario.',
+    como_step3_title:'Lo recibís', como_step3_desc:'Despachamos en 48hs hábiles a todo el país. Te avisamos por email con el número de seguimiento.',
+    stat_mates:'Mates entregados', stat_years:'Años de oficio', stat_hand:'Artesanal',
+    exit_eyebrow:'Antes de irte...', exit_title:'¿Te vas sin tu mate?',
+    exit_desc:'Usá este código en tu próxima compra y llevate un 5% extra de descuento en tu pedido.',
+    exit_cta:'Copiar código y ver productos', exit_skip:'No gracias, me voy',
     search_ph:'Buscar productos...',
     f_todos:'Todos', f_madera:'Madera', f_calabaza:'Calabaza', f_bombillas:'Bombillas', f_combos:'Combos', f_favoritos:'♥ Favoritos',
     precio_label:'Precio:',
@@ -1001,6 +1059,14 @@ const I18N = {
     sort_default:'Sort',sort_price_asc:'Price: low to high',sort_price_desc:'Price: high to low',sort_name_asc:'Name A→Z',
     ord_history_title:'Previous orders',ord_history_none:'No previous orders.',
     results_count:'Showing %n product(s)', results_count_none:'No results',
+    sec_como_num:'★ Simple', sec_como_title:'How to buy?',
+    como_step1_title:'Pick your mate', como_step1_desc:'Browse the catalog, save favorites and add to cart.',
+    como_step2_title:'Transfer payment', como_step2_desc:'Confirm your order and transfer to our CBU. Get 10% off with bank transfer.',
+    como_step3_title:'Receive it', como_step3_desc:'We ship within 48 business hours nationwide. We send you a tracking number by email.',
+    stat_mates:'Mates delivered', stat_years:'Years of craft', stat_hand:'Handmade',
+    exit_eyebrow:'Before you go...', exit_title:'Leaving without your mate?',
+    exit_desc:'Use this code on your next purchase for an extra 5% off.',
+    exit_cta:'Copy code and browse products', exit_skip:'No thanks',
     search_ph:'Search products...',
     f_todos:'All', f_madera:'Wood', f_calabaza:'Gourd', f_bombillas:'Straws', f_combos:'Combos', f_favoritos:'♥ Favorites',
     precio_label:'Price:',
@@ -1202,7 +1268,26 @@ async function loadNosotros(){
     (d.values||[]).map(function(v){
       return '<div class="value-item"><span class="value-icon">'+v.icon+'</span><div class="value-name">'+v.name+'</div><div class="value-desc">'+v.desc+'</div></div>';
     }).join('')+
+    '</div>'+
+    '<div class="nos-stats">'+
+      '<div><div class="nos-stat-num"><span class="counter" data-target="200">0</span>+</div><div class="nos-stat-label" data-i18n="stat_mates">Mates entregados</div></div>'+
+      '<div><div class="nos-stat-num"><span class="counter" data-target="5">0</span></div><div class="nos-stat-label" data-i18n="stat_years">Años de oficio</div></div>'+
+      '<div><div class="nos-stat-num"><span class="counter" data-target="100">0</span>%</div><div class="nos-stat-label" data-i18n="stat_hand">Artesanal</div></div>'+
     '</div>';
+  // animate counters when visible
+  setTimeout(function(){
+    var counters=document.querySelectorAll('.counter');
+    var cObs=new IntersectionObserver(function(entries){
+      entries.forEach(function(e){
+        if(e.isIntersecting){
+          var el=e.target;var target=+el.getAttribute('data-target');var step=Math.ceil(target/40);var cur=0;
+          var t=setInterval(function(){cur+=step;if(cur>=target){cur=target;clearInterval(t);}el.textContent=cur;},40);
+          cObs.unobserve(el);
+        }
+      });
+    },{threshold:.3});
+    counters.forEach(function(c){cObs.observe(c);});
+  },100);
 }
 
 // ── FAQ: editable desde Admin → Pagina → Preguntas frecuentes ────────────────
@@ -1293,7 +1378,7 @@ function renderGrid(listOrFilter){
   g.innerHTML=list.map((p,i)=>{
     const stockBadge=p.stock&&p.stock<=5?`<span class="stock-low">${t('ultimas')} ${p.stock}</span>`:'';
     const shipBadge=p.precio>=100000?`<span class="free-ship">${t('free_ship')}</span>`:'';
-    return `<div class="product-card"><div class="p-img-wrap" onclick="viewProduct('${p.id}')"><img src="${getImg(p.imagen)}" alt="${p.nombre}" class="p-img" style="object-position:${getImgPos(p.imagen)}" loading="lazy" onload="this.closest('.p-img-wrap').classList.add('loaded')" crossorigin="anonymous"/>${favBtnHtml(p.id)}</div><div class="p-body"><div class="p-num">N\u00b000${i+1}</div>${stockBadge}${shipBadge}${p.badge?`<div class="p-badge">${p.badge}</div>`:''}<div class="p-name" onclick="viewProduct('${p.id}')">${p.nombre}</div><div class="p-mat">${p.material}</div><div class="p-footer"><div><div class="p-price">${fmt(p.precio)}</div><div class="p-transfer">${t('transf_label')} <strong>${fmt(p.precio_transferencia)}</strong> (\u221210%)</div></div><div class="p-btns"><button class="p-view-btn" onclick="viewProduct('${p.id}')">${t('ver_btn')}</button><button class="p-add-btn" onclick="addToCart('${p.id}')">${t('add_btn')}</button></div></div></div></div>`;
+    return `<div class="product-card"><div class="p-img-wrap" onclick="viewProduct('${p.id}')"><img src="${getImg(p.imagen)}" alt="${p.nombre}" class="p-img" style="object-position:${getImgPos(p.imagen)}" loading="lazy" onload="this.closest('.p-img-wrap').classList.add('loaded')" crossorigin="anonymous"/>${favBtnHtml(p.id)}</div><div class="p-body"><div class="p-num">N\u00b000${i+1}</div>${stockBadge}${shipBadge}${p.badge?`<div class="p-badge">${p.badge}</div>`:''}<div class="p-name" onclick="viewProduct('${p.id}')">${p.nombre}</div><div class="p-mat">${p.material}</div><div class="p-footer"><div><div class="p-price-label">${t('transf_label')}</div><div class="p-price-orig">${fmt(p.precio)}</div><div class="p-price"><strong>${fmt(p.precio_transferencia)}</strong></div></div><div class="p-btns"><button class="p-view-btn" onclick="viewProduct('${p.id}')">${t('ver_btn')}</button><button class="p-add-btn" onclick="addToCart('${p.id}')">${t('add_btn')}</button></div></div></div></div>`;
   }).join('');
 }
 
@@ -1447,7 +1532,8 @@ async function confirmOrder(){
   document.getElementById('confirm-page').classList.add('show');
   trackPurchase(total);
   const _dateStr=new Date().toLocaleDateString('es-AR',{day:'2-digit',month:'2-digit',year:'numeric'});
-  saveOrder({name,total:fmt(getCheckoutTotal()),date:_dateStr,metodo:isT?'Transferencia':'Mercado Pago',detalle:cart.slice(0,2).map(i=>i.nombre+' x'+i.qty).join(', ')+(cart.length>2?' y más':'')});
+  saveOrder({name,total:fmt(getCheckoutTotal()),date:_dateStr,metodo:'Transferencia',detalle:cart.slice(0,2).map(i=>i.nombre+' x'+i.qty).join(', ')+(cart.length>2?' y más':'')});
+  sendWANotification('🧉 Nuevo pedido Oso Mates!\nCliente: '+name+'\nTotal: '+fmt(getCheckoutTotal())+'\nDetalle: '+cart.slice(0,2).map(i=>i.nombre+' x'+i.qty).join(', ')+(cart.length>2?' y más':''));
   cart=[];updateCartUI();
 }
 
@@ -1536,6 +1622,37 @@ function acceptCookies(){
 const obs=new IntersectionObserver(entries=>{entries.forEach((e,i)=>{if(e.isIntersecting)setTimeout(()=>e.target.classList.add('in'),i*80);});},{threshold:.1});
 document.querySelectorAll('.reveal').forEach(el=>obs.observe(el));
 
+
+// ── EXIT INTENT POPUP ────────────────────────────────────────────────────────
+var _exitShown=false;
+function showExitPopup(){
+  if(_exitShown)return;
+  try{if(localStorage.getItem('om_exit_seen'))return;}catch(e){}
+  _exitShown=true;
+  document.getElementById('exit-overlay').classList.add('show');
+  try{localStorage.setItem('om_exit_seen','1');}catch(e){}
+}
+function closeExitPopup(){document.getElementById('exit-overlay').classList.remove('show');}
+function copyExitCode(){
+  var code=document.getElementById('exit-coupon-code').textContent;
+  try{navigator.clipboard.writeText(code);}catch(e){}
+  showToast('Código copiado: '+code+' ✓');
+}
+document.addEventListener('mouseleave',function(e){if(e.clientY<=0)showExitPopup();});
+document.addEventListener('keydown',function(e){if(e.key==='Escape')closeExitPopup();});
+
+// ── WA NOTIFICATION (CallMeBot) ───────────────────────────────────────────────
+// To activate: register your number at https://www.callmebot.com/blog/free-api-whatsapp-messages/
+// then set WA_NOTIFY_PHONE and WA_NOTIFY_APIKEY below
+var WA_NOTIFY_PHONE='';  // ej: '5492233061168'
+var WA_NOTIFY_APIKEY=''; // el apikey que te manda CallMeBot
+async function sendWANotification(msg){
+  if(!WA_NOTIFY_PHONE||!WA_NOTIFY_APIKEY)return;
+  try{
+    var url='https://api.callmebot.com/whatsapp.php?phone='+WA_NOTIFY_PHONE+'&apikey='+WA_NOTIFY_APIKEY+'&text='+encodeURIComponent(msg);
+    await fetch(url,{mode:'no-cors'});
+  }catch(e){}
+}
 loadCart();loadProducts();loadFaq();loadNosotros();loadHeroBanner();loadTestimonios();loadPriceFilters();loadShippingZones();loadCoupon();updateCartUI();
 // Lazy-load bestsellers, combos, bombillas when their section enters viewport
 (function(){
@@ -1762,6 +1879,18 @@ document.getElementById('exit-overlay').addEventListener('click',function(e){
     <div class="exit-code" id="exit-code" onclick="copyExitCode()" title="Click para copiar">OSO10</div>
     <button class="exit-cta" onclick="document.querySelector('#catalogo').scrollIntoView({behavior:'smooth'});closeExitPopup();">Ver colección ahora</button>
     <span class="exit-skip" onclick="closeExitPopup()">No, gracias</span>
+  </div>
+</div>
+
+<div class="exit-overlay" id="exit-overlay">
+  <div class="exit-modal">
+    <button class="exit-close" onclick="closeExitPopup()">&#x2715;</button>
+    <div class="exit-eyebrow" data-i18n="exit_eyebrow">Antes de irte...</div>
+    <h2 class="exit-title" data-i18n="exit_title">¿Te vas sin tu mate?</h2>
+    <p class="exit-desc" data-i18n="exit_desc">Usá este código en tu próxima compra y llevate un 5% extra de descuento en tu pedido.</p>
+    <div class="exit-code" id="exit-coupon-code">VOLVE5</div>
+    <button class="exit-cta" onclick="copyExitCode();closeExitPopup();document.getElementById('catalogo').scrollIntoView({behavior:'smooth'})" data-i18n="exit_cta">Copiar código y ver productos</button>
+    <div class="exit-skip" onclick="closeExitPopup()" data-i18n="exit_skip">No gracias, me voy</div>
   </div>
 </div>
 </body>

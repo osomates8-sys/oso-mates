@@ -163,11 +163,25 @@ body{font-family:Montserrat,sans-serif;background:#f0f0ee;color:#0a0a0a;}
 
     <!-- VENTAS -->
     <div class="tab-content active" id="tab-ventas">
-      <div class="section-bar"><h2>Pedidos</h2><button class="add-btn" id="refresh-btn">Actualizar</button></div>
+      <div class="section-bar"><h2>Pedidos</h2>
+        <div style="display:flex;gap:.6rem;align-items:center;flex-wrap:wrap;">
+          <input type="date" id="filter-from" style="font-family:'Montserrat',sans-serif;font-size:.65rem;padding:.4rem .7rem;border:1px solid #ddd;background:#fff;color:#111;" placeholder="Desde"/>
+          <input type="date" id="filter-to" style="font-family:'Montserrat',sans-serif;font-size:.65rem;padding:.4rem .7rem;border:1px solid #ddd;background:#fff;color:#111;" placeholder="Hasta"/>
+          <select id="filter-estado" style="font-family:'Montserrat',sans-serif;font-size:.65rem;padding:.4rem .7rem;border:1px solid #ddd;background:#fff;color:#111;">
+            <option value="">Todos los estados</option>
+            <option value="pendiente">Pendiente</option>
+            <option value="confirmado">Confirmado</option>
+            <option value="enviado">Enviado</option>
+          </select>
+          <button class="add-btn" id="refresh-btn" style="margin:0;">Filtrar</button>
+          <button class="add-btn" onclick="exportSalesCSV()" style="margin:0;background:#2a9d5c;">Exportar CSV</button>
+        </div>
+      </div>
+      <div id="sales-summary" style="font-size:.72rem;color:#888;padding:.5rem 0 1rem;"></div>
       <div class="data-table">
         <div class="t-head t-head-sales">
-          <div class="th">Cliente</div><div class="th">Email</div><div class="th">Detalle</div>
-          <div class="th">Metodo</div><div class="th">Total</div><div class="th">Estado</div>
+          <div class="th">Fecha</div><div class="th">Cliente</div><div class="th">Detalle</div>
+          <div class="th">Total</div><div class="th">Estado</div>
         </div>
         <div id="sales-body"><div class="loading">Cargando...</div></div>
       </div>
@@ -438,35 +452,75 @@ body{font-family:Montserrat,sans-serif;background:#f0f0ee;color:#0a0a0a;}
     });
   }
 
+  var _allSales=[];
   function loadSales() {
     sbClient.from('ventas').select('*').order('created_at',{ascending:false}).then(function(res) {
-      var body = document.getElementById('sales-body');
-      var data = res.data || [];
-      if (!data.length) { body.innerHTML = '<div class="loading">Sin ventas aun</div>'; return; }
-      var rows = '';
-      for (var i = 0; i < data.length; i++) {
-        var v = data[i];
-        rows += '<div class="t-row t-row-sales">';
-        rows += '<div style="font-size:.9rem">' + (v.cliente_nombre||'-') + '</div>';
-        rows += '<div style="font-size:.7rem;color:#888">' + (v.cliente_email||'-') + '</div>';
-        rows += '<div style="font-size:.68rem;color:#444">' + ((v.detalle||'').substring(0,50)) + '...</div>';
-        rows += '<div style="font-size:.7rem">' + (v.metodo_pago||'-') + '</div>';
-        rows += '<div style="font-size:1rem">' + fmt(v.total||0) + '</div>';
-        rows += '<div><select class="sale-select" data-id="' + v.id + '">';
-        rows += '<option value="pendiente"' + (v.estado==='pendiente'?' selected':'') + '>Pendiente</option>';
-        rows += '<option value="confirmado"' + (v.estado==='confirmado'?' selected':'') + '>Confirmado</option>';
-        rows += '<option value="enviado"' + (v.estado==='enviado'?' selected':'') + '>Enviado</option>';
-        rows += '</select></div></div>';
-      }
-      body.innerHTML = rows;
-      body.querySelectorAll('.sale-select').forEach(function(sel) {
-        sel.addEventListener('change', function() {
-          sbClient.from('ventas').update({estado:this.value}).eq('id',this.dataset.id).then(function(){
-            showToast('Estado actualizado');loadStats();
-          });
+      _allSales=res.data||[];
+      renderSales();
+    });
+  }
+  function renderSales(){
+    var body=document.getElementById('sales-body');
+    var from=document.getElementById('filter-from').value;
+    var to=document.getElementById('filter-to').value;
+    var estado=document.getElementById('filter-estado').value;
+    var data=_allSales.filter(function(v){
+      var d=v.created_at?v.created_at.substring(0,10):'';
+      if(from&&d<from)return false;
+      if(to&&d>to)return false;
+      if(estado&&v.estado!==estado)return false;
+      return true;
+    });
+    var summ=document.getElementById('sales-summary');
+    var total=data.reduce(function(acc,v){return acc+(v.total||0);},0);
+    summ.textContent=data.length+' pedido(s) · Total: '+fmt(total);
+    if(!data.length){body.innerHTML='<div class="loading">Sin resultados</div>';return;}
+    var stateColors={pendiente:'#e67e22',confirmado:'#2a9d5c',enviado:'#3498db'};
+    var rows='';
+    for(var i=0;i<data.length;i++){
+      var v=data[i];
+      var fecha=v.created_at?new Date(v.created_at).toLocaleDateString('es-AR',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'}):'';
+      rows+='<div class="t-row t-row-sales">';
+      rows+='<div style="font-size:.65rem;color:#888;">'+fecha+'</div>';
+      rows+='<div><div style="font-size:.85rem;font-weight:600;">'+(v.cliente_nombre||'-')+'</div><div style="font-size:.65rem;color:#888;">'+(v.cliente_email||'-')+'</div></div>';
+      rows+='<div style="font-size:.65rem;color:#444;">'+(v.detalle||'').substring(0,60)+'...</div>';
+      rows+='<div style="font-size:.9rem;font-weight:700;">'+fmt(v.total||0)+'</div>';
+      rows+='<div><select class="sale-select" data-id="'+v.id+'">';
+      rows+='<option value="pendiente"'+(v.estado==='pendiente'?' selected':'')+'>Pendiente</option>';
+      rows+='<option value="confirmado"'+(v.estado==='confirmado'?' selected':'')+'>Confirmado</option>';
+      rows+='<option value="enviado"'+(v.estado==='enviado'?' selected':'')+'>Enviado ✓</option>';
+      rows+='</select></div></div>';
+    }
+    body.innerHTML=rows;
+    body.querySelectorAll('.sale-select').forEach(function(sel){
+      sel.addEventListener('change',function(){
+        sbClient.from('ventas').update({estado:this.value}).eq('id',this.dataset.id).then(function(){
+          showToast('Estado actualizado');loadStats();loadSales();
         });
       });
     });
+  }
+  function exportSalesCSV(){
+    var from=document.getElementById('filter-from').value;
+    var to=document.getElementById('filter-to').value;
+    var estado=document.getElementById('filter-estado').value;
+    var data=_allSales.filter(function(v){
+      var d=v.created_at?v.created_at.substring(0,10):'';
+      if(from&&d<from)return false;
+      if(to&&d>to)return false;
+      if(estado&&v.estado!==estado)return false;
+      return true;
+    });
+    var csv='Fecha,Cliente,Email,Detalle,Total,Estado\n';
+    data.forEach(function(v){
+      var fecha=v.created_at?v.created_at.substring(0,10):'';
+      csv+='"'+fecha+'","'+(v.cliente_nombre||'')+'","'+(v.cliente_email||'')+'","'+(v.detalle||'').replace(/"/g,"'")+'","'+fmt(v.total||0)+'","'+(v.estado||'')+'"\n';
+    });
+    var blob=new Blob([csv],{type:'text/csv;charset=utf-8;'});
+    var link=document.createElement('a');
+    link.href=URL.createObjectURL(blob);
+    link.download='pedidos_osomates_'+new Date().toISOString().substring(0,10)+'.csv';
+    link.click();
   }
 
   function loadProducts() {
@@ -1187,4 +1241,4 @@ body{font-family:Montserrat,sans-serif;background:#f0f0ee;color:#0a0a0a;}
 })();
 </script>
 </body>
-</html>
+</html>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   
