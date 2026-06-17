@@ -258,6 +258,22 @@ footer{background:var(--black);padding:3rem 4rem;display:flex;justify-content:sp
 .nos-stat-num{font-family:'Cormorant Garamond',serif;font-size:2.8rem;color:var(--warm);line-height:1;}
 .nos-stat-label{font-size:.6rem;letter-spacing:.15em;text-transform:uppercase;color:var(--gray);margin-top:.2rem;}
 .counter{display:inline-block;}
+.curado-section{padding:5rem 4rem;background:var(--white);}
+[data-theme="dark"] .curado-section{background:var(--black);}
+.curado-section .section-num{font-size:.55rem;letter-spacing:.18em;text-transform:uppercase;color:var(--warm);margin-bottom:.8rem;}
+.curado-section .section-title{font-size:clamp(1.6rem,4vw,2.5rem);font-weight:800;line-height:1.15;margin-bottom:.6rem;}
+.curado-section .section-desc{font-size:.82rem;color:var(--gray);max-width:560px;margin-bottom:3rem;line-height:1.7;}
+.curado-steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:2rem;max-width:1100px;margin:0 auto;}
+.curado-step{padding:2rem 1.8rem 1.8rem;border:1px solid var(--light);background:var(--white);transition:box-shadow .25s;}
+[data-theme="dark"] .curado-step{background:var(--mid);border-color:#333;}
+.curado-step:hover{box-shadow:0 8px 28px rgba(10,10,10,.08);}
+.curado-step-num{display:inline-block;font-size:.55rem;letter-spacing:.15em;text-transform:uppercase;color:var(--warm);background:rgba(200,149,108,.1);padding:.3rem .7rem;margin-bottom:1.1rem;}
+.curado-step-icon{font-size:1.8rem;margin-bottom:.8rem;display:block;}
+.curado-step-title{font-size:.88rem;font-weight:800;letter-spacing:.04em;text-transform:uppercase;margin-bottom:.6rem;}
+.curado-step-desc{font-size:.75rem;color:var(--gray);line-height:1.7;}
+.curado-tip{max-width:1100px;margin:2.5rem auto 0;padding:1.4rem 1.8rem;border-left:3px solid var(--warm);background:rgba(200,149,108,.06);font-size:.76rem;color:var(--gray);line-height:1.7;}
+.curado-tip strong{color:var(--warm);}
+@media(max-width:768px){.curado-section{padding:4rem 1.5rem;}}
 .cookie-banner{position:fixed;left:0;right:0;bottom:0;background:var(--black);color:var(--white);padding:1.2rem 2rem;display:none;align-items:center;justify-content:center;gap:1.5rem;z-index:5000;flex-wrap:wrap;}
 .cookie-banner.show{display:flex;}
 .cookie-banner p{font-size:.75rem;font-weight:300;line-height:1.6;max-width:700px;text-align:center;}
@@ -784,6 +800,46 @@ fbq('track', 'PageView');
     </div>
   </div>
 </section>
+<section class="curado-section" id="curado">
+  <div class="section-num" data-i18n="sec_curado_num">★ Primer paso</div>
+  <h2 class="section-title" data-i18n="sec_curado_title">Cómo <em>curar</em> tu mate</h2>
+  <p class="section-desc" data-i18n="sec_curado_desc">Un mate nuevo necesita ser curado antes del primer uso. Este proceso protege la madera, le da sabor y alarga su vida útil.</p>
+  <div class="curado-steps">
+    <div class="curado-step reveal">
+      <span class="curado-step-num" data-i18n="curado_step1_num">Paso 01</span>
+      <span class="curado-step-icon">🧂</span>
+      <div class="curado-step-title" data-i18n="curado_step1_title">Llenar con yerba y sal</div>
+      <div class="curado-step-desc" data-i18n="curado_step1_desc">Completá el mate con yerba usada hasta las ¾ partes. Agregá sal gruesa y humedecé con agua tibia hasta formar una pasta.</div>
+    </div>
+    <div class="curado-step reveal">
+      <span class="curado-step-num" data-i18n="curado_step2_num">Paso 02</span>
+      <span class="curado-step-icon">⏰</span>
+      <div class="curado-step-title" data-i18n="curado_step2_title">Dejar reposar 24 horas</div>
+      <div class="curado-step-desc" data-i18n="curado_step2_desc">Dejá la mezcla adentro del mate durante 24 horas. La madera absorbe los aceites naturales de la yerba, sellando los poros y dándole el sabor característico.</div>
+    </div>
+    <div class="curado-step reveal">
+      <span class="curado-step-num" data-i18n="curado_step3_num">Paso 03</span>
+      <span class="curado-step-icon">🚿</span>
+      <div class="curado-step-title" data-i18n="curado_step3_title">Vaciar y enjuagar</div>
+      <div class="curado-step-desc" data-i18n="curado_step3_desc">Retirá la yerba con cuchara, enjuagá con agua tibia sin jabón. Nunca uses detergente ni lavavajillas.</div>
+    </div>
+    <div class="curado-step reveal">
+      <span class="curado-step-num" data-i18n="curado_step4_num">Paso 04</span>
+      <span class="curado-step-icon">🌬️</span>
+      <div class="curado-step-title" data-i18n="curado_step4_title">Secar boca abajo</div>
+      <div class="curado-step-desc" data-i18n="curado_step4_desc">Dejá el mate boca abajo sobre una superficie ventilada hasta que seque completamente. Evitá lugares húmedos para prevenir hongos.</div>
+    </div>
+    <div class="curado-step reveal">
+      <span class="curado-step-num" data-i18n="curado_step5_num">Paso 05</span>
+      <span class="curado-step-icon">🧉</span>
+      <div class="curado-step-title" data-i18n="curado_step5_title">¡Listo para usar!</div>
+      <div class="curado-step-desc" data-i18n="curado_step5_desc">Los primeros mates pueden tener sabor más intenso, es normal. En unos días el sabor se estabiliza.</div>
+    </div>
+  </div>
+  <div class="curado-tip reveal">
+    <strong data-i18n="curado_tip_label">Consejo:</strong> <span data-i18n="curado_tip_text">Si tu mate es de calabaza, repetí el proceso 2-3 veces. Para mates de madera, con una vez alcanza.</span>
+  </div>
+</section>
 <section id="nosotros" style="padding:0">
   <div class="nos-right reveal" id="nosotros-content">
     <div class="loading">Cargando...</div>
@@ -1012,6 +1068,13 @@ const I18N = {
     sort_default:'Ordenar',sort_price_asc:'Precio: menor a mayor',sort_price_desc:'Precio: mayor a menor',sort_name_asc:'Nombre A→Z',
     ord_history_title:'Pedidos anteriores',ord_history_none:'Sin pedidos previos.',
     results_count:'Mostrando %n producto(s)', results_count_none:'Sin resultados',
+    sec_curado_num:'★ Primer paso', sec_curado_title:'Cómo curar tu mate', sec_curado_desc:'Un mate nuevo necesita ser curado antes del primer uso. Este proceso protege la madera, le da sabor y alarga su vida útil.',
+    curado_step1_num:'Paso 01', curado_step1_title:'Llenar con yerba y sal', curado_step1_desc:'Completá el mate con yerba usada hasta las ¾ partes. Agregá sal gruesa y humedecé con agua tibia hasta formar una pasta.',
+    curado_step2_num:'Paso 02', curado_step2_title:'Dejar reposar 24 horas', curado_step2_desc:'Dejá la mezcla adentro del mate durante 24 horas. La madera absorbe los aceites naturales de la yerba.',
+    curado_step3_num:'Paso 03', curado_step3_title:'Vaciar y enjuagar', curado_step3_desc:'Retirá la yerba con cuchara, enjuagá con agua tibia sin jabón. Nunca uses detergente.',
+    curado_step4_num:'Paso 04', curado_step4_title:'Secar boca abajo', curado_step4_desc:'Dejá el mate boca abajo sobre superficie ventilada hasta secar completamente.',
+    curado_step5_num:'Paso 05', curado_step5_title:'¡Listo para usar!', curado_step5_desc:'Los primeros mates pueden tener sabor más intenso, es normal.',
+    curado_tip_label:'Consejo:', curado_tip_text:'Si tu mate es de calabaza, repetí el proceso 2-3 veces. Para mates de madera, con una vez alcanza.',
     sec_como_num:'★ Simple', sec_como_title:'¿Cómo comprar?',
     como_step1_title:'Elegís tu mate', como_step1_desc:'Explorá el catálogo, guardá tus favoritos y agregá al carrito lo que te guste.',
     como_step2_title:'Transferís', como_step2_desc:'Confirmás el pedido y transferís al CBU. Tenés 10% de descuento por pago bancario.',
@@ -1059,6 +1122,13 @@ const I18N = {
     sort_default:'Sort',sort_price_asc:'Price: low to high',sort_price_desc:'Price: high to low',sort_name_asc:'Name A→Z',
     ord_history_title:'Previous orders',ord_history_none:'No previous orders.',
     results_count:'Showing %n product(s)', results_count_none:'No results',
+    sec_curado_num:'★ First step', sec_curado_title:'How to cure your mate', sec_curado_desc:'A new mate gourd needs to be cured before first use. This protects the wood, adds flavor and extends its life.',
+    curado_step1_num:'Step 01', curado_step1_title:'Fill with yerba and salt', curado_step1_desc:'Fill 3/4 of the mate with used yerba. Add coarse salt and moisten with warm water to form a paste.',
+    curado_step2_num:'Step 02', curado_step2_title:'Let it rest 24 hours', curado_step2_desc:'The wood absorbs the natural oils from the yerba, sealing the pores and developing its flavor.',
+    curado_step3_num:'Step 03', curado_step3_title:'Empty and rinse', curado_step3_desc:'Remove the yerba with a spoon, rinse with warm water — no soap, no dishwasher.',
+    curado_step4_num:'Step 04', curado_step4_title:'Dry upside down', curado_step4_desc:'Leave the mate upside down on a ventilated surface until fully dry.',
+    curado_step5_num:'Step 05', curado_step5_title:'Ready to use!', curado_step5_desc:'The first few mates may taste stronger — normal. The flavor settles in a few days.',
+    curado_tip_label:'Tip:', curado_tip_text:'Calabash mates benefit from 2-3 curing cycles. For wood mates, once is enough.',
     sec_como_num:'★ Simple', sec_como_title:'How to buy?',
     como_step1_title:'Pick your mate', como_step1_desc:'Browse the catalog, save favorites and add to cart.',
     como_step2_title:'Transfer payment', como_step2_desc:'Confirm your order and transfer to our CBU. Get 10% off with bank transfer.',
