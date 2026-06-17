@@ -343,11 +343,6 @@ body{font-family:Montserrat,sans-serif;background:#f0f0ee;color:#0a0a0a;}
         </div>
         <div class="fg"><label class="fl">Badge</label><input class="fi" id="f-badge" placeholder="Popular, Nuevo..."/></div>
       </div>
-      <div class="fg">
-        <label class="fl">Stock</label>
-        <input class="fi" type="number" id="f-stock" placeholder="Dejar vacio si no querés mostrar stock"/>
-        <p style="font-size:.62rem;color:#888;margin-top:.4rem">Si el stock es 5 o menos, en la web se muestra "Ultimas X". Dejalo vacio para no mostrar nada.</p>
-      </div>
       <div class="form-actions">
         <button class="btn-cancel" id="cancel-btn">Cancelar</button>
         <button class="btn-save" id="save-btn">Guardar</button>
@@ -1112,7 +1107,6 @@ body{font-family:Montserrat,sans-serif;background:#f0f0ee;color:#0a0a0a;}
     currentImgPos = imgParsed.pos;
     document.getElementById('f-cat').value = p.categoria || 'madera';
     document.getElementById('f-badge').value = p.badge || '';
-    document.getElementById('f-stock').value = (p.stock===null||p.stock===undefined) ? '' : p.stock;
     selectedImages = p.imagenes || [];
     renderSelectedImgs();
     renderImgPosPicker();
@@ -1123,7 +1117,7 @@ body{font-family:Montserrat,sans-serif;background:#f0f0ee;color:#0a0a0a;}
   function openNew() {
     document.getElementById('modal-title').textContent = 'Nuevo producto';
     document.getElementById('f-id').value = '';
-    ['nombre','material','desc','mp','img','badge','stock'].forEach(function(f) { document.getElementById('f-'+f).value=''; });
+    ['nombre','material','desc','mp','img','badge'].forEach(function(f) { document.getElementById('f-'+f).value=''; });
     document.getElementById('f-precio').value = '';
     document.getElementById('f-transf').value = '';
     document.getElementById('f-cat').value = 'madera';
@@ -1152,7 +1146,6 @@ body{font-family:Montserrat,sans-serif;background:#f0f0ee;color:#0a0a0a;}
       imagenes: selectedImages.length > 0 ? selectedImages : [imgVal],
       categoria: document.getElementById('f-cat').value,
       badge: document.getElementById('f-badge').value || null,
-      stock: document.getElementById('f-stock').value === '' ? null : parseInt(document.getElementById('f-stock').value),
       activo: true
     };
     if (!data.nombre || !data.precio) { showToast('Nombre y precio obligatorios'); return; }
