@@ -109,6 +109,7 @@ section{padding:8rem 4rem}
 .sug-img{width:32px;height:32px;object-fit:cover;flex-shrink:0;}
 .ftab.active,.ftab:hover{color:var(--black);border-bottom-color:var(--black);}
 .catalog-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:0;}
+.results-count{font-size:.65rem;letter-spacing:.12em;text-transform:uppercase;color:var(--gray);padding:.6rem 4rem;border-bottom:1px solid var(--light);}
 .product-card{border:1px solid var(--light);margin:-1px 0 0 -1px;position:relative;overflow:hidden;background:var(--white);transition:box-shadow .3s,transform .3s;}
 .product-card:hover{box-shadow:0 8px 40px rgba(0,0,0,.12);z-index:2;transform:translateY(-2px);}
 .p-img-wrap{height:280px;overflow:hidden;background:var(--light);cursor:pointer;position:relative;}
@@ -664,6 +665,7 @@ fbq('track', 'PageView');
     <span class="pfab-label" data-i18n="precio_label">Precio:</span>
     <button class="pfab active" data-price="todos" onclick="filterPrice('todos',this)" data-i18n="f_todos">Todos</button>
   </div>
+  <div class="results-count" id="results-count" style="display:none;"></div>
   <div class="catalog-grid" id="grid"></div>
 </section>
 
@@ -964,6 +966,7 @@ const I18N = {
     sec_catalogo_num:'01 — Catálogo', sec_catalogo_title:'La <em>colección</em>',
     sort_default:'Ordenar',sort_price_asc:'Precio: menor a mayor',sort_price_desc:'Precio: mayor a menor',sort_name_asc:'Nombre A→Z',
     ord_history_title:'Pedidos anteriores',ord_history_none:'Sin pedidos previos.',
+    results_count:'Mostrando %n producto(s)', results_count_none:'Sin resultados',
     search_ph:'Buscar productos...',
     f_todos:'Todos', f_madera:'Madera', f_calabaza:'Calabaza', f_bombillas:'Bombillas', f_combos:'Combos', f_favoritos:'♥ Favoritos',
     precio_label:'Precio:',
@@ -1002,6 +1005,7 @@ const I18N = {
     sec_catalogo_num:'01 — Catalog', sec_catalogo_title:'The <em>collection</em>',
     sort_default:'Sort',sort_price_asc:'Price: low to high',sort_price_desc:'Price: high to low',sort_name_asc:'Name A→Z',
     ord_history_title:'Previous orders',ord_history_none:'No previous orders.',
+    results_count:'Showing %n product(s)', results_count_none:'No results',
     search_ph:'Search products...',
     f_todos:'All', f_madera:'Wood', f_calabaza:'Gourd', f_bombillas:'Straws', f_combos:'Combos', f_favoritos:'♥ Favorites',
     precio_label:'Price:',
@@ -1547,7 +1551,25 @@ function acceptCookies(){
 const obs=new IntersectionObserver(entries=>{entries.forEach((e,i)=>{if(e.isIntersecting)setTimeout(()=>e.target.classList.add('in'),i*80);});},{threshold:.1});
 document.querySelectorAll('.reveal').forEach(el=>obs.observe(el));
 
-loadCart();loadProducts();loadBestsellers();loadBombillas();loadCombos();loadFaq();loadNosotros();loadHeroBanner();loadTestimonios();loadPriceFilters();loadShippingZones();loadCoupon();updateCartUI();
+loadCart();loadProducts();loadFaq();loadNosotros();loadHeroBanner();loadTestimonios();loadPriceFilters();loadShippingZones();loadCoupon();updateCartUI();
+// Lazy-load bestsellers, combos, bombillas when their section enters viewport
+(function(){
+  var lazyMap={'bestsellers-grid':loadBestsellers,'combos-grid':loadCombos,'bombillas-grid':loadBombillas};
+  var loaded={};
+  var lo=new IntersectionObserver(function(entries){
+    entries.forEach(function(e){
+      if(e.isIntersecting&&!loaded[e.target.id]){
+        loaded[e.target.id]=true;
+        lazyMap[e.target.id]();
+        lo.unobserve(e.target);
+      }
+    });
+  },{rootMargin:'200px 0px'});
+  ['bestsellers-grid','combos-grid','bombillas-grid'].forEach(function(id){
+    var el=document.getElementById(id);
+    if(el)lo.observe(el);
+  });
+})();
 
 // ── CACHE de productos (10 min TTL) ──────────────────────────────────────────
 const CACHE_KEY='om_products';const CACHE_TTL=10*60*1000;
@@ -1650,13 +1672,16 @@ function applyFilters(){
   if(currentSearchTerm){
     list=list.filter(p=>(p.nombre||'').toLowerCase().includes(currentSearchTerm));
   }
+  const rc=document.getElementById('results-count');
   if(!list.length){
-    g.innerHTML=currentCatFilter==='favoritos'?'<div class="loading">Todavía no tenés favoritos. Toc\u00e1 el \u2665 en un producto para guardarlo.</div>':'<div class="loading">No encontramos productos con esos filtros</div>';
+    g.innerHTML=currentCatFilter==='favoritos'?'<div class="loading">Todavía no tenés favoritos. Tocá el ♥ en un producto para guardarlo.</div>':'<div class="loading">No encontramos productos con esos filtros</div>';
+    if(rc){rc.textContent=t('results_count_none')||'Sin resultados';rc.style.display='';}
     return;
   }
   if(currentSort==='price_asc')list=[...list].sort((a,b)=>a.precio-b.precio);
   else if(currentSort==='price_desc')list=[...list].sort((a,b)=>b.precio-a.precio);
   else if(currentSort==='name_asc')list=[...list].sort((a,b)=>(a.nombre||'').localeCompare(b.nombre||''));
+  if(rc){rc.textContent=(t('results_count')||'Mostrando %n producto(s)').replace('%n',list.length);rc.style.display='';}
   renderGrid(list);
 }
 
