@@ -315,8 +315,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:500;display:flex;justify-content
   <div class="cart-items" id="cart-items"></div>
   <div class="cart-footer">
     <div class="cart-subtotal"><span class="cart-subtotal-label" data-i18n="cart_total">Total</span><span class="cart-subtotal-amount" id="cart-total">$0</span></div>
-    <button class="checkout-btn mp" onclick="openCheckout('mp')" data-i18n="cart_pay_mp">Pagar con Mercado Pago</button>
-    <button class="checkout-btn" onclick="openCheckout('transfer')" data-i18n="cart_pay_transfer">Transferencia (&#x2212;10%)</button>
+    <button class="checkout-btn" onclick="openCheckout('transfer')" data-i18n="cart_pay_transfer">Pagar por transferencia (&#x2212;10%)</button>
   </div>
 </div>
 <div class="co-overlay" id="co-overlay">
@@ -334,11 +333,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:500;display:flex;justify-content
         <div class="co-total"><span class="co-total-label" id="co-total-label" data-i18n="co_total">Total</span><span class="co-total-amount" id="co-total-amount"></span></div>
         <div class="coupon-box"><input id="coupon-input" type="text" placeholder="Código de cupón" data-i18n-ph="coupon_ph"/><button class="coupon-btn" onclick="applyCoupon()" data-i18n="coupon_btn">Aplicar</button></div>
         <div class="coupon-msg" id="coupon-msg"></div>
-        <div class="pay-options">
-          <div class="pay-opt" id="opt-mp" onclick="selectPay('mp')"><span class="pay-opt-icon">💳</span><div class="pay-opt-label" data-i18n="pay_mp_label">Mercado Pago</div><div class="pay-opt-desc" data-i18n="pay_mp_desc">Tarjeta, débito o saldo</div></div>
-          <div class="pay-opt" id="opt-tr" onclick="selectPay('transfer')"><span class="pay-opt-icon">🏦</span><div class="pay-opt-label" data-i18n="pay_tr_label">Transferencia</div><div class="pay-opt-desc" data-i18n="pay_tr_desc">10% de descuento</div></div>
-        </div>
-        <div class="transfer-box" id="transfer-box">
+        <div class="transfer-box show" id="transfer-box">
           <div class="transfer-box-title" data-i18n="transfer_title">&#x2713; Datos para transferir</div>
           <div class="trow"><span class="tlabel" data-i18n="transfer_banco">Banco</span><span class="tval" data-i18n="transfer_banco_val">Francés (BBVA)</span></div>
           <div class="trow"><span class="tlabel" data-i18n="transfer_cbu">CBU</span><span class="tval">0170090940000048482721 <button class="copy-btn" onclick="copyCBU()" data-i18n="copy_btn">Copiar</button></span></div>
@@ -469,7 +464,7 @@ function getImg(img){
 function getImgPos(img){
   return parseImgVal(img).pos;
 }
-let allProds=[], currentProd=null, cart=[], payMethod='mp';
+let allProds=[], currentProd=null, cart=[], payMethod='transfer';
 function fmt(n){return '$'+parseInt(n).toLocaleString('es-AR');}
 const params = new URLSearchParams(window.location.search);
 const prodId = params.get('id');
@@ -694,7 +689,7 @@ function renderProduct(p, related){
         </ul>
         <div class="product-actions">
           <button class="btn-add" onclick="addToCartAndOpen()">${t('btn_add')}</button>
-          <button class="btn-mp" onclick="window.open('${p.link_mp}','_blank')">${t('btn_buy')}</button>
+
         </div>
         <button class="btn-fav${isFav(p.id)?' active':''}" id="fav-btn" onclick="toggleProductFav('${p.id}')">${isFav(p.id)?t('fav_added'):t('fav_add')}</button>
         <button class="btn-share" onclick="shareProduct('${p.id}')">&#x2197; ${t('share_btn')}</button>
@@ -921,18 +916,9 @@ function goToStep2(){
     if(e&&!e.value&&saved.email)e.value=saved.email;
   }catch(err){}
 }
-function openCheckout(m){if(!cart.length){showToast('Agregá productos primero 👆');return;}toggleCart();payMethod=m;buildCheckout();goToStep1();document.getElementById('co-overlay').classList.add('open');}
+function openCheckout(m){if(!cart.length){showToast('Agregá productos primero 👆');return;}toggleCart();payMethod='transfer';buildCheckout();goToStep1();document.getElementById('co-overlay').classList.add('open');}
 function closeCheckout(){document.getElementById('co-overlay').classList.remove('open');}
-function selectPay(m){
-  payMethod=m;
-  document.getElementById('opt-mp').classList.toggle('sel',m==='mp');
-  document.getElementById('opt-tr').classList.toggle('sel',m==='transfer');
-  document.getElementById('transfer-box').classList.toggle('show',m==='transfer');
-  buildCheckoutTotal();
-  const btn=document.getElementById('confirm-btn');
-  if(m==='mp'){btn.textContent=t('confirm_btn_mp');btn.className='confirm-btn mp-btn';}
-  else{btn.textContent=t('confirm_btn');btn.className='confirm-btn';}
-}
+function selectPay(m){payMethod='transfer';buildCheckoutTotal();}
 function buildCheckout(){
   document.getElementById('co-items').innerHTML=cart.map(item=>`<div class="co-item"><span class="co-item-name">${item.nombre}${item.grabado?` (${t('cart_item_grabado')}: "${escapeHtml(item.grabado)}")`:''} × ${item.qty}</span><span>${fmt(itemUnitPrice(item,payMethod==='transfer')*item.qty)}</span></div>`).join('');
   _couponApplied=false;
@@ -958,7 +944,7 @@ async function confirmOrder(){
   let detalle=cart.map(i=>i.nombre+(i.grabado?' (Grabado: "'+i.grabado+'")':'')+' x'+i.qty+' = '+fmt(itemUnitPrice(i,isT)*i.qty)).join(' | ');
   if(_couponApplied&&_coupon.percent>0)detalle+=' | Cup\u00f3n '+_coupon.code+' (-'+_coupon.percent+'%)';
   const datosT=isT?'DATOS: Banco Frances BBVA | CBU: 0170090940000048482721 | Total: '+fmt(total):'';
-  const metodo=isT?'Transferencia (10% dcto.)':'Mercado Pago';
+  const metodo='Transferencia (10% dcto.)';
   const btn=document.getElementById('confirm-btn');
   btn.textContent='Procesando...';btn.disabled=true;
   await sb.from('ventas').insert({cliente_nombre:name,cliente_email:email,detalle:detalle,metodo_pago:metodo,total:total,estado:'pendiente'});
@@ -967,7 +953,6 @@ async function confirmOrder(){
     await emailjs.send('service_s6si3n4','template_ulqz3nj',emailParams);
     await emailjs.send('service_s6si3n4','template_ulqz3nj',{...emailParams,email:'osomates8@gmail.com',cliente_nombre:'NUEVO PEDIDO — '+name+' ('+email+')'});
   }catch(e){console.error(e);}
-  if(payMethod==='mp'){cart.forEach(i=>window.open(i.link_mp,'_blank'));}
   closeCheckout();
   document.getElementById('success-text').textContent=isT?'Revisá tu email ('+email+') para ver los datos de transferencia.':'Revisá tu email ('+email+'). Te redirigimos a Mercado Pago.';
   document.getElementById('success-overlay').classList.add('open');
