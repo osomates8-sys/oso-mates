@@ -1411,7 +1411,9 @@ function getImg(img){
 function getImgPos(img){
   return parseImgVal(img).pos;
 }
-function fmt(n){return '$'+parseInt(n).toLocaleString('es-AR');}
+function fmt(n){if(!n&&n!==0)return '';return '$'+parseInt(n).toLocaleString('es-AR');}
+function getPrecioTransf(p){return (p.precio_transferencia&&p.precio_transferencia>0)?p.precio_transferencia:p.precio;}
+function hasDescuento(p){return p.precio_transferencia&&p.precio_transferencia>0&&p.precio_transferencia<p.precio;}
 
 async function loadProducts(){
   const cached=getCachedProducts();
@@ -1448,7 +1450,7 @@ function renderGrid(listOrFilter){
   g.innerHTML=list.map((p,i)=>{
     const stockBadge=p.stock&&p.stock<=5?`<span class="stock-low">${t('ultimas')} ${p.stock}</span>`:'';
     const shipBadge=p.precio>=100000?`<span class="free-ship">${t('free_ship')}</span>`:'';
-    return `<div class="product-card"><div class="p-img-wrap" onclick="viewProduct('${p.id}')"><img src="${getImg(p.imagen)}" alt="${p.nombre}" class="p-img" style="object-position:${getImgPos(p.imagen)}" loading="lazy" onload="this.closest('.p-img-wrap').classList.add('loaded')" crossorigin="anonymous"/>${favBtnHtml(p.id)}</div><div class="p-body"><div class="p-num">N\u00b000${i+1}</div>${stockBadge}${shipBadge}${p.badge?`<div class="p-badge">${p.badge}</div>`:''}<div class="p-name" onclick="viewProduct('${p.id}')">${p.nombre}</div><div class="p-mat">${p.material}</div><div class="p-footer"><div><div class="p-price-label">${t('transf_label')}</div><div class="p-price-orig">${fmt(p.precio)}</div><div class="p-price"><strong>${fmt(p.precio_transferencia)}</strong></div></div><div class="p-btns"><button class="p-view-btn" onclick="viewProduct('${p.id}')">${t('ver_btn')}</button><button class="p-add-btn" onclick="addToCart('${p.id}')">${t('add_btn')}</button></div></div></div></div>`;
+    return `<div class="product-card"><div class="p-img-wrap" onclick="viewProduct('${p.id}')"><img src="${getImg(p.imagen)}" alt="${p.nombre}" class="p-img" style="object-position:${getImgPos(p.imagen)}" loading="lazy" onload="this.closest('.p-img-wrap').classList.add('loaded')" crossorigin="anonymous"/>${favBtnHtml(p.id)}</div><div class="p-body"><div class="p-num">N\u00b000${i+1}</div>${stockBadge}${shipBadge}${p.badge?`<div class="p-badge">${p.badge}</div>`:''}<div class="p-name" onclick="viewProduct('${p.id}')">${p.nombre}</div><div class="p-mat">${p.material}</div><div class="p-footer"><div>${hasDescuento(p)?`<div class="p-price-label">${t('transf_label')}</div><div class="p-price-orig">${fmt(p.precio)}</div>`:''}<div class="p-price"><strong>${fmt(getPrecioTransf(p))}</strong></div></div><div class="p-btns"><button class="p-view-btn" onclick="viewProduct('${p.id}')">${t('ver_btn')}</button><button class="p-add-btn" onclick="addToCart('${p.id}')">${t('add_btn')}</button></div></div></div></div>`;
   }).join('');
 }
 
@@ -1503,7 +1505,7 @@ function applyCoupon(){
   buildCheckoutTotal();
 }
 function cartTotal(){return cart.reduce((s,i)=>s+i.precio*i.qty,0);}
-function cartTransferTotal(){return cart.reduce((s,i)=>s+i.precio_transferencia*i.qty,0);}
+function cartTransferTotal(){return cart.reduce((s,i)=>s+(getPrecioTransf(i))*i.qty,0);}
 
 const DEFAULT_SHIPPING_ZONES=[
   {label:'CABA y GBA',cost:4500,days:'2-3 días hábiles'},
