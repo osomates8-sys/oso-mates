@@ -279,13 +279,6 @@ footer{background:var(--black);padding:3rem 4rem;display:flex;justify-content:sp
 .cookie-banner p{font-size:.75rem;font-weight:300;line-height:1.6;max-width:700px;text-align:center;}
 .cookie-banner a{color:inherit;text-decoration:underline;}
 .cookie-banner-btn{background:var(--white);color:var(--black);border:none;padding:.8rem 1.8rem;font-family:'Montserrat',sans-serif;font-size:.62rem;letter-spacing:.15em;text-transform:uppercase;cursor:pointer;white-space:nowrap;}
-.pay-options{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1.5rem;}
-.pay-opt{border:1.5px solid var(--light);padding:1.5rem;cursor:pointer;transition:all .2s;text-align:center;}
-.pay-opt:hover,.pay-opt.sel{border-color:var(--black);background:var(--black);color:var(--white);}
-.pay-opt-icon{font-size:1.5rem;margin-bottom:.5rem;display:block;}
-.pay-opt-label{font-size:.62rem;letter-spacing:.15em;text-transform:uppercase;font-weight:600;}
-.pay-opt-desc{font-size:.6rem;color:var(--gray);margin-top:.3rem;transition:color .2s;}
-.pay-opt:hover .pay-opt-desc,.pay-opt.sel .pay-opt-desc{color:rgba(255,255,255,.6)}
 .transfer-box{background:#f0f8f4;border:1px solid #c3e6d0;padding:1.5rem;margin-bottom:1.5rem;display:none;}
 .transfer-box.show{display:block;}
 .transfer-box-title{font-size:.62rem;letter-spacing:.15em;text-transform:uppercase;color:var(--green);font-weight:700;margin-bottom:1rem;}
@@ -365,7 +358,6 @@ footer{background:var(--black);padding:3rem 4rem;display:flex;justify-content:sp
   .section-header{flex-direction:column;align-items:flex-start;gap:1rem;}
   .cart-sidebar{width:100%;}
   footer{flex-direction:column;text-align:center;padding:2rem;}
-  .pay-options{grid-template-columns:1fr;}
   .field-group{grid-template-columns:1fr;}
 }
 @media(max-width:600px){.catalog-grid{grid-template-columns:1fr;}.values-list{grid-template-columns:1fr;}}
@@ -1104,9 +1096,9 @@ const I18N = {
     wa_label:'WhatsApp directo', wa_btn:'Escribir ahora →',
     newsletter_title:'Sumate a la lista', newsletter_text:'Recibí novedades, descuentos exclusivos y nuevos lanzamientos directo a tu email.', newsletter_ph:'tu@email.com', newsletter_btn:'Suscribirme',
     footer_copy1:'© 2026 — Hecho en Argentina', footer_copy2:'Todos los derechos reservados', footer_legal:'Política de privacidad y términos',
-    cart_title:'Tu carrito', cart_close:'✕ Cerrar', cart_ship_title:'Calculá tu envío', cart_total:'Total', cart_pay_mp:'Pagar con Mercado Pago', cart_pay_transfer:'Transferencia (−10%)', cart_empty:'Tu carrito está vacío',
+    cart_title:'Tu carrito', cart_close:'✕ Cerrar', cart_ship_title:'Calculá tu envío', cart_total:'Total', cart_pay_transfer:'Transferencia (−10%)', cart_empty:'Tu carrito está vacío',
     co_title:'Resumen de compra', co_close:'✕ Volver', co_productos:'Productos', co_total:'Total', coupon_ph:'Código de cupón', coupon_btn:'Aplicar',
-    pay_mp_label:'Mercado Pago', pay_mp_desc:'Tarjeta, débito o saldo MP', pay_tr_label:'Transferencia', pay_tr_desc:'10% de descuento',
+    pay_tr_label:'Transferencia', pay_tr_desc:'10% de descuento',
     transfer_title:'✓ Datos para transferir', transfer_banco:'Banco', transfer_banco_val:'Francés (BBVA)', transfer_cbu:'CBU', copy_btn:'Copiar', dcto_banner:'10% DE DESCUENTO APLICADO',
     co_datos:'Tus datos', field_nombre:'Nombre *', field_nombre_ph:'Tu nombre completo', field_email:'Email *', field_email_ph:'tu@email.com', field_note:'Te enviaremos la confirmación a tu email.', confirm_btn:'Confirmar pedido',
     success_title:'¡Pedido confirmado!', success_close:'Cerrar',
@@ -1158,9 +1150,9 @@ const I18N = {
     wa_label:'Direct WhatsApp', wa_btn:'Message us →',
     newsletter_title:'Join our list', newsletter_text:'Get news, exclusive discounts and new releases straight to your inbox.', newsletter_ph:'you@email.com', newsletter_btn:'Subscribe',
     footer_copy1:'© 2026 — Made in Argentina', footer_copy2:'All rights reserved', footer_legal:'Privacy policy and terms',
-    cart_title:'Your cart', cart_close:'✕ Close', cart_ship_title:'Calculate your shipping', cart_total:'Total', cart_pay_mp:'Pay with Mercado Pago', cart_pay_transfer:'Bank transfer (−10%)', cart_empty:'Your cart is empty',
+    cart_title:'Your cart', cart_close:'✕ Close', cart_ship_title:'Calculate your shipping', cart_total:'Total', cart_pay_transfer:'Bank transfer (−10%)', cart_empty:'Your cart is empty',
     co_title:'Order summary', co_close:'✕ Back', co_productos:'Products', co_total:'Total', coupon_ph:'Coupon code', coupon_btn:'Apply',
-    pay_mp_label:'Mercado Pago', pay_mp_desc:'Card, debit or MP balance', pay_tr_label:'Bank transfer', pay_tr_desc:'10% discount',
+    pay_tr_label:'Bank transfer', pay_tr_desc:'10% discount',
     transfer_title:'✓ Transfer details', transfer_banco:'Bank', transfer_banco_val:'Francés (BBVA)', transfer_cbu:'CBU', copy_btn:'Copy', dcto_banner:'10% DISCOUNT APPLIED',
     co_datos:'Your details', field_nombre:'Name *', field_nombre_ph:'Your full name', field_email:'Email *', field_email_ph:'you@email.com', field_note:'We\'ll send your confirmation by email.', confirm_btn:'Confirm order',
     success_title:'Order confirmed!', success_close:'Close',
@@ -1484,8 +1476,7 @@ async function loadCoupon(){
   }catch(e){}
 }
 function getCheckoutTotal(){
-  const isT=payMethod==='transfer';
-  let total=isT?cartTransferTotal():cartTotal();
+  let total=cartTransferTotal();
   if(_couponApplied&&_coupon.percent>0)total=total*(1-_coupon.percent/100);
   return total;
 }
@@ -1545,6 +1536,9 @@ function updateCartShipEstimate(){
   }
 }
 
+function lineKey(item){return item.id;}
+function itemUnitPrice(item,isTransfer){return isTransfer?getPrecioTransf(item):(item.precio||0);}
+function escapeHtml(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
 function updateCartUI(){saveCart();
   const count=cart.reduce((s,i)=>s+i.qty,0);
   document.getElementById('cart-count').textContent=count;
@@ -1570,9 +1564,8 @@ function buildCheckout(){
 }
 
 function buildCheckoutTotal(){
-  const isT=payMethod==='transfer';
   const total=getCheckoutTotal();
-  let label=isT?'Total (con 10% dcto.)':'Total';
+  let label='Total (con 10% dcto.)';
   if(_couponApplied&&_coupon.percent>0)label+=' (cup\u00f3n -'+_coupon.percent+'%)';
   document.getElementById('co-total-label').textContent=label;
   document.getElementById('co-total-amount').textContent=fmt(total);
@@ -1584,11 +1577,10 @@ async function confirmOrder(){
   if(!name){showToast('Ingres\u00e1 tu nombre \ud83d\udc46');return;}
   if(!email||!email.includes('@')){showToast('Ingres\u00e1 un email v\u00e1lido \ud83d\udc46');return;}
   try{localStorage.setItem('om_client',JSON.stringify({name,email}));}catch(e){}
-  const isT=payMethod==='transfer';
   const total=getCheckoutTotal();
-  let detalle=cart.map(i=>i.nombre+(i.grabado?' (Grabado: "'+i.grabado+'")':'')+' x'+i.qty+' = '+fmt(itemUnitPrice(i,isT)*i.qty)).join(' | ');
+  let detalle=cart.map(i=>i.nombre+(i.grabado?' (Grabado: "'+i.grabado+'")':'')+' x'+i.qty+' = '+fmt(itemUnitPrice(i,true)*i.qty)).join(' | ');
   if(_couponApplied&&_coupon.percent>0)detalle+=' | Cup\u00f3n '+_coupon.code+' (-'+_coupon.percent+'%)';
-  const datosT=isT?'DATOS: Banco Frances BBVA | CBU: 0170090940000048482721 | Total: '+fmt(total):'';
+  const datosT='DATOS: Banco Frances BBVA | CBU: 0170090940000048482721 | Total: '+fmt(total);
   const metodo='Transferencia (10% dcto.)';
   const btn=document.getElementById('confirm-btn');
   btn.textContent='Procesando...';btn.disabled=true;
@@ -1599,9 +1591,9 @@ async function confirmOrder(){
     await emailjs.send('service_s6si3n4','template_ulqz3nj',{...params,email:'osomates8@gmail.com',cliente_nombre:'NUEVO PEDIDO \u2014 '+name+' ('+email+')'});
   }catch(e){console.error(e);}
   closeCheckout();
-  const confirmTitle=isT?'Pedido confirmado':'Redirigiendo a Mercado Pago';
-  const confirmText=isT?'Revis\u00e1 tu email ('+email+') para ver los datos de transferencia.':'Te enviamos la confirmaci\u00f3n a '+email+'.';
-  const steps=isT?'<div class="confirm-step"><span class="confirm-step-num">1</span><span>Recibir\u00e1s un email con el CBU y el total</span></div><div class="confirm-step"><span class="confirm-step-num">2</span><span>Realiz\u00e1 la transferencia desde tu banco</span></div><div class="confirm-step"><span class="confirm-step-num">3</span><span>Despachamos en 48hs h\u00e1biles</span></div>':'<div class="confirm-step"><span class="confirm-step-num">1</span><span>Complet\u00e1 el pago en Mercado Pago</span></div><div class="confirm-step"><span class="confirm-step-num">2</span><span>Recibir\u00e1s confirmaci\u00f3n por email</span></div><div class="confirm-step"><span class="confirm-step-num">3</span><span>Despachamos en 48hs h\u00e1biles</span></div>';
+  const confirmTitle='Pedido confirmado';
+  const confirmText='Revis\u00e1 tu email ('+email+') para ver los datos de transferencia.';
+  const steps='<div class="confirm-step"><span class="confirm-step-num">1</span><span>Recibir\u00e1s un email con el CBU y el total</span></div><div class="confirm-step"><span class="confirm-step-num">2</span><span>Realiz\u00e1 la transferencia desde tu banco</span></div><div class="confirm-step"><span class="confirm-step-num">3</span><span>Despachamos en 48hs h\u00e1biles</span></div>';
   document.getElementById('confirm-title').textContent=confirmTitle;
   document.getElementById('confirm-text').textContent=confirmText;
   document.getElementById('confirm-steps').innerHTML=steps;
@@ -1943,7 +1935,7 @@ document.getElementById('exit-overlay').addEventListener('click',function(e){
   </div>
 </div>
 <script type="application/ld+json">
-{"@context":"https://schema.org","@type":"Store","name":"Oso Mates","description":"Mates artesanales tallados a mano en Mar del Plata. Algarrobo, calabaza, cuero. Envíos a todo el país.","url":"https://osomates8-sys.github.io/oso-mates/","telephone":"+542233061168","email":"osomates8@gmail.com","address":{"@type":"PostalAddress","addressLocality":"Mar del Plata","addressRegion":"Buenos Aires","addressCountry":"AR"},"sameAs":["https://www.instagram.com/oso_mates"],"priceRange":"$$","image":"https://osomates8-sys.github.io/oso-mates/imperial_algarrobo.jpg","currenciesAccepted":"ARS","paymentAccepted":"Cash, Credit Card, Transfer"}
+{"@context":"https://schema.org","@type":"Store","name":"Oso Mates","description":"Mates artesanales tallados a mano en Mar del Plata. Algarrobo, calabaza, cuero. Envíos a todo el país.","url":"https://osomates8-sys.github.io/oso-mates/","telephone":"+542233061168","email":"osomates8@gmail.com","address":{"@type":"PostalAddress","addressLocality":"Mar del Plata","addressRegion":"Buenos Aires","addressCountry":"AR"},"sameAs":["https://www.instagram.com/oso_mates"],"priceRange":"$$","image":"https://osomates8-sys.github.io/oso-mates/imperial_algarrobo.jpg","currenciesAccepted":"ARS","paymentAccepted":"Bank Transfer"}
 </script>
 <!-- POPUP SALIDA -->
 <div class="exit-overlay" id="exit-overlay">
