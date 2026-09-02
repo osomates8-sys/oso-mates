@@ -11,9 +11,9 @@
 <meta property="og:description" content="Mates tallados a mano con maderas nobles. Cada pieza es única. Envíos a todo el país."/>
 <meta property="og:url" content="https://osomates.com/"/>
 <meta property="og:type" content="website"/>
-<meta property="og:image" content="https://osomates.com/imperial_algarrobo.jpg"/>
-<meta property="og:image:width" content="600"/>
-<meta property="og:image:height" content="800"/>
+<meta property="og:image" content="https://osomates.com/og-image.png"/>
+<meta property="og:image:width" content="1080"/>
+<meta property="og:image:height" content="1080"/>
 <meta name="geo.region" content="AR-B"/>
 <meta name="geo.placename" content="Mar del Plata"/>
 <link rel="canonical" href="https://osomates.com/"/>
@@ -1225,8 +1225,10 @@ function trackAddToCart(prod) {
   }
 }
 function trackPurchase(total) {
+  // El pedido se confirma acá pero el pago (transferencia) todavía no ingresó,
+  // por eso registramos InitiateCheckout y no Purchase.
   if (typeof fbq !== 'undefined') {
-    fbq('track', 'Purchase', { value: total, currency: 'ARS' });
+    fbq('track', 'InitiateCheckout', { value: total, currency: 'ARS' });
   }
 }
 
