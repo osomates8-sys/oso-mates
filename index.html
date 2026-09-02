@@ -557,6 +557,10 @@ footer{background:var(--black);padding:3rem 4rem;display:flex;justify-content:sp
   #testimonios,#galeria{padding:5rem 1.5rem;}
   .gallery-grid{grid-template-columns:repeat(2,1fr);}
 }
+/* fix responsive mobile: mas vendidos / combos / bombillas */
+#bestsellers,#combos-section,#bombillas-section{scroll-margin-top:90px;}
+@media(max-width:900px){#bestsellers,#combos-section,#bombillas-section{padding:5rem 1.5rem!important;}.bestsellers-grid{grid-template-columns:1fr 1fr;gap:1.25rem;}.bs-img{height:220px;}}
+@media(max-width:600px){#bestsellers,#combos-section,#bombillas-section{padding:4rem 1.25rem!important;}.bestsellers-grid{grid-template-columns:1fr;gap:1.5rem;}.bs-img{height:260px;}.bs-info{padding:1.1rem;}.bs-name{font-size:1.35rem;}.bs-price{font-size:1.3rem;}.bs-footer{gap:1rem;}}
 </style>
 <!-- Meta Pixel -->
 <script>
