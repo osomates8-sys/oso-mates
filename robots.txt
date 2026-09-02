@@ -2,4 +2,4 @@ User-agent: *
 Allow: /
 Disallow: /admin.html
 
-Sitemap: https://osomates8-sys.github.io/oso-mates/sitemap.xml
+Sitemap: https://osomates.com/sitemap.xml

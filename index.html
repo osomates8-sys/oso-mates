@@ -4,22 +4,22 @@
 <script>(function(){try{var t=localStorage.getItem('om_theme');if(t==='dark')document.documentElement.setAttribute('data-theme','dark');}catch(e){}})();</script>
 <meta charset="UTF-8"/>
 <!-- SEO -->
-<meta name="description" content="Oso Mates - Mates artesanales tallados a mano en Mar del Plata. Algarrobo, calabaza, cuero. Envios a todo el pais. Calidad artesanal unica."/>
+<meta name="description" content="Mates artesanales tallados a mano en Mar del Plata: algarrobo, calabaza y cuero. Cada pieza es única, con curado incluido. Envíos a todo el país y 10% OFF por transferencia."/>
 <meta name="keywords" content="mates artesanales, mates Mar del Plata, mates de madera, mates algarrobo, mates calabaza, mates tallados, bombillas artesanales"/>
 <meta name="author" content="Oso Mates"/>
-<meta property="og:title" content="Oso Mates - Mates Artesanales Mar del Plata"/>
-<meta property="og:description" content="Mates tallados a mano con maderas nobles. Cada pieza es unica. Envios a todo Argentina."/>
-<meta property="og:url" content="https://osomates8-sys.github.io/oso-mates"/>
+<meta property="og:title" content="Oso Mates — Mates artesanales tallados a mano | Mar del Plata"/>
+<meta property="og:description" content="Mates tallados a mano con maderas nobles. Cada pieza es única. Envíos a todo el país."/>
+<meta property="og:url" content="https://osomates.com/"/>
 <meta property="og:type" content="website"/>
-<meta property="og:image" content="https://osomates8-sys.github.io/oso-mates/imperial_algarrobo.jpg"/>
-<meta property="og:image:width" content="1200"/>
-<meta property="og:image:height" content="630"/>
+<meta property="og:image" content="https://osomates.com/imperial_algarrobo.jpg"/>
+<meta property="og:image:width" content="600"/>
+<meta property="og:image:height" content="800"/>
 <meta name="geo.region" content="AR-B"/>
 <meta name="geo.placename" content="Mar del Plata"/>
-<link rel="canonical" href="https://osomates8-sys.github.io/oso-mates"/>
+<link rel="canonical" href="https://osomates.com/"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧉</text></svg>"/>
-<title>OSO MATES</title>
+<title>Oso Mates — Mates artesanales tallados a mano | Mar del Plata</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet"/>
@@ -1584,7 +1584,9 @@ async function confirmOrder(){
   const metodo='Transferencia (10% dcto.)';
   const btn=document.getElementById('confirm-btn');
   btn.textContent='Procesando...';btn.disabled=true;
-  await sb.from('ventas').insert({cliente_nombre:name,cliente_email:email,detalle:detalle,metodo_pago:metodo,total:total,estado:'pendiente'});
+  try{
+    await sb.from('ventas').insert({cliente_nombre:name,cliente_email:email,detalle:detalle,metodo_pago:metodo,total:total,estado:'pendiente'});
+  }catch(e){console.error('No se pudo registrar la venta:',e);}
   const params={email,cliente_nombre:name,detalle_pedido:detalle,metodo_pago:metodo,total:fmt(total),datos_transferencia:datosT};
   try{
     await emailjs.send('service_s6si3n4','template_ulqz3nj',params);
@@ -1913,9 +1915,7 @@ document.addEventListener('mouseleave',function(e){
     setTimeout(()=>document.getElementById('exit-overlay').classList.add('open'),200);
   }
 });
-document.getElementById('exit-overlay').addEventListener('click',function(e){
-  if(e.target===this)closeExitPopup();
-});
+(function(){var _exitOv=document.getElementById('exit-overlay');if(_exitOv)_exitOv.addEventListener('click',function(e){if(e.target===this)closeExitPopup();});})();
 
 </script>
 
@@ -1935,7 +1935,7 @@ document.getElementById('exit-overlay').addEventListener('click',function(e){
   </div>
 </div>
 <script type="application/ld+json">
-{"@context":"https://schema.org","@type":"Store","name":"Oso Mates","description":"Mates artesanales tallados a mano en Mar del Plata. Algarrobo, calabaza, cuero. Envíos a todo el país.","url":"https://osomates8-sys.github.io/oso-mates/","telephone":"+542233061168","email":"osomates8@gmail.com","address":{"@type":"PostalAddress","addressLocality":"Mar del Plata","addressRegion":"Buenos Aires","addressCountry":"AR"},"sameAs":["https://www.instagram.com/oso_mates"],"priceRange":"$$","image":"https://osomates8-sys.github.io/oso-mates/imperial_algarrobo.jpg","currenciesAccepted":"ARS","paymentAccepted":"Bank Transfer"}
+{"@context":"https://schema.org","@type":"Store","name":"Oso Mates","description":"Mates artesanales tallados a mano en Mar del Plata. Algarrobo, calabaza, cuero. Envíos a todo el país.","url":"https://osomates.com/","telephone":"+542233061168","email":"osomates8@gmail.com","address":{"@type":"PostalAddress","addressLocality":"Mar del Plata","addressRegion":"Buenos Aires","addressCountry":"AR"},"sameAs":["https://www.instagram.com/oso_mates"],"priceRange":"$$","image":"https://osomates.com/imperial_algarrobo.jpg","currenciesAccepted":"ARS","paymentAccepted":"Bank Transfer"}
 </script>
 <!-- POPUP SALIDA -->
 <div class="exit-overlay" id="exit-overlay">
@@ -1950,16 +1950,5 @@ document.getElementById('exit-overlay').addEventListener('click',function(e){
   </div>
 </div>
 
-<div class="exit-overlay" id="exit-overlay">
-  <div class="exit-modal">
-    <button class="exit-close" onclick="closeExitPopup()">&#x2715;</button>
-    <div class="exit-eyebrow" data-i18n="exit_eyebrow">Antes de irte...</div>
-    <h2 class="exit-title" data-i18n="exit_title">¿Te vas sin tu mate?</h2>
-    <p class="exit-desc" data-i18n="exit_desc">Usá este código en tu próxima compra y llevate un 5% extra de descuento en tu pedido.</p>
-    <div class="exit-code" id="exit-coupon-code">VOLVE5</div>
-    <button class="exit-cta" onclick="copyExitCode();closeExitPopup();document.getElementById('catalogo').scrollIntoView({behavior:'smooth'})" data-i18n="exit_cta">Copiar código y ver productos</button>
-    <div class="exit-skip" onclick="closeExitPopup()" data-i18n="exit_skip">No gracias, me voy</div>
-  </div>
-</div>
 </body>
 </html>
