@@ -1244,6 +1244,16 @@ function trackPurchase(total) {
 
 function toggleFaq(el){var item=el.parentElement;var isOpen=item.classList.contains('open');document.querySelectorAll('.faq-item').forEach(function(i){i.classList.remove('open');});if(!isOpen)item.classList.add('open');}
 
+// ── Config: una sola lectura de la tabla config para toda la página ───────────
+let _CFG={};
+const _CFG_READY=(async function(){
+  try{
+    const {data}=await sb.from('config').select('clave,valor');
+    (data||[]).forEach(function(r){_CFG[r.clave]=r.valor;});
+  }catch(e){}
+})();
+function _cfgRow(clave){return (_CFG&&_CFG[clave]!=null)?[{clave:clave,valor:_CFG[clave]}]:null;}
+
 // ── Testimonios: editable desde Admin → Pagina → Testimonios de clientes ─────
 const DEFAULT_TESTIMONIOS=[
   {stars:5,text:'Compré el Imperial Algarrobo y es una joya. La madera tiene una textura increíble, se nota que es tallado a mano. Llegó perfectamente embalado y curado.',author:'Martina G.',location:'Buenos Aires'},
@@ -1254,7 +1264,7 @@ async function loadTestimonios(){
   const grid=document.getElementById('testimonios-grid');
   let items=DEFAULT_TESTIMONIOS;
   try{
-    const {data}=await sb.from('config').select('*').eq('clave','testimonios').limit(1);
+    await _CFG_READY;const data=_cfgRow('testimonios');
     if(data&&data[0]&&data[0].valor){
       const parsed=JSON.parse(data[0].valor);
       if(Array.isArray(parsed)&&parsed.length)items=parsed;
@@ -1284,7 +1294,7 @@ async function loadPriceFilters(){
   const row=document.getElementById('price-filter-row');
   let items=DEFAULT_PRICE_FILTERS;
   try{
-    const {data}=await sb.from('config').select('*').eq('clave','price_filters').limit(1);
+    await _CFG_READY;const data=_cfgRow('price_filters');
     if(data&&data[0]&&data[0].valor){
       const parsed=JSON.parse(data[0].valor);
       if(Array.isArray(parsed)&&parsed.length)items=parsed;
@@ -1299,7 +1309,7 @@ async function loadPriceFilters(){
 // ── Hero y banner: editable desde Admin → Pagina ──────────────────────────────
 async function loadHeroBanner(){
   try{
-    const {data}=await sb.from('config').select('*').in('clave',['banner','hero_h1','hero_h2','hero_desc']);
+    await _CFG_READY;const data=['banner','hero_h1','hero_h2','hero_desc'].map(function(k){return _CFG[k]!=null?{clave:k,valor:_CFG[k]}:null;}).filter(Boolean);
     if(!data)return;
     const map={};
     data.forEach(function(r){map[r.clave]=r.valor;});
@@ -1332,7 +1342,7 @@ async function loadNosotros(){
   const cont=document.getElementById('nosotros-content');
   let d=DEFAULT_NOSOTROS;
   try{
-    const {data}=await sb.from('config').select('*').eq('clave','nosotros_content').limit(1);
+    await _CFG_READY;const data=_cfgRow('nosotros_content');
     if(data&&data[0]&&data[0].valor){
       const parsed=JSON.parse(data[0].valor);
       if(parsed&&parsed.title1)d=parsed;
@@ -1381,7 +1391,7 @@ async function loadFaq(){
   const grid=document.getElementById('faq-grid');
   let items=DEFAULT_FAQ;
   try{
-    const {data}=await sb.from('config').select('*').eq('clave','faq_items').limit(1);
+    await _CFG_READY;const data=_cfgRow('faq_items');
     if(data&&data[0]&&data[0].valor){
       const parsed=JSON.parse(data[0].valor);
       if(Array.isArray(parsed)&&parsed.length)items=parsed;
@@ -1432,8 +1442,31 @@ async function loadProducts(){
   allProds=data;
   setCachedProducts(data);
   renderGrid(allProds);
+  injectCatalogLD(allProds);
   loadGallery();loadInstagramGrid();
   loadRecentlyViewed();
+}
+function injectCatalogLD(list){
+  try{
+    if(!Array.isArray(list)||!list.length)return;
+    const validUntil=new Date(Date.now()+365*24*3600*1000).toISOString().slice(0,10);
+    const items=list.map(function(p,i){
+      const img=(p.imagenes&&p.imagenes[0])?p.imagenes[0]:p.imagen;
+      return {"@type":"ListItem","position":i+1,"item":{
+        "@type":"Product","name":p.nombre,"image":[getImg(img)],
+        "description":(p.descripcion||'').slice(0,200),"sku":p.id,
+        "brand":{"@type":"Brand","name":"Oso Mates"},
+        "offers":{"@type":"Offer","url":"https://osomates.com/producto.html?id="+p.id,
+          "priceCurrency":"ARS","price":p.precio,"priceValidUntil":validUntil,
+          "availability":(p.stock===0)?"https://schema.org/OutOfStock":"https://schema.org/InStock",
+          "itemCondition":"https://schema.org/NewCondition"}
+      }};
+    });
+    const ld={"@context":"https://schema.org","@type":"ItemList","name":"Mates artesanales Oso Mates","itemListElement":items};
+    let el=document.getElementById('catalog-ld');
+    if(!el){el=document.createElement('script');el.type='application/ld+json';el.id='catalog-ld';document.head.appendChild(el);}
+    el.textContent=JSON.stringify(ld);
+  }catch(e){}
 }
 
 function getFavs(){try{return JSON.parse(localStorage.getItem('om_favs')||'[]');}catch(e){return [];}}
@@ -1480,7 +1513,7 @@ let _coupon=DEFAULT_COUPON;
 let _couponApplied=false;
 async function loadCoupon(){
   try{
-    const {data}=await sb.from('config').select('*').eq('clave','coupon').limit(1);
+    await _CFG_READY;const data=_cfgRow('coupon');
     if(data&&data[0]&&data[0].valor){
       const parsed=JSON.parse(data[0].valor);
       if(parsed&&typeof parsed==='object')_coupon=parsed;
@@ -1523,7 +1556,7 @@ let _shipZones=DEFAULT_SHIPPING_ZONES;
 async function loadShippingZones(){
   let items=DEFAULT_SHIPPING_ZONES;
   try{
-    const {data}=await sb.from('config').select('*').eq('clave','shipping_zones').limit(1);
+    await _CFG_READY;const data=_cfgRow('shipping_zones');
     if(data&&data[0]&&data[0].valor){
       const parsed=JSON.parse(data[0].valor);
       if(Array.isArray(parsed)&&parsed.length)items=parsed;
@@ -1875,7 +1908,7 @@ async function loadGallery(){
   const grid=document.getElementById('gallery-grid');
   let galImgs=[];
   try{
-    const {data}=await sb.from('config').select('*').eq('clave','galeria_imgs').limit(1);
+    await _CFG_READY;const data=_cfgRow('galeria_imgs');
     if(data&&data[0]&&data[0].valor){galImgs=JSON.parse(data[0].valor)||[];}
   }catch(e){}
   if(galImgs.length){
@@ -1902,7 +1935,7 @@ async function loadInstagramGrid(){
   if(!grid)return;
   let galImgs=[];
   try{
-    const {data}=await sb.from('config').select('*').eq('clave','galeria_imgs').limit(1);
+    await _CFG_READY;const data=_cfgRow('galeria_imgs');
     if(data&&data[0]&&data[0].valor){galImgs=JSON.parse(data[0].valor)||[];}
   }catch(e){}
   if(galImgs.length){
@@ -1947,7 +1980,7 @@ document.addEventListener('mouseleave',function(e){
   </div>
 </div>
 <script type="application/ld+json">
-{"@context":"https://schema.org","@type":"Store","name":"Oso Mates","description":"Mates artesanales tallados a mano en Mar del Plata. Algarrobo, calabaza, cuero. Envíos a todo el país.","url":"https://osomates.com/","telephone":"+542233061168","email":"osomates8@gmail.com","address":{"@type":"PostalAddress","addressLocality":"Mar del Plata","addressRegion":"Buenos Aires","addressCountry":"AR"},"sameAs":["https://www.instagram.com/oso_mates"],"priceRange":"$$","image":"https://osomates.com/imperial_algarrobo.jpg","currenciesAccepted":"ARS","paymentAccepted":"Bank Transfer"}
+{"@context":"https://schema.org","@type":"Store","name":"Oso Mates","description":"Mates artesanales tallados a mano en Mar del Plata. Algarrobo, calabaza, cuero. Envíos a todo el país.","url":"https://osomates.com/","telephone":"+542233061168","email":"osomates8@gmail.com","address":{"@type":"PostalAddress","addressLocality":"Mar del Plata","addressRegion":"Buenos Aires","addressCountry":"AR"},"sameAs":["https://www.instagram.com/oso_mates"],"priceRange":"$$","image":"https://osomates.com/og-image.png","currenciesAccepted":"ARS","paymentAccepted":"Bank Transfer"}
 </script>
 <!-- POPUP SALIDA -->
 <div class="exit-overlay" id="exit-overlay">

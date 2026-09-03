@@ -9,7 +9,9 @@
 <meta property="og:title" content="Oso Mates" id="meta-og-title"/>
 <meta property="og:description" content="Mates artesanales tallados a mano en Mar del Plata." id="meta-og-desc"/>
 <meta property="og:type" content="product"/>
-<meta property="og:image" content="https://osomates8-sys.github.io/oso-mates/imperial_algarrobo.jpg" id="meta-og-image"/>
+<meta property="og:image" content="https://osomates.com/og-image.png" id="meta-og-image"/>
+<meta property="og:url" content="https://osomates.com/producto.html" id="meta-og-url"/>
+<link rel="canonical" href="https://osomates.com/producto.html" id="link-canonical"/>
 <script type="application/ld+json" id="product-ld">{}</script>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧉</text></svg>"/>
 <title>OSO MATES — Producto</title>
@@ -745,24 +747,33 @@ function renderProduct(p, related){
   if(metaOgTitle) metaOgTitle.setAttribute('content', p.nombre + ' — Oso Mates');
   if(metaOgDesc) metaOgDesc.setAttribute('content', (p.descripcion||'').slice(0,160));
   if(metaOgImg) metaOgImg.setAttribute('content', getImg(imgs[0]));
+  const canonUrl = "https://osomates.com/producto.html?id=" + p.id;
+  const metaOgUrl = document.getElementById('meta-og-url');
+  const linkCanon = document.getElementById('link-canonical');
+  if(metaOgUrl) metaOgUrl.setAttribute('content', canonUrl);
+  if(linkCanon) linkCanon.setAttribute('href', canonUrl);
+  document.title = p.nombre + " — Oso Mates | Mates artesanales tallados a mano";
   const ldEl = document.getElementById('product-ld');
   if(ldEl){
     const availability = (p.stock===0) ? 'https://schema.org/OutOfStock' : 'https://schema.org/InStock';
+    const validUntil = new Date(Date.now()+365*24*3600*1000).toISOString().slice(0,10);
     const ld = {
       "@context":"https://schema.org",
       "@type":"Product",
       "name":p.nombre,
-      "image":[getImg(imgs[0])],
+      "image":imgs.map(getImg),
       "description":(p.descripcion||'').slice(0,300),
       "sku":p.id,
       "brand":{"@type":"Brand","name":"Oso Mates"},
       "offers":{
         "@type":"Offer",
-        "url":"https://osomates8-sys.github.io/oso-mates/producto.html?id="+p.id,
+        "url":canonUrl,
         "priceCurrency":"ARS",
         "price":p.precio,
+        "priceValidUntil":validUntil,
         "availability":availability,
-        "itemCondition":"https://schema.org/NewCondition"
+        "itemCondition":"https://schema.org/NewCondition",
+        "seller":{"@type":"Organization","name":"Oso Mates"}
       }
     };
     ldEl.textContent = JSON.stringify(ld);
