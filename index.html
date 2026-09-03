@@ -421,6 +421,13 @@ footer{background:var(--black);padding:3rem 4rem;display:flex;justify-content:sp
 .confirm-step-num{background:var(--black);color:var(--white);width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.6rem;font-weight:700;flex-shrink:0;margin-top:2px;}
 .confirm-close{display:inline-block;padding:1rem 2.5rem;background:var(--black);color:var(--white);border:none;font-family:'Montserrat',sans-serif;font-size:.65rem;letter-spacing:.2em;text-transform:uppercase;cursor:pointer;transition:background .2s;}
 .confirm-close:hover{background:#333}
+.confirm-cbu{border:1px solid var(--black);padding:1.1rem 1.3rem;margin-bottom:1.4rem;background:var(--white);}
+.confirm-cbu-row{display:flex;justify-content:space-between;align-items:center;gap:1rem;padding:.5rem 0;font-size:.8rem;border-bottom:1px solid var(--light);}
+.confirm-cbu-row:last-child{border-bottom:none;}
+.confirm-cbu-lbl{color:var(--gray);text-transform:uppercase;letter-spacing:.12em;font-size:.6rem;flex-shrink:0;}
+.confirm-cbu-val{font-weight:600;text-align:right;word-break:break-all;}
+.confirm-cbu-total .confirm-cbu-val{font-size:1rem;}
+.confirm-cbu-copy{margin-left:.5rem;background:var(--black);color:var(--white);border:none;padding:.25rem .6rem;font-family:'Montserrat',sans-serif;font-size:.55rem;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;vertical-align:middle;}
 
 /* BANNER PROMO */
 .promo-banner{
@@ -1639,11 +1646,21 @@ async function confirmOrder(){
   }catch(e){console.error(e);}
   closeCheckout();
   const confirmTitle='Pedido confirmado';
-  const confirmText='Revis\u00e1 tu email ('+email+') para ver los datos de transferencia.';
-  const steps='<div class="confirm-step"><span class="confirm-step-num">1</span><span>Recibir\u00e1s un email con el CBU y el total</span></div><div class="confirm-step"><span class="confirm-step-num">2</span><span>Realiz\u00e1 la transferencia desde tu banco</span></div><div class="confirm-step"><span class="confirm-step-num">3</span><span>Despachamos en 48hs h\u00e1biles</span></div>';
+  const confirmText='Te enviamos los datos por email a '+email+'. Tambi\u00e9n los ten\u00e9s ac\u00e1:';
+  const aliasRow=(typeof TRANSFER_ALIAS!=='undefined'&&TRANSFER_ALIAS)?
+    '<div class="confirm-cbu-row"><span class="confirm-cbu-lbl">Alias</span><span class="confirm-cbu-val">'+TRANSFER_ALIAS+' <button type="button" class="confirm-cbu-copy" onclick="copyAlias()">Copiar</button></span></div>':'';
+  const cbuBox='<div class="confirm-cbu">'+
+    '<div class="confirm-cbu-row"><span class="confirm-cbu-lbl">Banco</span><span class="confirm-cbu-val">Franc\u00e9s (BBVA)</span></div>'+
+    '<div class="confirm-cbu-row"><span class="confirm-cbu-lbl">CBU</span><span class="confirm-cbu-val">0170090940000048482721 <button type="button" class="confirm-cbu-copy" onclick="copyCBU()">Copiar</button></span></div>'+
+    aliasRow+
+    '<div class="confirm-cbu-row confirm-cbu-total"><span class="confirm-cbu-lbl">Total a transferir</span><span class="confirm-cbu-val">'+fmt(total)+'</span></div>'+
+  '</div>';
+  const steps='<div class="confirm-step"><span class="confirm-step-num">1</span><span>Transfer\u00ed el total a ese CBU o alias desde tu banco</span></div>'+
+    '<div class="confirm-step"><span class="confirm-step-num">2</span><span>Envianos el comprobante por WhatsApp o respondiendo el email</span></div>'+
+    '<div class="confirm-step"><span class="confirm-step-num">3</span><span>Despachamos en 48hs h\u00e1biles</span></div>';
   document.getElementById('confirm-title').textContent=confirmTitle;
   document.getElementById('confirm-text').textContent=confirmText;
-  document.getElementById('confirm-steps').innerHTML=steps;
+  document.getElementById('confirm-steps').innerHTML=cbuBox+steps;
   document.getElementById('confirm-page').classList.add('show');
   trackPurchase(total);
   const _dateStr=new Date().toLocaleDateString('es-AR',{day:'2-digit',month:'2-digit',year:'numeric'});
@@ -1653,6 +1670,7 @@ async function confirmOrder(){
 }
 
 function copyCBU(){navigator.clipboard.writeText('0170090940000048482721');showToast('CBU copiado \u2713');}
+function copyAlias(){if(typeof TRANSFER_ALIAS!=='undefined'&&TRANSFER_ALIAS){navigator.clipboard.writeText(TRANSFER_ALIAS);showToast('Alias copiado \u2713');}}
 function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3000);}
 async function subscribeNewsletter(){
   const input=document.getElementById('newsletter-email');
@@ -1755,6 +1773,9 @@ function copyExitCode(){
 }
 document.addEventListener('mouseleave',function(e){if(e.clientY<=0)showExitPopup();});
 document.addEventListener('keydown',function(e){if(e.key==='Escape')closeExitPopup();});
+
+// Alias bancario (opcional): si lo completás, aparece en la pantalla de confirmación
+var TRANSFER_ALIAS='';   // ej: 'oso.mates.mdp'
 
 // ── WA NOTIFICATION (CallMeBot) ───────────────────────────────────────────────
 // To activate: register your number at https://www.callmebot.com/blog/free-api-whatsapp-messages/
