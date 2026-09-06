@@ -20,6 +20,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet"/>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+<script src="fallback-data.js"></script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{--black:#0a0a0a;--white:#f8f8f6;--gray:#888;--light:#ebebeb;--mid:#444;--blue:#009ee3;--green:#2a9d5c;--warm:#c8956c;}
@@ -459,7 +460,9 @@ const IMG_MAP = {
   "IMG_5277.jpg": "IMG_5277.webp",
   "IMG_5272.jpg": "IMG_5272.webp"
 };
-const GHBASE='https://osomates8-sys.github.io/oso-mates/';
+/* Imagenes .webp servidas desde el mismo origen del sitio (estan en la raiz del repo).
+   Se usa una URL absoluta al propio origen para que tambien sirva en las og:image. */
+const GHBASE=((typeof location!=='undefined' && location.origin && location.origin.indexOf('http')===0) ? location.origin : 'https://osomates.com')+'/';
 function parseImgVal(v){
   if(!v)return{file:'',pos:'center'};
   const idx=v.indexOf('|');
@@ -471,7 +474,7 @@ function getImg(img){
   if(!file) return '';
   if(file.startsWith('http')) return file;
   if(IMG_MAP[file]) return GHBASE+IMG_MAP[file];
-  return 'https://dkyfaeqcbeyhibqjztwa.supabase.co/storage/v1/object/public/imagenes/'+file;
+  return GHBASE+file;
 }
 function getImgPos(img){
   return parseImgVal(img).pos;
@@ -541,15 +544,24 @@ async function loadProduct(){
   }
   try{
     const {data:rows,error} = await sb.from('productos').select('*').eq('id',prodId).limit(1);
-    const data = (rows && rows.length > 0) ? rows[0] : null;
+    let data = (rows && rows.length > 0) ? rows[0] : null;
+    let related;
     if(error||!data){
+      const fb=(window.FALLBACK_PRODUCTOS||[]);
+      data=fb.find(function(p){return p.id===prodId;})||null;
+      related=fb.filter(function(p){return p.id!==prodId;}).slice(0,3);
+    }
+    if(!data){
       console.error('loadProduct error:', error, 'rows:', rows);
       document.getElementById('product-content').innerHTML='<div class="loading" style="padding:6rem 2rem">Producto no encontrado. <a href="index.html" style="color:var(--black)">← Volver al catálogo</a></div>';
       return;
     }
     currentProd = data;
     document.title = 'OSO MATES — '+data.nombre;
-    const {data:related} = await sb.from('productos').select('*').eq('activo',true).neq('id',prodId).limit(3);
+    if(!related){
+      const r = await sb.from('productos').select('*').eq('activo',true).neq('id',prodId).limit(3);
+      related = r.data || (window.FALLBACK_PRODUCTOS||[]).filter(function(p){return p.id!==prodId;}).slice(0,3);
+    }
     allProds = [data,...(related||[])];
     renderProduct(data, related||[]);
   }catch(e){
@@ -842,6 +854,9 @@ async function loadCoupon(){
       if(parsed&&typeof parsed==='object')_coupon=parsed;
     }
   }catch(e){}
+  if((!_coupon||!_coupon.code)&&window.FALLBACK_CONFIG&&window.FALLBACK_CONFIG.coupon){
+    try{_coupon=JSON.parse(window.FALLBACK_CONFIG.coupon);}catch(e){}
+  }
 }
 function getCheckoutTotal(){
   const isT=payMethod==='transfer';

@@ -25,6 +25,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet"/>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+<script src="fallback-data.js"></script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{--black:#0a0a0a;--white:#f8f8f6;--gray:#888;--light:#ebebeb;--mid:#444;--blue:#009ee3;--green:#2a9d5c;--warm:#c8956c;}
@@ -1211,6 +1212,7 @@ async function loadBestsellers() {
   grid.innerHTML = skeletonBsCards(3);
   var res = await sb.from('productos').select('*').eq('activo', true).limit(3);
   var data = res.data || [];
+  if (!data.length && window.FALLBACK_PRODUCTOS) data = window.FALLBACK_PRODUCTOS.slice(0, 3);
   if (!data.length) { grid.innerHTML = ''; return; }
   grid.innerHTML = data.map(function(p) {
     return '<div class="bs-card" onclick="viewProduct(\'' + p.id + '\')">'+
@@ -1258,6 +1260,7 @@ const _CFG_READY=(async function(){
     const {data}=await sb.from('config').select('clave,valor');
     (data||[]).forEach(function(r){_CFG[r.clave]=r.valor;});
   }catch(e){}
+  if(!Object.keys(_CFG).length && window.FALLBACK_CONFIG){Object.assign(_CFG,window.FALLBACK_CONFIG);}
 })();
 function _cfgRow(clave){return (_CFG&&_CFG[clave]!=null)?[{clave:clave,valor:_CFG[clave]}]:null;}
 
@@ -1419,7 +1422,9 @@ document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;cur.style.le
 
 let allProds=[],cart=[],payMethod='transfer';
 
-const GHBASE='https://osomates8-sys.github.io/oso-mates/';
+/* Imagenes .webp servidas desde el mismo origen del sitio (estan en la raiz del repo).
+   Se usa una URL absoluta al propio origen para que tambien sirva en las og:image. */
+const GHBASE=((typeof location!=='undefined' && location.origin && location.origin.indexOf('http')===0) ? location.origin : 'https://osomates.com')+'/';
 function parseImgVal(v){
   if(!v)return{file:'',pos:'center'};
   const idx=v.indexOf('|');
@@ -1431,7 +1436,7 @@ function getImg(img){
   if(!file) return '';
   if(file.startsWith('http')) return file;
   if(IMG_MAP[file]) return GHBASE+IMG_MAP[file];
-  return 'https://dkyfaeqcbeyhibqjztwa.supabase.co/storage/v1/object/public/imagenes/'+file;
+  return GHBASE+file;
 }
 function getImgPos(img){
   return parseImgVal(img).pos;
@@ -1445,9 +1450,13 @@ async function loadProducts(){
   if(cached){allProds=cached;renderGrid(allProds);loadGallery();loadInstagramGrid();}
   else{document.getElementById('grid').innerHTML=skeletonProductCards(6);}
   const {data,error}=await sb.from('productos').select('*').eq('activo',true).order('created_at');
-  if(error){if(!cached)console.error(error);return;}
-  allProds=data;
-  setCachedProducts(data);
+  let list=data;
+  if(error||!data||!data.length){
+    if(window.FALLBACK_PRODUCTOS&&window.FALLBACK_PRODUCTOS.length){list=window.FALLBACK_PRODUCTOS;}
+    else{if(!cached)console.error(error);return;}
+  }
+  allProds=list;
+  setCachedProducts(list);
   renderGrid(allProds);
   injectCatalogLD(allProds);
   loadGallery();loadInstagramGrid();
