@@ -39,12 +39,21 @@
   a.gh{display:inline-block;margin-top:.6rem;color:var(--warm);font-weight:600;font-size:.88rem}
   .steps{background:#fff;border:1px dashed var(--warm);border-radius:9px;padding:1rem 1.2rem;font-size:.88rem;margin-top:1rem}
   .steps ol{margin:.4rem 0 0 1.1rem} .steps li{margin:.3rem 0}
+  .imgs{display:flex;flex-wrap:wrap;gap:.5rem;margin-top:.35rem}
+  .thumb{position:relative;width:78px;height:78px;border-radius:8px;overflow:hidden;border:1px solid var(--line);background:#f0ece3;flex:0 0 auto}
+  .thumb img{width:100%;height:100%;object-fit:cover;display:block}
+  .thumb .x{position:absolute;top:2px;right:2px;width:20px;height:20px;line-height:18px;text-align:center;border-radius:50%;background:rgba(0,0,0,.6);color:#fff;font-size:13px;cursor:pointer;border:none;padding:0}
+  .thumb.main::after{content:"principal";position:absolute;left:0;right:0;bottom:0;background:var(--warm);color:#fff;font-size:.6rem;text-align:center;letter-spacing:.04em;padding:1px 0}
+  .up-btn{width:78px;height:78px;border:1px dashed var(--warm);color:var(--warm);border-radius:8px;background:#fff;font-size:1.4rem;line-height:1;display:flex;align-items:center;justify-content:center;cursor:pointer;flex:0 0 auto}
+  .filename-row{display:flex;gap:.5rem;margin-top:.5rem}
+  .filename-row input{flex:1}
+  .filename-row button{white-space:nowrap}
 </style>
 </head>
 <body>
 <div class="wrap">
   <h1>Editar la tienda</h1>
-  <p class="sub">Cambiá productos, precios y textos. Al terminar, generás el archivo y lo guardás en GitHub — los cambios salen en vivo en ~1 minuto. No toca la base de datos.</p>
+  <p class="sub">Cambiá productos, precios, fotos y textos. Al terminar generás el archivo y lo guardás en GitHub — los cambios salen en vivo en ~1 minuto. No usa base de datos.</p>
 
   <h2>Productos</h2>
   <div id="productos"></div>
@@ -65,8 +74,8 @@
       <div><label>Cupón — % descuento</label><input type="number" id="cup-percent" min="0" max="100"/></div>
       <div class="chk" style="align-self:end"><input type="checkbox" id="cup-active"/><label style="margin:0">Cupón activo</label></div>
     </div>
-    <label>Imágenes de la galería (nombres de archivo separados por coma)</label>
-    <input type="text" id="cfg-galeria"/>
+    <label>Fotos de la galería</label>
+    <div id="galeria-imgs"></div>
   </div>
 
   <div class="card">
@@ -103,12 +112,15 @@
 </div>
 
 <script>
-const IMG_FILES = ["IMG_5190-Edit.jpg","IMG_5206-Edit.jpg","IMG_5161-Edit.jpg","IMG_5218-Edit-2-Edit.jpg","IMG_5145.jpg","IMG_5139.jpg","DSC08987.jpg","IMG_5233.jpg","IMG_5277.jpg","IMG_5272.jpg","camionero2.webp","ranchero2.webp","galleta2.webp","imperial_algarrobo.jpg","imperial_calabaza.jpg","criollo.jpg","camionero.jpg","ranchero.jpg","galleta.jpg"];
 const CATS = ["calabaza","madera","bombillas","combos"];
+const MAX_DIM = 1200;
+const IMG_Q = 0.82;
+const SIZE_WARN = 1.8e6;
 
 function clone(o){return JSON.parse(JSON.stringify(o));}
 let productos = clone(window.FALLBACK_PRODUCTOS || []);
 let config = clone(window.FALLBACK_CONFIG || {});
+let galeria = [];
 
 function el(tag, attrs, kids){
   const n = document.createElement(tag);
@@ -116,6 +128,62 @@ function el(tag, attrs, kids){
   (kids||[]).forEach(c=>n.appendChild(typeof c==='string'?document.createTextNode(c):c));
   return n;
 }
+
+function compressImage(file){
+  return new Promise(function(resolve,reject){
+    const img=new Image();
+    img.onload=function(){
+      let w=img.naturalWidth, h=img.naturalHeight;
+      if(Math.max(w,h)>MAX_DIM){ const s=MAX_DIM/Math.max(w,h); w=Math.round(w*s); h=Math.round(h*s); }
+      const c=document.createElement('canvas'); c.width=w; c.height=h;
+      c.getContext('2d').drawImage(img,0,0,w,h);
+      let out=c.toDataURL('image/webp',IMG_Q);
+      if(out.slice(0,20).indexOf('image/webp')===-1) out=c.toDataURL('image/jpeg',IMG_Q);
+      resolve(out);
+    };
+    img.onerror=function(){reject(new Error('No se pudo leer la imagen'));};
+    const fr=new FileReader();
+    fr.onload=function(){img.src=fr.result;};
+    fr.onerror=function(){reject(new Error('No se pudo leer el archivo'));};
+    fr.readAsDataURL(file);
+  });
+}
+
+/* galería de imágenes reutilizable: getList()->array, setList(array) */
+function imageManager(getList, setList, opts){
+  opts=opts||{};
+  const box=el('div',{class:'imgs'});
+  function render(){
+    box.innerHTML='';
+    getList().forEach(function(v,i){
+      const t=el('div',{class:'thumb'+(i===0&&opts.markMain?' main':'')});
+      t.appendChild(el('img',{src:v,alt:''}));
+      const x=el('button',{class:'x',title:'Quitar'},['×']);
+      x.onclick=function(){ const l=getList().slice(); l.splice(i,1); setList(l); render(); };
+      t.appendChild(x);
+      if(i>0){
+        const up=el('button',{class:'x',title:'Hacer principal'},['★']);
+        up.style.right='24px'; up.style.background='rgba(168,112,63,.9)';
+        up.onclick=function(){ const l=getList().slice(); const m=l.splice(i,1)[0]; l.unshift(m); setList(l); render(); };
+        t.appendChild(up);
+      }
+      box.appendChild(t);
+    });
+    const add=el('label',{class:'up-btn',title:'Subir foto'},['+']);
+    const inp=el('input',{type:'file',accept:'image/*'}); inp.style.display='none';
+    inp.onchange=async function(){
+      const f=inp.files&&inp.files[0]; if(!f)return;
+      add.textContent='…';
+      try{ const uri=await compressImage(f); const l=getList().slice(); l.push(uri); setList(l); render(); }
+      catch(e){ alert(e.message); render(); }
+    };
+    add.appendChild(inp);
+    box.appendChild(add);
+  }
+  render();
+  return box;
+}
+
 function field(labelText, value, opts){
   opts=opts||{};
   const wrap=el('div');
@@ -127,7 +195,6 @@ function field(labelText, value, opts){
     (opts.options||[]).forEach(o=>{ const op=el('option',{value:o},[o]); if(o===value)op.selected=true; inp.appendChild(op); });
   } else {
     inp=el('input',{type:opts.type||'text'});
-    if(opts.list){inp.setAttribute('list',opts.list);}
     inp.value=value==null?'':value;
   }
   inp.dataset.key=opts.key||'';
@@ -139,6 +206,7 @@ function renderProductos(){
   const box=document.getElementById('productos');
   box.innerHTML='';
   productos.forEach((p,idx)=>{
+    if(!Array.isArray(p.imagenes)) p.imagenes = p.imagen ? [p.imagen] : [];
     const card=el('div',{class:'card'});
     const head=el('div',{class:'prod-head'});
     head.appendChild(el('strong',{},[p.nombre||('Producto '+(idx+1))]));
@@ -164,12 +232,18 @@ function renderProductos(){
     const f_badge=field('Etiqueta (Popular / Exclusivo / vacío)',p.badge,{key:'badge'});
     const r3=el('div',{class:'row'}); r3.append(f_cat.wrap,f_badge.wrap); card.appendChild(r3);
 
-    const f_link=field('Link de MercadoPago',p.link_mp,{key:'link_mp'});
-    card.appendChild(f_link.wrap);
-
-    const f_img=field('Imagen principal (archivo)',p.imagen,{key:'imagen',list:'imgfiles'});
-    const f_imgs=field('Todas las imágenes (archivos separados por coma)',(p.imagenes||[]).join(', '),{key:'imagenes'});
-    const r4=el('div',{class:'row'}); r4.append(f_img.wrap,f_imgs.wrap); card.appendChild(r4);
+    card.appendChild(el('label',{},['Fotos (la primera es la principal)']));
+    card.appendChild(imageManager(
+      function(){return productos[idx].imagenes;},
+      function(l){ productos[idx].imagenes=l; productos[idx].imagen=l[0]||''; },
+      {markMain:true}
+    ));
+    const fnRow=el('div',{class:'filename-row'});
+    const fnInp=el('input',{type:'text',placeholder:'o pegá un nombre de archivo del repo (ej: criollo.webp)'});
+    const fnBtn=el('button',{class:'btn-ghost'},['Agregar']);
+    fnBtn.onclick=function(){ const v=fnInp.value.trim(); if(!v)return; productos[idx].imagenes.push(v); productos[idx].imagen=productos[idx].imagenes[0]; fnInp.value=''; renderProductos(); };
+    fnRow.append(fnInp,fnBtn);
+    card.appendChild(fnRow);
 
     const chk=el('label',{class:'chk'});
     const cb=el('input',{type:'checkbox'}); cb.checked=p.activo!==false; cb.dataset.key='activo';
@@ -187,6 +261,7 @@ function collectProductos(){
   cards.forEach(card=>{
     const orig=productos[card._prodIndex]||{};
     const o=clone(orig);
+    delete o.link_mp;
     card.querySelectorAll('[data-key]').forEach(inp=>{
       const k=inp.dataset.key; if(!k)return;
       if(k==='activo'){ o.activo=inp.checked; return; }
@@ -195,17 +270,23 @@ function collectProductos(){
         o[k]= v==='' ? (k==='stock'?null:0) : parseInt(v,10);
       } else if(k==='badge'){
         o.badge = v.trim()==='' ? null : v.trim();
-      } else if(k==='imagenes'){
-        o.imagenes = v.split(',').map(s=>s.trim()).filter(Boolean);
       } else {
         o[k]=v;
       }
     });
+    o.imagenes = Array.isArray(o.imagenes) ? o.imagenes.filter(Boolean) : [];
+    o.imagen = o.imagenes[0] || '';
     if(!o.id) o.id = 'nuevo-'+Math.random().toString(36).slice(2,10);
     if(!o.created_at) o.created_at = new Date().toISOString();
     out.push(o);
   });
   return out;
+}
+
+function renderGaleria(){
+  const host=document.getElementById('galeria-imgs');
+  host.innerHTML='';
+  host.appendChild(imageManager(function(){return galeria;}, function(l){galeria=l; renderGaleria();}, {markMain:false}));
 }
 
 function loadConfigForm(){
@@ -218,8 +299,9 @@ function loadConfigForm(){
   document.getElementById('cup-code').value = cup.code||'';
   document.getElementById('cup-percent').value = cup.percent||0;
   document.getElementById('cup-active').checked = !!cup.active;
-  let gal=[]; try{ gal=JSON.parse(config.galeria_imgs||'[]'); }catch(e){}
-  document.getElementById('cfg-galeria').value = gal.join(', ');
+  try{ galeria=JSON.parse(config.galeria_imgs||'[]'); }catch(e){ galeria=[]; }
+  if(!Array.isArray(galeria)) galeria=[];
+  renderGaleria();
   ['faq_items','testimonios','nosotros_content'].forEach(k=>{
     let pretty=config[k]||'';
     try{ pretty=JSON.stringify(JSON.parse(config[k]),null,2); }catch(e){}
@@ -238,8 +320,7 @@ function collectConfig(){
     percent: parseInt(document.getElementById('cup-percent').value,10)||0,
     active: document.getElementById('cup-active').checked
   });
-  const gal = document.getElementById('cfg-galeria').value.split(',').map(s=>s.trim()).filter(Boolean);
-  c.galeria_imgs = JSON.stringify(gal);
+  c.galeria_imgs = JSON.stringify(galeria.filter(Boolean));
   const errs=[];
   ['faq_items','testimonios','nosotros_content'].forEach(k=>{
     const raw=document.getElementById('cfg-'+k).value.trim();
@@ -255,7 +336,7 @@ function buildFile(prods,cfg){
   order.forEach(k=>{ if(cfg[k]!==undefined) ordered[k]=cfg[k]; });
   Object.keys(cfg).forEach(k=>{ if(ordered[k]===undefined) ordered[k]=cfg[k]; });
   return '/* Oso Mates - datos de la tienda. Editado desde editar.html el '+new Date().toISOString().slice(0,10)+'.\n'+
-    '   La tienda usa estos datos mientras la base remota no responda. */\n'+
+    '   La tienda usa SOLO estos datos (no hay base de datos externa). */\n'+
     '(function () {\n'+
     '  window.FALLBACK_PRODUCTOS = '+JSON.stringify(prods,null,2).replace(/\n/g,'\n  ')+';\n\n'+
     '  window.FALLBACK_CONFIG = '+JSON.stringify(ordered,null,2).replace(/\n/g,'\n  ')+';\n\n'+
@@ -267,7 +348,7 @@ function buildFile(prods,cfg){
 
 document.getElementById('add-prod').onclick=()=>{
   productos = collectProductos();
-  productos.push({id:'',nombre:'Nuevo mate',material:'',descripcion:'',precio:0,precio_transferencia:0,link_mp:'',imagen:'',categoria:'madera',badge:null,activo:true,created_at:'',imagenes:[]});
+  productos.push({id:'',nombre:'Nuevo mate',material:'',descripcion:'',precio:0,precio_transferencia:0,imagen:'',categoria:'madera',badge:null,activo:true,created_at:'',imagenes:[]});
   renderProductos();
   window.scrollTo(0,document.body.scrollHeight);
 };
@@ -283,8 +364,11 @@ document.getElementById('generate').onclick=()=>{
   }
   const text=buildFile(prods,cc.config);
   document.getElementById('output').value=text;
-  msg.className='msg ok';
-  msg.textContent='Listo. Copiá el texto y pegalo en GitHub reemplazando todo el archivo.';
+  const kb=Math.round(text.length/1024);
+  msg.className='msg '+(text.length>SIZE_WARN?'err':'ok');
+  msg.textContent = text.length>SIZE_WARN
+    ? ('Generado, pero el archivo pesa '+kb+' KB (muchas fotos subidas). Conviene usar menos fotos o más chicas.')
+    : ('Listo ('+kb+' KB). Copiá el texto y pegalo en GitHub reemplazando todo el archivo.');
   productos=prods; config=cc.config;
 };
 
@@ -296,11 +380,6 @@ document.getElementById('copy').onclick=async()=>{
   const msg=document.getElementById('msg');
   msg.className='msg ok'; msg.textContent='Copiado. Abrí el link a GitHub y pegá.';
 };
-
-// datalist for image filenames
-const dl=el('datalist',{id:'imgfiles'});
-IMG_FILES.forEach(f=>dl.appendChild(el('option',{value:f})));
-document.body.appendChild(dl);
 
 if(!window.FALLBACK_PRODUCTOS){
   document.querySelector('.wrap').innerHTML='<h1>No se pudo cargar fallback-data.js</h1><p>Recargá la página.</p>';

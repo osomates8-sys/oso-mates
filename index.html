@@ -23,7 +23,6 @@
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet"/>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 <script src="fallback-data.js"></script>
 <style>
@@ -1054,8 +1053,39 @@ function toggleMobileNav(){
   h.classList.toggle('open');m.classList.toggle('open');
   document.body.style.overflow=m.classList.contains('open')?'hidden':'';
 }
-const {createClient} = supabase;
-const sb = createClient('https://dkyfaeqcbeyhibqjztwa.supabase.co','sb_publishable_zzsZ-7Upi-SAUD78wx0CJQ_skroMzF4');
+/* Datos 100% locales (fallback-data.js). Sin base de datos externa.
+   `sb` es un mini-cliente que imita la API que usa el resto del codigo. */
+const sb = (function(){
+  function rowsFor(table){
+    if(table==='productos') return (window.FALLBACK_PRODUCTOS||[]).map(function(p){return Object.assign({stock:null},p);});
+    if(table==='config') return (window.FALLBACK_CONFIG_ROWS||[]).slice();
+    return [];
+  }
+  function qb(table){
+    var flt=[], lim=null, ord=null;
+    function exec(){
+      try{
+        var out=rowsFor(table).filter(function(r){return flt.every(function(f){return f(r);});});
+        if(ord) out=out.slice().sort(function(a,b){return a[ord]>b[ord]?1:(a[ord]<b[ord]?-1:0);});
+        if(lim!=null) out=out.slice(0,lim);
+        return {data:out,error:null};
+      }catch(e){return {data:null,error:e};}
+    }
+    var api={
+      select:function(){return api;},
+      eq:function(k,v){flt.push(function(r){return r[k]===v;});return api;},
+      neq:function(k,v){flt.push(function(r){return r[k]!==v;});return api;},
+      order:function(k){ord=k;return api;},
+      limit:function(n){lim=n;return api;},
+      insert:function(){return Promise.resolve({data:null,error:null});},
+      upsert:function(){return Promise.resolve({data:null,error:null});},
+      then:function(res,rej){return Promise.resolve(exec()).then(res,rej);},
+      catch:function(cb){return Promise.resolve(exec()).catch(cb);}
+    };
+    return api;
+  }
+  return { from:function(t){return qb(t);} };
+})();
 emailjs.init('pr1E8ccHpaDtcv1Ml');
 
 const I18N = {
@@ -1434,7 +1464,7 @@ function parseImgVal(v){
 function getImg(img){
   const file=parseImgVal(img).file;
   if(!file) return '';
-  if(file.startsWith('http')) return file;
+  if(file.startsWith('http')||file.startsWith('data:')) return file;
   if(IMG_MAP[file]) return GHBASE+IMG_MAP[file];
   return GHBASE+file;
 }
