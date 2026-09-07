@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta name="robots" content="noindex, nofollow"/>
+<title>Editar tienda — Oso Mates</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400&family=Montserrat:wght@400;500;600&display=swap" rel="stylesheet"/>
+<script src="fallback-data.js"></script>
+<style>
+  :root{--ink:#2c2620;--warm:#a8703f;--line:#e5ddd0;--bg:#f7f4ee;--card:#fff;--ok:#2a9d5c;--err:#c0392b}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Montserrat',system-ui,sans-serif;background:var(--bg);color:var(--ink);line-height:1.5;padding:2rem 1rem 6rem}
+  .wrap{max-width:820px;margin:0 auto}
+  h1{font-family:'Cormorant Garamond',serif;font-weight:500;font-size:2.4rem;margin-bottom:.2rem}
+  h2{font-family:'Cormorant Garamond',serif;font-weight:500;font-size:1.6rem;margin:2.2rem 0 .8rem;padding-bottom:.4rem;border-bottom:2px solid var(--line)}
+  .sub{color:#6b5f4f;font-size:.9rem;margin-bottom:1.5rem}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:1.1rem 1.2rem;margin-bottom:1rem}
+  .prod-head{display:flex;justify-content:space-between;align-items:center;gap:.6rem;margin-bottom:.8rem}
+  .prod-head strong{font-size:1.05rem}
+  label{display:block;font-size:.72rem;text-transform:uppercase;letter-spacing:.08em;color:#6b5f4f;margin:.7rem 0 .25rem;font-weight:600}
+  input[type=text],input[type=number],textarea,select{width:100%;font:inherit;font-size:.92rem;padding:.55rem .7rem;border:1px solid var(--line);border-radius:7px;background:#fdfcf9;color:var(--ink)}
+  textarea{min-height:110px;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:.82rem;line-height:1.45}
+  .row{display:grid;grid-template-columns:1fr 1fr;gap:.7rem}
+  .row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:.7rem}
+  @media(max-width:620px){.row,.row3{grid-template-columns:1fr}}
+  .chk{display:flex;align-items:center;gap:.5rem;margin-top:.9rem;font-size:.9rem;text-transform:none;letter-spacing:0}
+  .chk input{width:auto}
+  button{font:inherit;font-weight:600;cursor:pointer;border:none;border-radius:7px;padding:.65rem 1.1rem;font-size:.9rem}
+  .btn-primary{background:var(--warm);color:#fff}
+  .btn-ghost{background:transparent;border:1px solid var(--warm);color:var(--warm);padding:.4rem .8rem;font-size:.8rem}
+  .btn-del{background:transparent;color:var(--err);border:1px solid #e6c9c4;padding:.35rem .7rem;font-size:.78rem}
+  .bar{position:fixed;left:0;right:0;bottom:0;background:#fff;border-top:1px solid var(--line);padding:.9rem 1rem;display:flex;gap:.8rem;justify-content:center;flex-wrap:wrap;box-shadow:0 -4px 16px rgba(0,0,0,.06)}
+  .out{margin-top:1rem}
+  .out textarea{min-height:240px}
+  .hint{font-size:.8rem;color:#6b5f4f;margin-top:.4rem}
+  .msg{font-size:.85rem;margin-top:.5rem;font-weight:600}
+  .msg.ok{color:var(--ok)} .msg.err{color:var(--err)}
+  a.gh{display:inline-block;margin-top:.6rem;color:var(--warm);font-weight:600;font-size:.88rem}
+  .steps{background:#fff;border:1px dashed var(--warm);border-radius:9px;padding:1rem 1.2rem;font-size:.88rem;margin-top:1rem}
+  .steps ol{margin:.4rem 0 0 1.1rem} .steps li{margin:.3rem 0}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Editar la tienda</h1>
+  <p class="sub">Cambiá productos, precios y textos. Al terminar, generás el archivo y lo guardás en GitHub — los cambios salen en vivo en ~1 minuto. No toca la base de datos.</p>
+
+  <h2>Productos</h2>
+  <div id="productos"></div>
+  <button class="btn-ghost" id="add-prod">+ Agregar producto</button>
+
+  <h2>Textos de la web</h2>
+  <div class="card">
+    <label>Barra superior (banner)</label>
+    <input type="text" id="cfg-banner"/>
+    <div class="row">
+      <div><label>Título 1 (hero)</label><input type="text" id="cfg-hero_h1"/></div>
+      <div><label>Título 2 (hero)</label><input type="text" id="cfg-hero_h2"/></div>
+    </div>
+    <label>Bajada del hero (opcional)</label>
+    <input type="text" id="cfg-hero_desc"/>
+    <div class="row3">
+      <div><label>Cupón — código</label><input type="text" id="cup-code"/></div>
+      <div><label>Cupón — % descuento</label><input type="number" id="cup-percent" min="0" max="100"/></div>
+      <div class="chk" style="align-self:end"><input type="checkbox" id="cup-active"/><label style="margin:0">Cupón activo</label></div>
+    </div>
+    <label>Imágenes de la galería (nombres de archivo separados por coma)</label>
+    <input type="text" id="cfg-galeria"/>
+  </div>
+
+  <div class="card">
+    <p class="hint"><strong>Avanzado</strong> — estos son textos en formato JSON. Editá con cuidado respetando las comillas y las llaves.</p>
+    <label>Preguntas frecuentes (faq_items)</label>
+    <textarea id="cfg-faq_items"></textarea>
+    <label>Testimonios de clientes</label>
+    <textarea id="cfg-testimonios"></textarea>
+    <label>Sección "Nosotros" (nosotros_content)</label>
+    <textarea id="cfg-nosotros_content"></textarea>
+  </div>
+
+  <div class="steps">
+    <strong>Cómo guardar</strong>
+    <ol>
+      <li>Tocá <em>Generar archivo</em> abajo.</li>
+      <li>Tocá <em>Copiar</em>.</li>
+      <li>Abrí el link a GitHub, borrá todo el contenido del archivo y pegá lo copiado.</li>
+      <li>Abajo de todo en GitHub, tocá <strong>Commit changes</strong>.</li>
+    </ol>
+  </div>
+
+  <div class="out">
+    <label>Archivo generado (fallback-data.js)</label>
+    <textarea id="output" readonly placeholder="Tocá 'Generar archivo'"></textarea>
+    <div id="msg" class="msg"></div>
+    <a class="gh" id="gh-link" href="https://github.com/osomates8-sys/oso-mates/edit/main/fallback-data.js" target="_blank" rel="noopener">→ Abrir fallback-data.js en GitHub para pegar y guardar</a>
+  </div>
+</div>
+
+<div class="bar">
+  <button class="btn-primary" id="generate">Generar archivo</button>
+  <button class="btn-ghost" id="copy">Copiar</button>
+</div>
+
+<script>
+const IMG_FILES = ["IMG_5190-Edit.jpg","IMG_5206-Edit.jpg","IMG_5161-Edit.jpg","IMG_5218-Edit-2-Edit.jpg","IMG_5145.jpg","IMG_5139.jpg","DSC08987.jpg","IMG_5233.jpg","IMG_5277.jpg","IMG_5272.jpg","camionero2.webp","ranchero2.webp","galleta2.webp","imperial_algarrobo.jpg","imperial_calabaza.jpg","criollo.jpg","camionero.jpg","ranchero.jpg","galleta.jpg"];
+const CATS = ["calabaza","madera","bombillas","combos"];
+
+function clone(o){return JSON.parse(JSON.stringify(o));}
+let productos = clone(window.FALLBACK_PRODUCTOS || []);
+let config = clone(window.FALLBACK_CONFIG || {});
+
+function el(tag, attrs, kids){
+  const n = document.createElement(tag);
+  for(const k in (attrs||{})){ if(k==='class')n.className=attrs[k]; else if(k==='html')n.innerHTML=attrs[k]; else n.setAttribute(k,attrs[k]); }
+  (kids||[]).forEach(c=>n.appendChild(typeof c==='string'?document.createTextNode(c):c));
+  return n;
+}
+function field(labelText, value, opts){
+  opts=opts||{};
+  const wrap=el('div');
+  wrap.appendChild(el('label',{},[labelText]));
+  let inp;
+  if(opts.type==='textarea'){ inp=el('textarea'); inp.value=value==null?'':value; }
+  else if(opts.type==='select'){
+    inp=el('select');
+    (opts.options||[]).forEach(o=>{ const op=el('option',{value:o},[o]); if(o===value)op.selected=true; inp.appendChild(op); });
+  } else {
+    inp=el('input',{type:opts.type||'text'});
+    if(opts.list){inp.setAttribute('list',opts.list);}
+    inp.value=value==null?'':value;
+  }
+  inp.dataset.key=opts.key||'';
+  wrap.appendChild(inp);
+  return {wrap:wrap, input:inp};
+}
+
+function renderProductos(){
+  const box=document.getElementById('productos');
+  box.innerHTML='';
+  productos.forEach((p,idx)=>{
+    const card=el('div',{class:'card'});
+    const head=el('div',{class:'prod-head'});
+    head.appendChild(el('strong',{},[p.nombre||('Producto '+(idx+1))]));
+    const del=el('button',{class:'btn-del'},['Eliminar']);
+    del.onclick=()=>{ if(confirm('¿Eliminar "'+(p.nombre||'este producto')+'"?')){ productos.splice(idx,1); renderProductos(); } };
+    head.appendChild(del);
+    card.appendChild(head);
+
+    const f_nombre=field('Nombre',p.nombre,{key:'nombre'});
+    const f_material=field('Material',p.material,{key:'material'});
+    const r1=el('div',{class:'row'}); r1.append(f_nombre.wrap,f_material.wrap); card.appendChild(r1);
+
+    const f_desc=field('Descripción',p.descripcion,{key:'descripcion',type:'textarea'});
+    f_desc.input.style.minHeight='70px'; f_desc.input.style.fontFamily="'Montserrat',sans-serif"; f_desc.input.style.fontSize='.9rem';
+    card.appendChild(f_desc.wrap);
+
+    const f_precio=field('Precio (lista)',p.precio,{key:'precio',type:'number'});
+    const f_transf=field('Precio transferencia',p.precio_transferencia,{key:'precio_transferencia',type:'number'});
+    const f_stock=field('Stock (vacío = sin límite)',p.stock,{key:'stock',type:'number'});
+    const r2=el('div',{class:'row3'}); r2.append(f_precio.wrap,f_transf.wrap,f_stock.wrap); card.appendChild(r2);
+
+    const f_cat=field('Categoría',p.categoria,{key:'categoria',type:'select',options:CATS});
+    const f_badge=field('Etiqueta (Popular / Exclusivo / vacío)',p.badge,{key:'badge'});
+    const r3=el('div',{class:'row'}); r3.append(f_cat.wrap,f_badge.wrap); card.appendChild(r3);
+
+    const f_link=field('Link de MercadoPago',p.link_mp,{key:'link_mp'});
+    card.appendChild(f_link.wrap);
+
+    const f_img=field('Imagen principal (archivo)',p.imagen,{key:'imagen',list:'imgfiles'});
+    const f_imgs=field('Todas las imágenes (archivos separados por coma)',(p.imagenes||[]).join(', '),{key:'imagenes'});
+    const r4=el('div',{class:'row'}); r4.append(f_img.wrap,f_imgs.wrap); card.appendChild(r4);
+
+    const chk=el('label',{class:'chk'});
+    const cb=el('input',{type:'checkbox'}); cb.checked=p.activo!==false; cb.dataset.key='activo';
+    chk.append(cb,document.createTextNode('Producto visible en la tienda'));
+    card.appendChild(chk);
+
+    card._prodIndex=idx;
+    box.appendChild(card);
+  });
+}
+
+function collectProductos(){
+  const cards=document.querySelectorAll('#productos .card');
+  const out=[];
+  cards.forEach(card=>{
+    const orig=productos[card._prodIndex]||{};
+    const o=clone(orig);
+    card.querySelectorAll('[data-key]').forEach(inp=>{
+      const k=inp.dataset.key; if(!k)return;
+      if(k==='activo'){ o.activo=inp.checked; return; }
+      let v=inp.value;
+      if(k==='precio'||k==='precio_transferencia'||k==='stock'){
+        o[k]= v==='' ? (k==='stock'?null:0) : parseInt(v,10);
+      } else if(k==='badge'){
+        o.badge = v.trim()==='' ? null : v.trim();
+      } else if(k==='imagenes'){
+        o.imagenes = v.split(',').map(s=>s.trim()).filter(Boolean);
+      } else {
+        o[k]=v;
+      }
+    });
+    if(!o.id) o.id = 'nuevo-'+Math.random().toString(36).slice(2,10);
+    if(!o.created_at) o.created_at = new Date().toISOString();
+    out.push(o);
+  });
+  return out;
+}
+
+function loadConfigForm(){
+  document.getElementById('cfg-banner').value = config.banner||'';
+  document.getElementById('cfg-hero_h1').value = config.hero_h1||'';
+  document.getElementById('cfg-hero_h2').value = config.hero_h2||'';
+  document.getElementById('cfg-hero_desc').value = config.hero_desc||'';
+  let cup={code:'',percent:0,active:false};
+  try{ cup=JSON.parse(config.coupon||'{}'); }catch(e){}
+  document.getElementById('cup-code').value = cup.code||'';
+  document.getElementById('cup-percent').value = cup.percent||0;
+  document.getElementById('cup-active').checked = !!cup.active;
+  let gal=[]; try{ gal=JSON.parse(config.galeria_imgs||'[]'); }catch(e){}
+  document.getElementById('cfg-galeria').value = gal.join(', ');
+  ['faq_items','testimonios','nosotros_content'].forEach(k=>{
+    let pretty=config[k]||'';
+    try{ pretty=JSON.stringify(JSON.parse(config[k]),null,2); }catch(e){}
+    document.getElementById('cfg-'+k).value = pretty;
+  });
+}
+
+function collectConfig(){
+  const c=clone(config);
+  c.banner = document.getElementById('cfg-banner').value;
+  c.hero_h1 = document.getElementById('cfg-hero_h1').value;
+  c.hero_h2 = document.getElementById('cfg-hero_h2').value;
+  c.hero_desc = document.getElementById('cfg-hero_desc').value;
+  c.coupon = JSON.stringify({
+    code: document.getElementById('cup-code').value.trim(),
+    percent: parseInt(document.getElementById('cup-percent').value,10)||0,
+    active: document.getElementById('cup-active').checked
+  });
+  const gal = document.getElementById('cfg-galeria').value.split(',').map(s=>s.trim()).filter(Boolean);
+  c.galeria_imgs = JSON.stringify(gal);
+  const errs=[];
+  ['faq_items','testimonios','nosotros_content'].forEach(k=>{
+    const raw=document.getElementById('cfg-'+k).value.trim();
+    try{ c[k]=JSON.stringify(JSON.parse(raw)); }
+    catch(e){ errs.push(k); }
+  });
+  return {config:c, errors:errs};
+}
+
+function buildFile(prods,cfg){
+  const order=['galeria_imgs','faq_items','hero_h1','hero_h2','hero_desc','banner','nosotros_content','testimonios','coupon'];
+  const ordered={};
+  order.forEach(k=>{ if(cfg[k]!==undefined) ordered[k]=cfg[k]; });
+  Object.keys(cfg).forEach(k=>{ if(ordered[k]===undefined) ordered[k]=cfg[k]; });
+  return '/* Oso Mates - datos de la tienda. Editado desde editar.html el '+new Date().toISOString().slice(0,10)+'.\n'+
+    '   La tienda usa estos datos mientras la base remota no responda. */\n'+
+    '(function () {\n'+
+    '  window.FALLBACK_PRODUCTOS = '+JSON.stringify(prods,null,2).replace(/\n/g,'\n  ')+';\n\n'+
+    '  window.FALLBACK_CONFIG = '+JSON.stringify(ordered,null,2).replace(/\n/g,'\n  ')+';\n\n'+
+    '  window.FALLBACK_CONFIG_ROWS = Object.keys(window.FALLBACK_CONFIG).map(function (k) {\n'+
+    '    return { clave: k, valor: window.FALLBACK_CONFIG[k] };\n'+
+    '  });\n'+
+    '})();\n';
+}
+
+document.getElementById('add-prod').onclick=()=>{
+  productos = collectProductos();
+  productos.push({id:'',nombre:'Nuevo mate',material:'',descripcion:'',precio:0,precio_transferencia:0,link_mp:'',imagen:'',categoria:'madera',badge:null,activo:true,created_at:'',imagenes:[]});
+  renderProductos();
+  window.scrollTo(0,document.body.scrollHeight);
+};
+
+document.getElementById('generate').onclick=()=>{
+  const msg=document.getElementById('msg');
+  const prods=collectProductos();
+  const cc=collectConfig();
+  if(cc.errors.length){
+    msg.className='msg err';
+    msg.textContent='Hay un error de formato JSON en: '+cc.errors.join(', ')+'. Revisá las comillas y las llaves antes de generar.';
+    return;
+  }
+  const text=buildFile(prods,cc.config);
+  document.getElementById('output').value=text;
+  msg.className='msg ok';
+  msg.textContent='Listo. Copiá el texto y pegalo en GitHub reemplazando todo el archivo.';
+  productos=prods; config=cc.config;
+};
+
+document.getElementById('copy').onclick=async()=>{
+  const ta=document.getElementById('output');
+  if(!ta.value){ document.getElementById('generate').click(); }
+  try{ await navigator.clipboard.writeText(ta.value); }
+  catch(e){ ta.select(); document.execCommand('copy'); }
+  const msg=document.getElementById('msg');
+  msg.className='msg ok'; msg.textContent='Copiado. Abrí el link a GitHub y pegá.';
+};
+
+// datalist for image filenames
+const dl=el('datalist',{id:'imgfiles'});
+IMG_FILES.forEach(f=>dl.appendChild(el('option',{value:f})));
+document.body.appendChild(dl);
+
+if(!window.FALLBACK_PRODUCTOS){
+  document.querySelector('.wrap').innerHTML='<h1>No se pudo cargar fallback-data.js</h1><p>Recargá la página.</p>';
+} else {
+  renderProductos();
+  loadConfigForm();
+}
+</script>
+</body>
+</html>
