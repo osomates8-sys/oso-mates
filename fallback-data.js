@@ -126,7 +126,7 @@
     "testimonios": "[{\"stars\":5,\"text\":\"Compré el Imperial Algarrobo y es una joya. La madera tiene una textura increíble, se nota que es tallado a mano. Llegó en perfectas condiciones.\",\"author\":\"Martina G.\",\"location\":\"Buenos Aires\"},{\"stars\":5,\"text\":\"Pedí uno para regalar y quedaron fascinados. La calidad es impresionante para el precio. La bombilla artesanal también es hermosa. 100% lo recomiendo.\",\"author\":\"Federico R.\",\"location\":\"Rosario\"},{\"stars\":5,\"text\":\"Un lujo la atención y los productos, los mejores de Mar del plata!!\",\"author\":\"Agustin F.\",\"location\":\"Mar del plata\"}]",
     "coupon": "{\"code\":\"OSO10\",\"percent\":10,\"active\":true}",
     "oso_config": "{\"activo\":true,\"lado\":\"der\",\"tamano\":\"mediano\",\"celular\":true,\"zonas\":{\"inicio\":{\"accion\":\"saluda\",\"frase\":\"¡Hola! Encontrá tu próximo mate\"},\"productos\":{\"accion\":\"mate\",\"frase\":\"Un mate y seguimos!\"},\"galeria\":{\"accion\":\"mira\",\"frase\":\"Elegi el tuyo\"},\"info\":{\"accion\":\"quieto\",\"frase\":\"Este es para vos\"},\"contacto\":{\"accion\":\"asiente\",\"frase\":\"¿Te cebo uno? Escribinos.\"}},\"tocar\":[\"¡Cebame uno!\",\"Hechos a mano en Mar del Plata.\",\"¿Ya viste los bombillones?\",\"El ranchero es mi favorito.\"]}",
-    "grabado": "{\"active\":true,\"price\":7000,\"maxChars\":20}"
+    "grabado": "{\"active\":true,\"price\":9000,\"maxChars\":20}"
   };
 
   window.FALLBACK_CONFIG_ROWS = Object.keys(window.FALLBACK_CONFIG).map(function (k) {
