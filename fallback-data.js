@@ -9,13 +9,13 @@
       "descripcion": "La tradición en su forma más pura. Un sabor único en cada cebada.",
       "precio": 56000,
       "precio_transferencia": 50400,
-      "imagen": "IMG_5206-Edit.jpg",
+      "imagen": "IMG_5206-Edit.jpg|54% 45%",
       "categoria": "calabaza",
       "badge": null,
       "activo": true,
       "created_at": "2026-05-27T22:16:01.096033",
       "imagenes": [
-        "IMG_5206-Edit.jpg",
+        "IMG_5206-Edit.jpg|54% 45%",
         "IMG_5190-Edit.jpg"
       ],
       "stock": null
@@ -27,14 +27,14 @@
       "descripcion": "Fiel a sus raíces. El mate de toda la vida hecho con el cuidado de siempre.",
       "precio": 33000,
       "precio_transferencia": 29700,
-      "imagen": "IMG_5161-Edit.jpg",
+      "imagen": "IMG_5161-Edit.jpg|52% 57%",
       "categoria": "calabaza",
       "badge": null,
       "activo": true,
       "created_at": "2026-05-27T22:16:01.096033",
       "imagenes": [
-        "IMG_5161-Edit.jpg",
-        "IMG_5218-Edit-2-Edit.jpg"
+        "IMG_5161-Edit.jpg|52% 57%",
+        "IMG_5218-Edit-2-Edit.jpg|52% 64%"
       ],
       "stock": null
     },
@@ -45,16 +45,16 @@
       "descripcion": "Porte elegante y tamaño generoso. El preferido de los entendidos.",
       "precio": 55000,
       "precio_transferencia": 49500,
-      "imagen": "DSC08987.jpg",
+      "imagen": "DSC08987.jpg|53% 60%",
       "categoria": "madera",
       "badge": "Popular",
       "activo": true,
       "created_at": "2026-05-27T22:16:01.096033",
       "imagenes": [
-        "DSC08987.jpg",
-        "IMG_5139.jpg",
-        "IMG_5145.jpg",
-        "imperial-algarrobo-muftpl9nujl.webp"
+        "DSC08987.jpg|53% 60%",
+        "IMG_5139.jpg|48% 61%",
+        "IMG_5145.jpg|52% 55%",
+        "imperial-algarrobo-muftpl9nujl.webp|52% 61%"
       ],
       "stock": null
     },
@@ -65,14 +65,14 @@
       "descripcion": "El clásico resistente. Forma robusta y cómoda, ideal para el día a día.",
       "precio": 34000,
       "precio_transferencia": 30600,
-      "imagen": "camionero-muftpmhoz9y.webp",
+      "imagen": "camionero-muftpmhoz9y.webp|47% 55%",
       "categoria": "madera",
       "badge": null,
       "activo": true,
       "created_at": "2026-05-27T22:16:01.096033",
       "imagenes": [
-        "camionero-muftpmhoz9y.webp",
-        "camionero-muftpnooci1.webp"
+        "camionero-muftpmhoz9y.webp|47% 55%",
+        "camionero-muftpnooci1.webp|43% 54%"
       ],
       "stock": null
     },
@@ -83,15 +83,15 @@
       "descripcion": "Para los que van en serio. Grande, noble y con mucha personalidad.",
       "precio": 62000,
       "precio_transferencia": 55800,
-      "imagen": "ranchero-muftpoq5piw.webp",
+      "imagen": "ranchero-muftpoq5piw.webp|48% 73%",
       "categoria": "madera",
       "badge": "Exclusivo",
       "activo": true,
       "created_at": "2026-05-27T22:16:01.096033",
       "imagenes": [
-        "ranchero-muftpoq5piw.webp",
-        "ranchero-muftppvyy4c.webp",
-        "ranchero-muftpqulkny.webp"
+        "ranchero-muftpoq5piw.webp|48% 73%",
+        "ranchero-muftppvyy4c.webp|53% 68%",
+        "ranchero-muftpqulkny.webp|47% 59%"
       ],
       "stock": null
     },
@@ -102,14 +102,14 @@
       "descripcion": "Forma redondeada y clásica, perfecta para cebar.",
       "precio": 35000,
       "precio_transferencia": 31500,
-      "imagen": "galleta-muftpryxvqj.webp",
+      "imagen": "galleta-muftpryxvqj.webp|51% 61%",
       "categoria": "calabaza",
       "badge": null,
       "activo": true,
       "created_at": "2026-05-27T22:16:01.096033",
       "imagenes": [
-        "galleta-muftpryxvqj.webp",
-        "galleta-muftpszpxpk.webp"
+        "galleta-muftpryxvqj.webp|51% 61%",
+        "galleta-muftpszpxpk.webp|60% 28%"
       ],
       "stock": null
     }
