@@ -75,6 +75,12 @@
   .bar .status.ok{color:var(--ok)} .bar .status.err{color:var(--err)}
   button:disabled{opacity:.55;cursor:wait}
   button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible{outline:2px solid var(--warm);outline-offset:2px}
+  .oso-zona{display:grid;grid-template-columns:160px 175px 1fr;gap:.6rem;align-items:end;padding:.55rem 0;border-top:1px solid var(--line)}
+  .oso-zona:first-of-type{border-top:0}
+  .oso-zona .zn{font-weight:600;font-size:.88rem;align-self:center}
+  .oso-zona .zn small{display:block;font-weight:400;font-size:.72rem;color:#8a7d6b}
+  .oso-zona label{margin-top:0}
+  @media(max-width:620px){.oso-zona{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
@@ -132,6 +138,25 @@
     </div>
     <label>Fotos de la galería</label>
     <div id="galeria-imgs"></div>
+  </div>
+
+  <h2>El oso</h2>
+  <div class="card">
+    <label class="chk" style="margin-top:0"><input type="checkbox" id="oso-activo"/> Mostrar el oso en la tienda</label>
+    <div class="row3">
+      <div><label for="oso-lado">Lado de la pantalla</label>
+        <select id="oso-lado"><option value="izq">Izquierda</option><option value="der">Derecha (al lado de WhatsApp)</option></select></div>
+      <div><label for="oso-tamano">Tamaño</label>
+        <select id="oso-tamano"><option value="chico">Chico</option><option value="mediano">Mediano</option><option value="grande">Grande</option></select></div>
+      <label class="chk" style="align-self:end"><input type="checkbox" id="oso-celular"/> Mostrarlo también en celulares</label>
+    </div>
+  </div>
+  <div class="card">
+    <p class="hint">Qué hace y qué dice el oso cuando el cliente llega a cada parte de la página. Si dejás la frase vacía, en esa parte no dice nada.</p>
+    <div id="oso-zonas"></div>
+    <label for="oso-tocar">Frases cuando lo tocan (una por renglón, las va rotando)</label>
+    <textarea id="oso-tocar" style="min-height:110px;font-family:'Montserrat',sans-serif;font-size:.9rem"></textarea>
+    <p class="hint">Los cambios del oso se ven en la tienda después de tocar <strong>Guardar cambios</strong>.</p>
   </div>
 
   <div class="card">
@@ -509,7 +534,80 @@ function renderGaleria(){
   host.appendChild(imageManager(function(){return galeria;}, function(l){galeria=l;}, {markMain:false}));
 }
 
+/* ===== El oso ===== */
+const OSO_ZONAS=[
+  ['inicio','Inicio','Lo primero que se ve'],
+  ['productos','Productos','Más vendidos, combos, bombillas y catálogo'],
+  ['galeria','Galería','Galería, Instagram y opiniones'],
+  ['info','Información','Cuidado, cómo comprar, curado, preguntas y nosotros'],
+  ['contacto','Contacto','Contacto y newsletter']
+];
+const OSO_ACCIONES=[
+  ['saluda','Saluda con la oreja'],
+  ['mate','Toma mate'],
+  ['mira','Te mira'],
+  ['asiente','Asiente'],
+  ['quieto','Tranquilo']
+];
+const OSO_DEFAULT={
+  activo:true, lado:'izq', tamano:'mediano', celular:true,
+  zonas:{
+    inicio:   {accion:'saluda',  frase:'¡Hola! Bajá que te muestro los mates.'},
+    productos:{accion:'mate',    frase:'Mmm… huele a yerba recién cebada.'},
+    galeria:  {accion:'mira',    frase:'¡Mirá qué lindos quedaron!'},
+    info:     {accion:'quieto',  frase:'Pedís, pagás y te llega a tu casa.'},
+    contacto: {accion:'asiente', frase:'¿Te cebo uno? Escribinos.'}
+  },
+  tocar:['¡Cebame uno!','Hechos a mano en Mar del Plata.','¿Ya viste los combos?','El algarrobo es mi favorito.']
+};
+function renderOsoZonas(){
+  const box=document.getElementById('oso-zonas'); box.innerHTML='';
+  OSO_ZONAS.forEach(([k,nombre,desc])=>{
+    const row=el('div',{class:'oso-zona'});
+    const zn=el('div',{class:'zn'},[nombre]); zn.appendChild(el('small',{},[desc])); row.appendChild(zn);
+    const a=el('div'); a.appendChild(el('label',{for:'oso-acc-'+k},['Qué hace']));
+    const sel=el('select',{id:'oso-acc-'+k}); OSO_ACCIONES.forEach(([v,t])=>sel.appendChild(el('option',{value:v},[t]))); a.appendChild(sel); row.appendChild(a);
+    const f=el('div'); f.appendChild(el('label',{for:'oso-fra-'+k},['Qué dice']));
+    f.appendChild(el('input',{type:'text',id:'oso-fra-'+k,maxlength:'90'})); row.appendChild(f);
+    box.appendChild(row);
+  });
+}
+function loadOsoForm(){
+  const o=clone(OSO_DEFAULT);
+  try{
+    const s=config.oso_config?JSON.parse(config.oso_config):null;
+    if(s){
+      ['activo','lado','tamano','celular'].forEach(k=>{ if(s[k]!==undefined) o[k]=s[k]; });
+      if(s.zonas) Object.keys(o.zonas).forEach(z=>{ if(s.zonas[z]) Object.assign(o.zonas[z],s.zonas[z]); });
+      if(Array.isArray(s.tocar)) o.tocar=s.tocar;
+    }
+  }catch(e){}
+  if(!document.getElementById('oso-zonas').children.length) renderOsoZonas();
+  document.getElementById('oso-activo').checked=o.activo!==false;
+  document.getElementById('oso-lado').value=o.lado==='der'?'der':'izq';
+  document.getElementById('oso-tamano').value=['chico','mediano','grande'].includes(o.tamano)?o.tamano:'mediano';
+  document.getElementById('oso-celular').checked=o.celular!==false;
+  OSO_ZONAS.forEach(([k])=>{
+    document.getElementById('oso-acc-'+k).value=o.zonas[k].accion||'quieto';
+    document.getElementById('oso-fra-'+k).value=o.zonas[k].frase||'';
+  });
+  document.getElementById('oso-tocar').value=(o.tocar||[]).join('\n');
+}
+function collectOso(){
+  const o={
+    activo:document.getElementById('oso-activo').checked,
+    lado:document.getElementById('oso-lado').value,
+    tamano:document.getElementById('oso-tamano').value,
+    celular:document.getElementById('oso-celular').checked,
+    zonas:{},
+    tocar:document.getElementById('oso-tocar').value.split('\n').map(x=>x.trim()).filter(Boolean)
+  };
+  OSO_ZONAS.forEach(([k])=>{ o.zonas[k]={accion:document.getElementById('oso-acc-'+k).value, frase:document.getElementById('oso-fra-'+k).value.trim()}; });
+  return JSON.stringify(o);
+}
+
 function loadConfigForm(){
+  loadOsoForm();
   document.getElementById('cfg-banner').value = config.banner||'';
   document.getElementById('cfg-hero_h1').value = config.hero_h1||'';
   document.getElementById('cfg-hero_h2').value = config.hero_h2||'';
@@ -541,6 +639,7 @@ function collectConfig(){
     active: document.getElementById('cup-active').checked
   });
   c.galeria_imgs = JSON.stringify(galeria.filter(Boolean));
+  c.oso_config = collectOso();
   const errs=[];
   ['faq_items','testimonios','nosotros_content'].forEach(k=>{
     const raw=document.getElementById('cfg-'+k).value.trim();

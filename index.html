@@ -573,6 +573,28 @@ fbq('track', 'PageView');
 </script>
 <noscript><img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=1690890908657661&ev=PageView&noscript=1"/></noscript>
 <!-- End Meta Pixel -->
+
+<style id="celu-fix">
+/* Celulares: la fila de filtros del catálogo no entraba y hacía la página más ancha
+   que la pantalla (quedaban afuera el carrito, favoritos y el botón de WhatsApp).
+   Ahora los filtros bajan a una segunda línea. En la compu no cambia nada. */
+@media(max-width:760px){.filter-row{flex-wrap:wrap;row-gap:.1rem;}.ftab{padding:.6rem .8rem;}}
+/* Celulares angostos: barra de arriba más compacta para que entre el carrito. */
+@media(max-width:430px){
+  nav{padding-left:1rem;padding-right:1rem;}
+  nav .logo{font-size:1.05rem;letter-spacing:.22em;white-space:nowrap;}
+  nav .cart-btn{padding:.6rem .8rem;}
+}
+@media(max-width:385px){
+  nav .logo{font-size:.95rem;letter-spacing:.18em;}
+  nav>button{flex-shrink:0;}
+  nav .cart-btn span[data-i18n="cart_btn"]{display:none;}
+  nav .cart-btn::before{content:"";width:15px;height:15px;background:currentColor;
+    -webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 7h12l-1 13H7L6 7z'/%3E%3Cpath d='M9 7a3 3 0 0 1 6 0'/%3E%3C/svg%3E") center/contain no-repeat;
+            mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 7h12l-1 13H7L6 7z'/%3E%3Cpath d='M9 7a3 3 0 0 1 6 0'/%3E%3C/svg%3E") center/contain no-repeat;}
+}
+@media(max-width:340px){nav{padding-left:.75rem;padding-right:.75rem;}nav .logo{font-size:.85rem;letter-spacing:.14em;}}
+</style>
 </head>
 <body>
 <!-- BANNER PROMO -->
@@ -2054,6 +2076,239 @@ document.addEventListener('mouseleave',function(e){
     <span class="exit-skip" onclick="closeExitPopup()">No, gracias</span>
   </div>
 </div>
+
+
+<!-- ============================================================
+     OSO MATES — el oso animado.
+     Todo lo que dice y hace se edita en editar.html → "El oso".
+     Para sacarlo del todo: borrar desde acá hasta "FIN DEL OSO".
+     ============================================================ -->
+<style id="oso-css">
+.oso{position:fixed;bottom:0;right:96px;z-index:900;width:var(--oso-w,150px);color:var(--black);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+  transform:translateY(105%);transition:transform .9s cubic-bezier(.34,1.4,.64,1);pointer-events:none}
+.oso.izq{right:auto;left:10px}
+.oso.in{transform:translateY(0)}
+.oso.gone{transform:translateY(115%)}
+@media(max-width:700px){.oso{width:var(--oso-wm,110px)}.oso.izq{left:4px}.oso:not(.izq){right:92px}.oso.no-cel{display:none!important}}
+.oso-btn{display:block;width:100%;background:none;border:0;padding:0;margin:0;cursor:pointer;pointer-events:auto;-webkit-tap-highlight-color:transparent;color:inherit}
+.oso-btn:focus-visible{outline:2px solid var(--warm);outline-offset:4px;border-radius:12px}
+.oso svg{display:block;width:100%;height:auto;overflow:visible}
+.oso.izq svg{transform:scaleX(-1)}
+.oso .sil{fill:var(--white);filter:drop-shadow(0 -4px 14px rgba(0,0,0,.10))}
+.oso .sil-arm{fill:var(--white)}
+.oso .ink{fill:currentColor}
+.oso .claw{fill:none;stroke:currentColor;stroke-width:3.5;stroke-linecap:round}
+#oso-all{transform-box:view-box;transform-origin:175px 270px}
+#oso-nod{transform-box:view-box;transform-origin:175px 270px}
+#oso-ear{transform-box:view-box;transform-origin:196px 90px}
+#oso-eye{transform-box:fill-box;transform-origin:center;animation:oso-blink 5.5s infinite}
+#oso-brow{transition:transform .35s ease}
+#oso-arm{transform-box:view-box;transform-origin:70px 300px;transform:translateY(26px) rotate(5deg);transition:transform .7s cubic-bezier(.34,1.4,.64,1)}
+#oso-mate .m-line{fill:none;stroke:#9aa0a6;stroke-width:5;stroke-linecap:round}
+#oso-mate .m-body{fill:var(--white);stroke:currentColor;stroke-width:5;stroke-linejoin:round}
+#oso-mate .m-band{fill:none;stroke:var(--warm);stroke-width:6}
+#oso-mate .steam{opacity:0;transition:opacity .5s}
+#oso-mate .steam path{fill:none;stroke:var(--gray);stroke-width:3.5;stroke-linecap:round;opacity:0;animation:oso-steam 2.6s ease-in-out infinite}
+#oso-mate .steam path+path{animation-delay:1.3s}
+@keyframes oso-blink{0%,93%,100%{transform:scaleY(1)}96.5%{transform:scaleY(.08)}}
+@keyframes oso-ear{0%,100%{transform:rotate(0)}15%{transform:rotate(-12deg)}30%{transform:rotate(2deg)}45%{transform:rotate(-9deg)}60%{transform:rotate(0)}}
+@keyframes oso-nod{0%,100%{transform:rotate(0)}20%{transform:rotate(-6deg)}40%{transform:rotate(1deg)}60%{transform:rotate(-5deg)}80%{transform:rotate(0)}}
+@keyframes oso-sniff{0%,55%,100%{transform:rotate(0)}62%{transform:rotate(3deg)}68%{transform:rotate(1deg)}74%{transform:rotate(3.5deg)}82%{transform:rotate(0)}}
+@keyframes oso-steam{0%{opacity:0;transform:translate(0,6px)}35%{opacity:.85}100%{opacity:0;transform:translate(6px,-18px)}}
+@keyframes oso-hop{0%,100%{transform:translateY(0)}30%{transform:translateY(-22px)}55%{transform:translateY(0)}72%{transform:translateY(-7px)}}
+@keyframes oso-happy{0%,100%{transform:scaleY(1)}20%,70%{transform:scaleY(.12)}}
+/* Acciones (se eligen en el editor para cada parte de la página) */
+.oso[data-mode="saluda"] #oso-ear{animation:oso-ear 1.4s ease-in-out 2}
+.oso[data-mode="mate"] #oso-arm{transform:none}
+.oso[data-mode="mate"] #oso-mate .steam{opacity:1}
+.oso[data-mode="mate"] #oso-nod{animation:oso-sniff 3.2s ease-in-out infinite}
+.oso[data-mode="mate"] #oso-eye{animation:oso-happy 3.2s ease-in-out infinite}
+.oso[data-mode="mira"] #oso-brow{transform:translateY(-5px)}
+.oso[data-mode="asiente"] #oso-nod{animation:oso-nod 1.8s ease-in-out 2}
+.oso[data-mode="asiente"] #oso-ear{animation:oso-ear 1.4s ease-in-out 1.8s 2}
+.oso.hop .oso-btn{animation:oso-hop .7s ease-out}
+.oso.hop #oso-ear{animation:oso-ear 1s ease-in-out 1}
+/* Globito */
+.oso-bubble{position:absolute;right:62%;bottom:82%;width:max-content;max-width:200px;background:var(--white);color:var(--black);
+  border:1px solid var(--black);border-radius:16px 16px 4px 16px;padding:.6rem .85rem;font-family:'Montserrat',sans-serif;font-size:.72rem;line-height:1.45;font-weight:500;letter-spacing:0;text-transform:none;
+  opacity:0;transform:translateY(8px) scale(.9);transform-origin:bottom right;transition:opacity .25s,transform .25s;pointer-events:none}
+.oso.izq .oso-bubble{right:auto;left:62%;border-radius:16px 16px 16px 4px;transform-origin:bottom left}
+.oso-bubble.show{opacity:1;transform:none}
+@media(max-width:700px){.oso-bubble{max-width:160px;font-size:.68rem}}
+/* Botón para esconderlo */
+.oso-close{position:absolute;top:4px;right:4px;width:26px;height:26px;border-radius:50%;border:1px solid var(--light);background:var(--white);color:var(--mid);
+  font-size:14px;line-height:1;padding:0;cursor:pointer;pointer-events:auto;opacity:0;transition:opacity .2s;z-index:2}
+.oso.izq .oso-close{right:auto;left:4px}
+.oso:hover .oso-close,.oso:focus-within .oso-close{opacity:1}
+@media(hover:none){.oso-close{opacity:.75}}
+@media (prefers-reduced-motion: reduce){.oso{transition:none}.oso *{animation:none!important;transition:none!important}}
+</style>
+
+<div class="oso" id="oso" data-mode="" hidden>
+  <div class="oso-bubble" id="oso-bubble" role="status" aria-live="polite"></div>
+  <button type="button" class="oso-close" id="oso-close" aria-label="Esconder al oso">&times;</button>
+  <button type="button" class="oso-btn" id="oso-btn" aria-label="Oso de Oso Mates, tocalo para que te diga algo">
+<svg viewBox="-75 0 359 272" aria-hidden="true">
+<g id="oso-all">
+<g id="oso-nod">
+<path class="sil" d="M 198.4,12.1 C 195.4,12.7 191.3,14.1 188.4,15.6 C 179.8,20.2 175.2,21.0 168.2,19.0 C 156.8,15.9 146.3,17.4 129.2,24.7 C 119.3,29.0 113.2,28.4 104.2,22.4 C 95.9,16.8 90.6,18.9 90.0,28.0 C 89.3,37.1 86.5,41.3 76.0,48.8 C 60.7,59.8 51.0,74.2 51.0,86.0 C 50.9,96.7 47.0,101.6 31.5,110.1 C 15.6,118.9 15.5,118.9 13.8,120.8 C 11.9,122.8 11.4,123.9 11.3,126.6 C 11.2,129.0 11.2,129.1 12.8,134.3 C 13.7,137.1 14.1,138.9 15.4,146.3 C 16.3,150.9 18.4,154.8 22.3,158.9 C 23.6,160.3 25.7,162.8 27.0,164.4 C 34.1,173.8 42.8,177.9 55.0,177.7 C 70.1,177.5 69.9,177.4 80.0,183.7 C 85.3,187.1 87.2,188.1 93.6,190.7 C 102.8,194.4 105.8,197.6 108.3,206.1 C 110.5,213.4 113.8,219.0 119.4,224.8 C 125.8,231.4 130.8,234.5 145.6,240.9 C 147.7,241.8 151.8,243.7 154.7,245.2 C 157.7,246.7 160.9,248.3 161.9,248.7 C 163.9,249.6 165.8,250.7 168.2,252.3 C 171.2,254.5 171.7,254.3 177.1,247.8 C 181.9,242.0 187.9,236.5 196.1,230.2 C 197.6,229.0 200.1,227.1 201.7,225.8 C 206.8,221.9 218.6,213.1 221.7,210.9 C 256.7,185.9 272.5,163.0 272.5,137.0 C 272.5,129.6 271.9,127.5 268.6,122.0 C 265.8,117.3 265.2,115.5 264.6,109.5 C 263.9,102.7 262.1,96.6 257.9,86.9 C 253.2,76.4 242.1,63.2 231.5,55.4 C 226.4,51.7 224.2,49.2 222.6,45.3 C 221.3,42.2 221.2,41.1 220.9,34.1 C 220.7,25.9 220.4,24.4 218.5,20.6 C 215.5,14.6 206.3,10.7 198.4,12.1"/>
+<path class="ink" d="M 229.5,55.1 C 229.5,55.5 230.6,57.3 231.3,58.1 C 232.5,59.4 233.4,60.4 235.5,63.0 C 236.4,64.1 237.5,65.4 237.9,65.8 C 238.8,66.8 240.0,68.3 241.1,69.8 C 241.6,70.5 242.6,71.9 243.3,73.0 C 244.1,74.0 245.0,75.5 245.5,76.3 C 245.9,77.2 246.5,78.1 246.7,78.3 C 247.2,78.9 248.5,81.3 251.1,86.3 C 254.1,92.0 255.3,94.6 255.8,96.8 C 256.2,98.1 256.7,99.8 256.9,100.6 C 258.3,104.6 259.6,110.0 260.1,114.2 C 260.2,115.0 260.4,116.5 260.6,117.7 C 260.8,118.9 261.1,121.4 261.3,123.3 C 261.8,127.2 262.0,128.0 262.9,128.0 C 263.4,128.0 263.6,127.7 264.0,126.8 C 264.6,125.7 264.6,125.2 264.7,118.3 C 264.8,109.7 264.5,105.8 263.6,103.3 C 263.3,102.3 262.9,100.8 262.8,100.0 C 262.6,98.0 260.6,92.6 259.1,90.2 C 258.8,89.6 258.4,88.6 258.3,88.1 C 257.8,85.5 254.9,80.4 249.9,73.8 C 244.5,66.6 236.8,58.9 231.8,55.8 C 230.7,55.1 229.5,54.7 229.5,55.1 M 219.9,73.7 C 219.5,74.5 219.8,76.4 220.7,79.0 C 221.1,80.1 221.5,81.5 221.6,82.0 C 221.7,82.6 222.1,83.8 222.5,84.8 C 222.8,85.8 223.3,87.6 223.4,88.7 C 223.6,89.9 223.9,91.5 224.1,92.1 C 224.6,93.9 225.4,100.5 225.7,105.5 C 226.0,109.8 225.8,113.1 225.0,118.9 C 224.4,122.6 224.7,123.5 226.2,122.9 C 227.5,122.4 227.5,122.2 228.8,118.7 C 230.7,113.2 230.8,112.5 230.8,104.7 C 230.8,98.0 230.8,97.8 230.0,94.4 C 229.6,92.5 229.1,90.7 229.0,90.5 C 228.9,90.3 228.5,89.1 228.2,88.0 C 227.9,86.8 227.4,85.4 227.1,84.7 C 226.8,84.1 226.4,83.1 226.2,82.5 C 226.1,81.8 225.6,80.8 225.2,80.2 C 224.8,79.6 224.4,78.7 224.2,78.1 C 224.1,77.6 223.5,76.7 223.0,76.1 C 222.5,75.5 221.9,74.6 221.6,74.2 C 221.0,73.2 220.3,73.0 219.9,73.7 M 196.8,112.6 C 197.1,119.8 195.9,133.3 195.0,133.3 C 194.9,133.3 194.0,131.9 193.0,130.0 C 189.7,123.6 188.0,122.8 187.2,127.5 C 187.0,128.5 186.7,130.4 186.4,131.7 C 186.2,133.0 185.9,135.7 185.7,137.6 C 185.6,140.1 185.3,141.7 184.9,143.1 C 184.5,144.2 184.0,146.4 183.6,148.1 C 183.2,149.7 182.7,151.4 182.5,151.8 C 182.2,152.5 181.0,155.6 179.8,159.0 C 179.1,161.0 178.8,161.6 177.0,164.7 C 174.0,169.8 173.4,170.9 172.5,171.8 C 172.1,172.4 171.7,172.9 171.7,173.0 C 171.7,173.5 169.4,176.8 168.5,177.5 C 168.0,177.9 167.1,178.8 166.6,179.5 C 165.0,181.6 163.7,183.0 162.9,183.4 C 162.5,183.6 162.0,184.1 161.7,184.5 C 161.4,185.0 160.7,185.7 160.0,186.2 C 159.4,186.6 158.3,187.3 157.6,187.8 C 155.1,189.5 151.6,193.4 153.4,192.5 C 153.6,192.4 154.7,192.1 155.8,191.9 C 156.8,191.6 157.8,191.3 158.0,191.1 C 158.1,190.9 158.8,190.5 159.5,190.2 C 160.3,189.9 161.4,189.2 162.0,188.6 C 162.6,188.0 163.6,187.3 164.2,186.9 C 167.1,185.5 174.6,177.8 176.5,174.4 C 176.7,173.9 177.3,173.1 177.7,172.6 C 178.1,172.2 178.7,171.2 179.0,170.6 C 179.3,169.9 180.1,168.6 180.7,167.7 C 183.6,163.7 188.9,150.7 189.0,147.8 C 189.0,147.5 189.3,146.6 189.6,145.9 C 190.0,145.1 190.4,143.7 190.5,142.8 C 190.8,140.4 190.9,140.2 191.5,140.3 C 192.3,140.4 192.9,141.6 193.5,144.5 C 194.4,149.1 194.8,149.5 196.4,147.5 C 197.8,145.9 197.9,145.5 198.5,142.5 C 198.8,141.0 199.2,139.0 199.5,138.1 C 200.0,136.5 200.0,135.5 200.1,128.8 C 200.3,119.2 200.1,116.6 198.9,114.1 C 198.4,113.2 197.9,111.7 197.7,111.0 C 197.4,109.1 197.2,108.7 196.9,108.7 C 196.7,108.7 196.7,110.0 196.8,112.6 M 236.5,117.8 C 236.2,118.6 235.7,121.5 235.1,126.2 C 234.0,134.3 233.2,138.7 232.3,141.8 C 231.8,143.5 231.5,145.1 231.5,145.6 C 231.5,146.0 231.1,147.2 230.6,148.2 C 230.2,149.2 229.6,150.8 229.3,151.6 C 227.2,157.7 223.5,165.5 220.5,170.3 C 220.0,171.2 218.9,172.8 218.2,174.0 C 216.1,177.4 213.3,181.4 211.9,183.1 C 211.1,183.9 210.1,185.3 209.5,186.1 C 209.0,186.9 208.0,188.0 207.5,188.6 C 206.9,189.1 205.7,190.4 204.8,191.5 C 202.9,193.7 195.6,201.2 192.9,203.6 C 189.2,206.8 185.6,210.6 185.8,211.0 C 186.1,211.4 186.9,211.2 187.4,210.6 C 187.8,210.3 188.3,209.9 188.7,209.8 C 189.0,209.8 189.8,209.4 190.3,209.0 C 190.9,208.6 192.2,207.7 193.2,207.0 C 194.3,206.3 196.0,205.1 197.0,204.3 C 198.0,203.5 199.1,202.6 199.4,202.3 C 200.6,201.5 202.8,199.6 204.7,197.8 C 205.7,196.8 207.3,195.4 208.2,194.6 C 211.5,191.6 221.2,180.3 222.2,178.2 C 222.5,177.6 223.1,176.7 223.5,176.1 C 224.4,175.0 224.7,174.5 226.3,171.7 C 227.9,169.1 229.2,166.5 230.1,164.2 C 230.6,163.0 231.3,161.6 231.6,161.0 C 232.2,159.8 233.2,157.3 234.0,154.8 C 234.3,154.0 234.8,152.6 235.1,151.7 C 237.0,146.5 238.7,135.8 238.7,129.5 C 238.7,126.2 238.1,119.3 237.7,117.9 C 237.4,116.7 236.8,116.7 236.5,117.8 M 268.9,124.1 C 268.8,124.3 268.7,125.7 268.7,127.2 C 268.7,128.6 268.6,130.5 268.5,131.3 C 268.3,132.2 268.1,134.0 268.0,135.5 C 267.7,138.5 267.0,141.5 266.0,144.6 C 265.6,145.7 265.2,146.9 265.1,147.2 C 264.6,148.8 263.1,152.7 262.6,153.5 C 262.3,153.9 261.9,154.7 261.7,155.2 C 260.5,158.2 255.1,167.1 251.9,171.3 C 247.4,177.2 242.7,182.6 238.5,186.8 C 233.5,191.9 226.8,198.4 224.8,199.9 C 223.9,200.7 222.5,201.8 221.8,202.5 C 221.1,203.1 218.7,205.1 216.5,207.0 C 214.2,208.8 211.5,211.1 210.4,212.0 C 209.4,212.9 207.6,214.2 206.5,215.0 C 205.5,215.8 204.0,216.9 203.3,217.5 C 201.4,219.0 199.5,220.5 198.2,221.5 C 187.1,229.6 176.7,240.3 173.6,246.8 C 173.2,247.5 172.8,248.5 172.5,248.9 C 172.2,249.4 171.9,250.3 171.8,250.9 C 171.7,251.6 171.5,252.5 171.3,253.0 C 171.1,253.5 171.0,254.1 171.0,254.3 C 171.1,254.5 171.3,254.3 171.5,253.8 C 171.7,253.2 172.0,252.9 172.6,252.7 C 173.1,252.5 173.7,252.1 173.9,251.8 C 174.1,251.4 174.7,250.6 175.2,250.0 C 175.7,249.5 176.7,248.3 177.4,247.4 C 180.4,243.7 181.2,243.0 184.1,240.4 C 185.7,238.9 187.6,237.2 188.2,236.7 C 189.5,235.7 193.0,232.8 194.1,231.7 C 194.5,231.3 195.5,230.6 196.2,230.1 C 197.0,229.7 198.2,228.8 198.8,228.2 C 202.9,224.9 205.3,223.1 206.3,222.5 C 206.7,222.3 207.6,221.6 208.3,221.0 C 209.0,220.5 210.0,219.7 210.5,219.3 C 210.9,218.9 212.3,217.9 213.5,217.1 C 215.8,215.5 216.9,214.6 218.6,213.2 C 219.2,212.7 220.6,211.6 221.8,210.9 C 222.9,210.1 225.0,208.6 226.3,207.5 C 227.7,206.4 229.5,205.0 230.2,204.5 C 231.0,204.0 231.9,203.3 232.4,203.0 C 232.8,202.6 233.8,201.8 234.6,201.2 C 241.9,195.5 250.9,186.7 255.8,180.5 C 259.5,175.8 265.2,166.7 266.1,164.2 C 266.3,163.6 266.7,162.7 267.1,162.2 C 267.4,161.7 267.8,160.7 268.1,160.0 C 268.3,159.3 268.8,157.7 269.3,156.5 C 269.8,155.3 270.4,153.4 270.6,152.3 C 270.8,151.2 271.2,149.7 271.4,149.0 C 272.1,146.3 272.4,142.6 272.4,137.2 C 272.5,131.0 272.2,128.8 271.3,127.4 C 271.0,126.8 270.4,125.7 270.0,125.0 C 269.3,123.6 269.1,123.5 268.9,124.1 M 120.3,205.1 C 119.7,205.7 120.0,206.8 121.1,208.0 C 121.6,208.5 122.0,209.1 122.0,209.2 C 122.0,209.5 126.6,214.0 127.8,214.8 C 128.5,215.3 129.8,216.2 130.6,216.7 C 132.4,218.0 135.8,219.8 137.5,220.4 C 138.3,220.6 139.3,221.0 139.8,221.3 C 142.5,222.6 150.4,223.4 151.4,222.4 C 152.3,221.5 151.1,220.7 147.2,219.8 C 145.7,219.5 144.0,219.0 143.4,218.6 C 142.8,218.3 141.8,217.9 141.2,217.7 C 140.6,217.6 139.4,217.1 138.6,216.6 C 137.8,216.2 136.7,215.6 136.2,215.5 C 135.7,215.3 135.0,214.9 134.6,214.6 C 134.2,214.3 133.3,213.8 132.7,213.5 C 130.5,212.3 126.0,209.0 124.0,206.9 C 123.6,206.6 123.0,206.1 122.7,205.9 C 122.3,205.7 121.7,205.3 121.4,205.1 C 120.8,204.7 120.7,204.7 120.3,205.1 M 108.8,206.4 C 108.4,207.4 111.6,215.5 112.9,216.5 C 113.1,216.7 113.5,217.2 113.7,217.7 C 114.7,219.7 119.2,225.0 121.6,227.1 C 122.4,227.8 123.5,228.8 124.1,229.3 C 124.6,229.9 125.9,230.8 126.8,231.3 C 127.7,231.9 129.0,232.8 129.7,233.3 C 130.4,233.8 131.2,234.2 131.3,234.2 C 131.5,234.2 132.3,234.7 133.1,235.2 C 133.9,235.8 134.7,236.2 134.8,236.2 C 135.1,236.2 139.8,238.4 141.7,239.3 C 142.4,239.7 143.4,240.1 144.0,240.2 C 144.6,240.4 145.8,240.9 146.7,241.3 C 147.6,241.8 148.9,242.3 149.5,242.5 C 150.1,242.6 151.0,243.1 151.6,243.4 C 152.1,243.8 153.1,244.3 153.7,244.6 C 154.3,244.8 155.1,245.2 155.4,245.5 C 155.8,245.7 156.5,246.1 157.0,246.3 C 157.4,246.6 158.2,247.0 158.7,247.2 C 161.2,248.6 160.8,245.3 158.2,243.7 C 157.5,243.3 156.8,242.7 156.7,242.4 C 156.4,242.0 156.2,241.8 153.0,239.7 C 150.2,237.8 142.9,234.3 139.4,233.2 C 138.9,233.1 138.4,232.8 138.2,232.6 C 138.0,232.4 137.3,232.0 136.6,231.7 C 135.8,231.4 134.7,230.9 134.0,230.4 C 133.3,230.0 132.0,229.1 131.0,228.5 C 128.9,227.2 124.8,223.9 124.3,223.2 C 124.1,223.0 123.4,222.4 122.8,221.9 C 121.1,220.6 115.4,214.0 114.5,212.4 C 114.3,211.9 113.9,211.3 113.5,210.9 C 113.2,210.5 112.6,209.6 112.2,208.9 C 111.8,208.1 111.2,207.3 110.5,206.8 C 109.1,205.9 109.0,205.8 108.8,206.4"/>
+<path class="ink" d="M 155.9,17.3 C 155.9,17.4 154.3,17.5 152.5,17.7 C 150.2,17.9 148.5,18.2 147.3,18.6 C 146.4,18.9 144.6,19.4 143.3,19.6 C 142.1,19.8 140.4,20.3 139.5,20.7 C 138.6,21.1 137.5,21.5 137.1,21.6 C 136.7,21.7 135.7,22.1 134.8,22.5 C 134.0,22.9 133.0,23.3 132.6,23.4 C 131.4,23.6 125.9,26.2 125.3,26.7 C 125.1,27.0 124.3,27.4 123.6,27.8 C 122.9,28.1 122.1,28.7 121.9,29.1 C 121.6,29.4 121.0,29.8 120.5,30.0 C 118.2,30.7 118.1,32.1 120.3,32.0 C 121.1,32.0 121.8,31.8 122.5,31.3 C 123.0,31.0 124.1,30.5 125.0,30.2 C 125.8,29.9 126.9,29.5 127.4,29.2 C 128.3,28.6 133.0,27.0 135.9,26.2 C 137.0,25.9 138.3,25.4 139.0,25.1 C 139.9,24.6 140.9,24.4 142.7,24.2 C 144.0,24.1 145.8,23.7 146.7,23.5 C 149.8,22.5 157.0,22.1 164.2,22.4 C 170.2,22.8 172.0,22.7 172.0,22.2 C 172.0,21.4 171.1,20.5 170.3,20.2 C 169.8,20.0 168.6,19.5 167.7,19.0 C 166.2,18.3 165.5,18.1 162.3,17.7 C 158.8,17.2 156.2,17.1 155.9,17.3 M 93.8,19.6 C 91.4,20.5 89.4,24.3 90.2,26.3 C 90.6,27.4 91.1,27.3 93.3,25.8 C 96.0,24.1 96.4,24.0 100.6,24.0 C 102.4,24.0 104.0,23.9 104.2,23.7 C 105.2,23.1 102.9,20.9 100.3,19.9 C 98.6,19.2 95.2,19.1 93.8,19.6 M 110.3,28.4 C 110.1,28.4 109.8,28.8 109.6,29.2 C 109.2,29.9 109.1,30.0 107.9,30.0 C 106.8,30.0 106.4,30.1 105.7,30.6 C 105.3,30.9 104.4,31.4 103.7,31.7 C 102.9,31.9 101.8,32.4 101.2,32.8 C 100.6,33.1 99.5,33.6 98.9,33.8 C 98.2,34.1 97.1,34.6 96.4,35.1 C 95.7,35.6 95.1,36.0 95.0,36.0 C 94.6,36.0 92.2,37.5 91.1,38.4 C 90.5,38.8 89.6,39.4 89.1,39.7 C 88.5,39.9 87.9,40.4 87.6,40.7 C 87.3,41.0 86.5,41.5 85.8,41.9 C 85.1,42.2 84.4,42.6 84.3,42.7 C 84.3,42.8 83.7,43.2 83.2,43.5 C 82.7,43.7 81.4,44.7 80.4,45.5 C 79.4,46.4 78.1,47.4 77.4,47.8 C 73.1,50.6 68.1,54.9 64.5,58.8 C 63.8,59.5 62.7,60.8 61.8,61.7 C 58.9,64.8 56.5,68.2 54.2,72.7 C 53.4,74.1 52.0,78.1 51.4,80.2 C 50.8,82.6 50.8,89.8 51.4,91.3 C 52.5,94.2 52.5,94.5 52.0,96.0 C 51.3,97.7 51.1,97.9 41.0,104.5 C 40.0,105.2 39.0,105.7 38.9,105.7 C 38.7,105.7 37.8,106.3 36.9,107.0 C 35.9,107.7 34.4,108.6 33.5,109.0 C 32.6,109.5 31.5,110.1 31.1,110.4 C 30.7,110.7 28.8,111.7 27.0,112.7 C 25.1,113.6 22.7,114.9 21.6,115.5 C 20.5,116.2 18.9,117.0 18.1,117.5 C 10.6,121.5 9.1,126.2 12.9,133.8 C 13.9,135.8 14.0,136.3 14.0,137.7 C 14.0,138.6 14.2,140.1 14.4,141.1 C 14.7,142.0 15.0,143.7 15.1,144.8 C 15.3,147.1 15.8,149.3 16.5,150.2 C 16.7,150.6 17.2,151.6 17.5,152.5 C 18.4,155.0 21.5,158.8 23.8,160.3 C 24.2,160.6 25.4,162.2 26.6,163.9 C 28.7,167.1 30.4,168.9 33.2,171.1 C 36.0,173.3 37.3,174.2 37.7,174.2 C 37.9,174.2 38.9,174.6 40.0,175.1 C 41.0,175.6 42.6,176.2 43.5,176.4 C 44.4,176.6 45.8,177.0 46.6,177.3 C 48.0,177.8 48.6,177.8 54.1,177.8 C 60.0,177.8 60.1,177.8 61.6,177.2 C 62.7,176.7 63.8,176.5 65.6,176.3 C 69.3,176.0 69.3,176.0 70.4,177.0 C 71.0,177.5 72.1,178.3 72.9,178.7 C 73.7,179.1 74.8,179.9 75.4,180.5 C 75.9,181.1 76.8,181.9 77.4,182.2 C 78.0,182.5 79.2,183.2 79.9,183.7 C 84.5,186.7 85.9,187.6 87.6,188.2 C 88.6,188.6 89.9,189.2 90.5,189.5 C 92.9,190.7 97.3,192.0 102.8,193.2 C 106.0,193.9 111.8,193.9 115.3,193.2 C 116.7,193.0 118.7,192.6 119.8,192.5 C 120.9,192.3 122.6,191.9 123.6,191.5 C 124.5,191.2 126.3,190.6 127.5,190.3 C 128.6,189.9 130.0,189.3 130.5,189.0 C 130.9,188.6 131.9,188.1 132.7,188.0 C 133.4,187.8 134.3,187.4 134.5,187.1 C 134.8,186.8 135.3,186.2 135.7,185.7 C 136.6,184.7 136.4,184.5 135.0,185.1 C 133.9,185.5 131.2,186.1 129.0,186.3 C 128.3,186.4 127.1,186.8 126.4,187.1 C 125.6,187.4 124.3,187.7 123.2,187.8 C 122.2,187.9 120.1,188.2 118.6,188.5 C 113.6,189.3 110.1,189.4 106.4,188.6 C 104.7,188.3 102.8,188.0 102.2,188.0 C 100.8,188.0 91.7,185.2 90.7,184.5 C 90.4,184.3 88.9,183.5 87.5,182.8 C 86.0,182.1 84.3,181.1 83.6,180.6 C 83.0,180.1 82.3,179.7 82.1,179.7 C 81.9,179.7 80.3,178.5 78.7,176.9 C 72.8,171.6 71.0,171.0 65.0,172.3 C 63.6,172.6 62.6,172.6 58.0,172.3 C 50.5,171.8 49.8,171.7 47.8,171.1 C 46.9,170.8 45.4,170.3 44.6,170.1 C 42.4,169.5 37.7,166.9 38.1,166.5 C 38.4,166.2 42.6,166.8 44.6,167.4 C 47.1,168.3 47.4,168.3 55.7,168.2 C 63.7,168.2 65.3,168.1 66.1,167.3 C 67.2,166.2 65.6,165.7 60.0,165.6 C 53.9,165.4 52.5,165.3 50.0,164.5 C 48.8,164.1 47.3,163.7 46.6,163.6 C 45.2,163.4 39.9,160.9 37.9,159.6 C 32.6,156.0 30.0,150.6 30.7,144.6 C 31.0,141.7 32.1,139.8 35.1,136.8 C 37.1,134.8 39.0,132.3 40.1,130.3 C 40.7,129.1 40.8,123.4 40.2,122.5 C 37.7,119.0 36.4,118.0 33.5,117.0 C 31.1,116.1 31.4,115.4 34.9,113.5 C 36.4,112.8 38.0,111.8 38.6,111.4 C 39.1,110.9 40.5,110.0 41.6,109.2 C 45.0,106.9 46.5,105.8 48.2,104.4 C 49.1,103.6 50.4,102.5 51.2,101.9 C 53.0,100.5 59.4,94.1 60.8,92.3 C 62.7,90.0 63.0,88.3 61.9,86.9 C 61.6,86.6 61.1,85.9 60.9,85.5 C 60.5,84.8 60.4,84.7 59.9,85.0 C 59.2,85.3 58.6,85.0 56.7,83.2 C 55.3,81.8 55.3,81.5 56.7,78.4 C 58.8,73.9 62.4,68.3 65.9,64.1 C 68.0,61.6 75.5,54.1 77.3,52.7 C 78.3,51.9 79.5,50.8 80.1,50.3 C 80.6,49.8 81.5,49.0 82.0,48.7 C 82.4,48.4 83.3,47.7 83.9,47.2 C 84.5,46.6 85.1,46.2 85.2,46.2 C 85.3,46.2 85.8,45.9 86.3,45.5 C 86.8,45.0 88.1,44.1 89.3,43.3 C 90.4,42.6 91.8,41.6 92.5,41.2 C 94.4,39.9 96.9,38.3 100.4,36.3 C 101.1,35.8 102.1,35.2 102.5,34.9 C 102.9,34.5 103.6,34.2 104.2,34.1 C 104.8,34.0 105.4,33.6 105.9,33.2 C 106.3,32.8 107.0,32.2 107.5,32.0 C 108.0,31.8 108.7,31.4 108.9,31.1 C 109.2,30.7 109.8,30.4 110.2,30.3 C 111.5,30.1 112.3,29.5 112.2,28.9 C 112.1,28.3 111.0,28.1 110.3,28.4 M 24.9,125.0 C 25.3,125.4 27.7,129.2 27.7,129.6 C 27.7,129.7 28.3,131.0 29.0,132.3 C 30.2,134.8 30.3,135.2 29.2,135.2 C 27.3,135.2 25.0,133.2 24.5,131.0 C 24.3,130.4 23.9,129.1 23.6,128.3 C 22.4,125.3 23.1,123.6 24.9,125.0 M 16.6,127.1 C 17.1,127.9 17.6,130.9 17.3,131.2 C 17.0,131.6 14.9,127.5 15.1,126.9 C 15.3,126.3 16.1,126.4 16.6,127.1 M 88.5,158.6 C 88.3,158.8 88.3,159.1 88.8,159.6 C 89.1,160.0 89.5,160.8 89.6,161.3 C 89.9,163.3 90.8,163.8 91.6,162.7 C 92.5,161.4 92.1,160.2 90.3,159.1 C 88.8,158.1 88.9,158.1 88.5,158.6 M 77.6,162.3 C 76.6,162.7 75.2,164.4 75.3,164.9 C 75.5,166.0 79.9,166.9 81.2,166.2 C 82.4,165.6 82.9,163.0 81.9,162.4 C 81.2,161.9 78.7,161.8 77.6,162.3"/>
+<path class="ink" id="oso-ear" d="M 198.0,12.0 C 194.9,12.5 188.3,15.3 185.2,17.3 C 179.2,21.3 172.7,28.2 173.6,29.7 C 174.0,30.3 175.3,30.1 176.3,29.4 C 177.6,28.4 182.6,25.3 184.2,24.5 C 184.9,24.2 186.1,23.6 186.7,23.2 C 187.3,22.8 189.2,22.0 190.9,21.5 C 199.8,18.5 206.5,20.1 210.1,26.0 C 211.5,28.3 211.6,28.4 212.2,31.5 C 212.8,34.3 212.8,40.4 212.2,43.7 C 212.1,44.4 211.9,46.5 211.7,48.1 C 211.6,50.1 211.3,51.8 210.8,53.0 C 210.5,54.0 210.1,55.9 210.0,57.1 C 209.6,60.5 208.6,64.9 207.7,67.7 C 207.5,68.5 207.1,70.1 206.9,71.3 C 206.7,72.5 206.3,73.7 206.1,74.1 C 205.9,74.5 205.6,75.8 205.3,77.0 C 205.1,78.1 204.7,79.4 204.5,79.8 C 204.3,80.2 204.0,81.4 203.8,82.4 C 203.6,83.4 203.1,84.9 202.7,85.8 C 201.6,88.1 201.8,91.4 203.0,90.9 C 203.5,90.7 205.8,87.2 206.2,86.1 C 206.4,85.5 206.9,84.4 207.2,83.7 C 207.6,82.9 208.0,82.1 208.0,81.9 C 208.0,81.8 208.4,80.9 208.9,79.9 C 209.7,78.2 210.8,75.5 212.1,71.5 C 212.4,70.5 213.0,68.9 213.4,68.0 C 213.8,67.1 214.3,65.6 214.6,64.6 C 214.8,63.7 215.2,62.5 215.4,62.0 C 215.7,61.5 216.1,60.3 216.3,59.3 C 216.6,58.4 217.0,57.0 217.3,56.2 C 217.6,55.5 218.1,53.9 218.3,52.8 C 218.6,51.7 218.9,50.5 219.0,50.1 C 219.1,49.6 219.5,47.2 219.8,44.7 C 220.2,42.2 220.6,39.2 220.7,38.2 C 221.2,35.2 220.9,27.1 220.2,24.5 C 218.7,18.5 215.5,15.3 208.8,12.9 C 206.0,12.0 205.7,11.9 202.5,11.8 C 200.6,11.8 198.6,11.8 198.0,12.0 M 193.8,25.8 C 192.2,26.1 188.9,27.5 188.1,28.2 C 187.1,29.0 187.8,30.0 190.5,31.9 C 191.9,32.8 192.0,33.2 190.9,34.3 C 190.5,34.9 190.1,35.6 190.0,36.2 C 189.9,37.3 189.9,37.3 193.2,40.0 C 195.7,42.1 196.0,43.0 194.5,43.8 C 193.0,44.6 193.0,45.8 194.4,47.9 C 195.0,48.7 195.1,49.2 195.2,51.3 C 195.4,54.0 195.3,53.7 198.0,59.6 C 199.1,62.0 201.1,59.8 202.1,55.2 C 202.4,53.5 202.5,53.3 203.7,52.2 C 205.8,50.4 206.4,48.0 205.5,45.1 C 204.7,42.2 204.7,41.8 205.2,41.2 C 205.5,40.9 205.9,40.7 206.2,40.7 C 207.1,40.7 208.1,39.6 208.0,38.7 C 208.0,37.5 207.5,36.6 205.7,34.7 C 203.9,32.7 203.9,32.3 205.4,30.8 C 206.9,29.2 206.8,28.7 204.7,27.3 C 203.8,26.7 202.5,26.1 201.8,25.9 C 199.9,25.5 195.8,25.4 193.8,25.8 M 179.6,47.6 C 179.1,47.8 178.0,47.9 176.7,48.0 C 173.0,48.0 169.7,49.4 169.7,51.0 C 169.7,51.9 170.2,52.3 172.4,53.4 C 175.0,54.7 178.5,58.2 179.8,60.7 C 181.2,63.4 181.0,63.7 177.6,63.4 C 175.0,63.1 173.2,64.2 174.2,65.4 C 174.9,66.2 176.9,67.0 178.3,67.0 C 179.3,67.0 180.1,67.1 181.0,67.6 C 182.1,68.1 182.5,68.2 183.6,68.1 C 185.6,68.0 185.9,67.0 184.8,64.6 C 184.5,63.8 184.1,62.7 183.9,62.1 C 183.3,59.6 179.5,55.1 176.1,52.6 C 173.4,50.6 173.9,50.1 178.5,49.8 C 181.4,49.6 182.0,49.2 181.4,48.0 C 181.0,47.2 180.6,47.1 179.6,47.6"/>
+<path class="ink" id="oso-brow" d="M 96.2,78.0 C 95.6,78.1 94.7,78.4 94.2,78.7 C 93.7,78.9 92.9,79.3 92.3,79.5 C 91.8,79.6 90.1,80.4 88.6,81.2 C 85.5,82.9 84.9,83.0 84.1,82.1 C 83.1,81.0 82.2,81.4 82.2,82.8 C 82.2,83.5 84.1,85.4 85.1,85.6 C 85.5,85.7 86.7,85.5 87.8,85.2 C 88.9,84.9 90.6,84.5 91.6,84.3 C 92.5,84.1 93.7,83.7 94.2,83.3 C 95.4,82.5 96.9,82.2 99.7,82.2 C 103.6,82.2 104.6,81.6 103.4,79.7 C 102.2,77.9 99.7,77.3 96.2,78.0"/>
+<path class="ink" id="oso-eye" d="M 93.2,87.7 C 92.8,87.8 92.1,88.2 91.7,88.4 C 91.4,88.7 90.7,89.1 90.2,89.4 C 86.0,91.2 85.4,91.8 85.9,93.5 C 86.3,94.7 88.8,97.3 90.0,97.8 C 92.9,99.0 95.3,97.8 98.9,93.4 C 100.6,91.3 100.6,90.7 99.2,89.4 C 97.4,87.8 95.3,87.2 93.2,87.7"/>
+</g>
+<g id="oso-arm">
+<g id="oso-mate">
+<g class="steam"><path d="M-30 178 q-7 -8 0 -16 q7 -8 0 -16"/><path d="M-12 176 q-7 -8 0 -16 q7 -8 0 -16"/></g>
+<path class="m-line" d="M-14 196 L22 162"/>
+<path class="m-body" d="M-56 200 Q-60 250 -22 256 Q14 250 10 200 Z"/>
+<path class="m-band" d="M-55 222 Q-23 230 9 222"/>
+<ellipse cx="-23" cy="200" rx="33" ry="8" class="m-body"/>
+</g>
+<path class="sil-arm" d="M-14 230 C-18 208 -2 200 16 202 C46 206 84 236 110 300 L30 300 C24 280 2 266 -8 254 C-12 248 -14 240 -14 230 Z"/>
+<path class="ink" d="M14 200 C48 202 88 232 114 300 L104 300 C82 240 48 210 14 206 Z"/>
+<path class="ink" d="M-16 232 C-16 252 4 270 30 300 L22 300 C-2 274 -18 258 -20 238 Z"/>
+<path class="ink" d="M-16 232 C-19 214 -6 200 14 200 L14 205 C-2 206 -12 216 -11 232 Z"/>
+<path class="claw" d="M-15 216 q9 -4 17 1"/>
+<path class="claw" d="M-17 229 q10 -4 19 1"/>
+<path class="claw" d="M-15 242 q9 -3 17 2"/>
+</g>
+</g>
+</svg>
+  </button>
+</div>
+
+<script id="oso-js">
+(function(){
+  var oso=document.getElementById('oso'); if(!oso) return;
+  var all=document.getElementById('oso-all');
+  var bubble=document.getElementById('oso-bubble');
+  var ear=document.getElementById('oso-ear');
+  var reduce=window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* ---- Configuración por defecto (se pisa con lo guardado en el editor) ---- */
+  var CFG={
+    activo:true, lado:'izq', tamano:'mediano', celular:true,
+    zonas:{
+      inicio:   {accion:'saluda',  frase:'¡Hola! Bajá que te muestro los mates.'},
+      productos:{accion:'mate',    frase:'Mmm… huele a yerba recién cebada.'},
+      galeria:  {accion:'mira',    frase:'¡Mirá qué lindos quedaron!'},
+      info:     {accion:'quieto',  frase:'Pedís, pagás y te llega a tu casa.'},
+      contacto: {accion:'asiente', frase:'¿Te cebo uno? Escribinos.'}
+    },
+    tocar:['¡Cebame uno!','Hechos a mano en Mar del Plata.','¿Ya viste los combos?','El algarrobo es mi favorito.']
+  };
+  try{
+    var raw=(window.FALLBACK_CONFIG||{}).oso_config;
+    if(raw){
+      var s=JSON.parse(raw);
+      ['activo','lado','tamano','celular'].forEach(function(k){ if(s[k]!==undefined) CFG[k]=s[k]; });
+      if(s.zonas) Object.keys(CFG.zonas).forEach(function(z){ if(s.zonas[z]) for(var k in s.zonas[z]) CFG.zonas[z][k]=s.zonas[z][k]; });
+      if(Array.isArray(s.tocar)) CFG.tocar=s.tocar.filter(Boolean);
+    }
+  }catch(e){}
+  if(CFG.activo===false){ oso.remove(); return; }
+  try{ if(sessionStorage.getItem('oso-oculto')==='1'){ oso.remove(); return; } }catch(e){}
+
+  var SIZES={chico:[115,88],mediano:[150,110],grande:[190,135]};
+  var sz=SIZES[CFG.tamano]||SIZES.mediano;
+  oso.style.setProperty('--oso-w',sz[0]+'px'); oso.style.setProperty('--oso-wm',sz[1]+'px');
+  if(CFG.lado!=='der') oso.classList.add('izq');
+  if(CFG.celular===false) oso.classList.add('no-cel');
+  oso.hidden=false;
+
+  /* ---- Qué parte de la página es cada sección ---- */
+  var PARTES={
+    inicio:['hero'],
+    productos:['bestsellers','combos-section','bombillas-section','recent-section','catalogo'],
+    galeria:['galeria','instagram-section','testimonios'],
+    info:['cuidado','como-comprar','curado','faq','nosotros'],
+    contacto:['contacto','newsletter-section']
+  };
+
+  var bubbleTimer=null;
+  function say(text,ms){
+    if(!text) return;
+    bubble.textContent=text; bubble.classList.add('show');
+    clearTimeout(bubbleTimer); bubbleTimer=setTimeout(function(){ bubble.classList.remove('show'); }, ms||3400);
+  }
+  var zona='', mode='';
+  function setZona(z){
+    if(!z||z===zona) return;
+    zona=z; var zc=CFG.zonas[z]||{};
+    mode=zc.accion||'quieto';
+    oso.setAttribute('data-mode',''); void oso.offsetWidth; oso.setAttribute('data-mode',mode);
+    if(oso.classList.contains('in')){ if(zc.frase) say(zc.frase); else bubble.classList.remove('show'); }
+  }
+
+  // Entrada: se asoma desde abajo
+  setTimeout(function(){
+    oso.classList.add('in');
+    if(!zona) setZona('inicio');
+    setTimeout(function(){ say((CFG.zonas[zona]||{}).frase); },800);
+  },900);
+
+  // Cambia según la sección que está en el medio de la pantalla
+  if('IntersectionObserver' in window){
+    var io=new IntersectionObserver(function(entries){
+      entries.forEach(function(en){ if(en.isIntersecting) setZona(en.target.getAttribute('data-oso-zona')); });
+    },{rootMargin:'-45% 0px -45% 0px'});
+    Object.keys(PARTES).forEach(function(z){
+      PARTES[z].forEach(function(id){ var el=document.getElementById(id); if(el){ el.setAttribute('data-oso-zona',z); io.observe(el); } });
+    });
+  }
+
+  // Tocarlo: salta, mueve la oreja y dice algo
+  var n=0;
+  document.getElementById('oso-btn').addEventListener('click',function(){
+    oso.classList.remove('hop'); void oso.offsetWidth; oso.classList.add('hop');
+    if(CFG.tocar.length) say(CFG.tocar[n++ % CFG.tocar.length],2800);
+  });
+  oso.addEventListener('animationend',function(e){ if(e.animationName==='oso-hop') oso.classList.remove('hop'); });
+  document.getElementById('oso-close').addEventListener('click',function(){
+    oso.classList.add('gone');
+    try{ sessionStorage.setItem('oso-oculto','1'); }catch(e){}
+    setTimeout(function(){ oso.remove(); },900);
+  });
+
+  if(reduce) return;
+
+  // Mueve la oreja solo, cada tanto
+  setInterval(function(){
+    if(mode==='saluda'||mode==='asiente'||oso.classList.contains('hop')||document.hidden) return;
+    ear.style.animation='none'; void ear.getBBox(); ear.style.animation='oso-ear 1s ease-in-out 1';
+    setTimeout(function(){ ear.style.animation=''; },1100);
+  },7000);
+
+  // Sigue el mouse / el dedo con la cabeza, y se mueve con el scroll
+  var mouse=null;
+  addEventListener('pointermove',function(e){ mouse={x:e.clientX,y:e.clientY}; },{passive:true});
+  addEventListener('pointerdown',function(e){ mouse={x:e.clientX,y:e.clientY}; },{passive:true});
+  var lastY=scrollY, vel=0, phase=0, lastScroll=0, tilt=0;
+  addEventListener('scroll',function(){ lastScroll=performance.now(); },{passive:true});
+  function clamp(v,a,b){ return Math.max(a,Math.min(b,v)); }
+  function frame(t){
+    var y=scrollY, dy=y-lastY; lastY=y;
+    vel=vel*.82+dy*.18;
+    var moving=t-lastScroll<160;
+    if(moving) phase+=Math.min(Math.abs(dy),40)*.05;
+    var target=0;
+    if(moving){ target=clamp(-vel*.35,-9,9); }
+    else if(mouse){
+      var r=oso.getBoundingClientRect();
+      target=clamp((r.top+r.height*.45-mouse.y)/(mode==='mira'?25:45),-7,7);
+    }
+    tilt+=(target-tilt)*.12;
+    var bob=moving ? -Math.abs(Math.sin(phase))*6 : 0;
+    all.style.transform='translateY('+bob.toFixed(2)+'px) rotate('+tilt.toFixed(2)+'deg)';
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+})();
+</script>
+<!-- ======================== FIN DEL OSO ======================== -->
 
 </body>
 </html>
