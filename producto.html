@@ -518,7 +518,7 @@ function gallerySet(idx) {
   var imgs = window._galleryImgs || [];
   window._galleryIdx = idx;
   var mainImg = document.getElementById('gallery-main-img');
-  if (mainImg) mainImg.src = getImg(imgs[idx]);
+  if (mainImg) { mainImg.src = getImg(imgs[idx]); mainImg.style.objectPosition = getImgPos(imgs[idx]); }
   document.querySelectorAll('.gallery-thumb').forEach(function(t,i) {
     t.classList.toggle('active', i === idx);
   });
@@ -704,7 +704,7 @@ function renderProduct(p, related){
           <img src="${getImg(imgs[0])}" alt="${p.nombre}" class="product-img-main" id="gallery-main-img" onclick="lightboxOpen(this.src)" style="width:100%;height:100%;object-fit:cover;display:block;object-position:${getImgPos(imgs[0])}"/>
           ${imgs.length>1?'<button class="gallery-nav gallery-nav-prev" onclick="galleryPrev()">&#x2039;</button><button class="gallery-nav gallery-nav-next" onclick="galleryNext()">&#x203a;</button>':''}
         </div>
-        ${imgs.length>1?'<div class="gallery-thumbs" id="gallery-thumbs">' + imgs.map(function(img,i){return '<img src="'+getImg(img)+'" loading="lazy" class="gallery-thumb'+(i===0?' active':'')+'" data-idx="'+i+'" onclick="gallerySet('+i+')" alt="foto '+i+'"/>';}).join('') + '</div>':''}
+        ${imgs.length>1?'<div class="gallery-thumbs" id="gallery-thumbs">' + imgs.map(function(img,i){return '<img src="'+getImg(img)+'" style="object-position:'+getImgPos(img)+'" loading="lazy" class="gallery-thumb'+(i===0?' active':'')+'" data-idx="'+i+'" onclick="gallerySet('+i+')" alt="foto '+i+'"/>';}).join('') + '</div>':''}
       </div>
       <div class="product-info-section">
         <div>${stockBadge}${shipBadge}${p.badge?`<div class="product-badge" style="display:inline-block">${p.badge}</div>`:''}</div>
