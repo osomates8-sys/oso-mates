@@ -50,6 +50,21 @@
   .filename-row button{white-space:nowrap}
   .thumb.broken{display:flex;align-items:center;justify-content:center;font-size:.55rem;color:#8a7d6b;text-align:center;padding:4px;word-break:break-all}
   .thumb.broken img{display:none}
+  .thumb{cursor:pointer}
+  .thumb .crop-ic{position:absolute;top:2px;left:2px;width:20px;height:20px;line-height:20px;text-align:center;border-radius:50%;background:rgba(255,255,255,.85);color:var(--warm);font-size:12px;pointer-events:none}
+  .modal{position:fixed;inset:0;background:rgba(20,16,12,.6);display:flex;align-items:flex-start;justify-content:center;z-index:50;overflow-y:auto;padding:1rem}
+  .modal[hidden]{display:none}
+  .modal-box{background:#fff;border-radius:12px;padding:1.1rem 1.2rem;max-width:720px;width:100%;margin:auto}
+  .crop-src{position:relative;display:block;width:fit-content;max-width:100%;margin:.6rem auto;touch-action:none;cursor:crosshair;user-select:none;-webkit-user-select:none}
+  .crop-src img{display:block;max-width:100%;max-height:45vh;border-radius:6px;pointer-events:none}
+  .crop-dot{position:absolute;width:26px;height:26px;margin:-13px 0 0 -13px;border-radius:50%;border:3px solid #fff;box-shadow:0 0 0 2px var(--warm),0 2px 8px rgba(0,0,0,.4);pointer-events:none}
+  .crop-quick{display:flex;gap:.4rem;flex-wrap:wrap;justify-content:center;margin-bottom:.4rem}
+  .crop-previews{display:grid;grid-template-columns:repeat(4,1fr);gap:.6rem;align-items:end}
+  @media(max-width:560px){.crop-previews{grid-template-columns:1fr 1fr}}
+  .crop-previews figure{margin:0}
+  .crop-previews .pv{overflow:hidden;border-radius:6px;background:#f0ece3;border:1px solid var(--line)}
+  .crop-previews .pv img{width:100%;height:100%;object-fit:cover;display:block}
+  .crop-previews figcaption{font-size:.7rem;color:#8a7d6b;text-align:center;margin-top:.25rem}
   .gh-card{border-color:var(--warm)}
   .gh-card input[type=password]{width:100%;font:inherit;font-size:.92rem;padding:.55rem .7rem;border:1px solid var(--line);border-radius:7px;background:#fdfcf9}
   .gh-actions{display:flex;gap:.6rem;flex-wrap:wrap;margin-top:.7rem}
@@ -150,6 +165,32 @@
   </details>
 </div>
 
+<div class="modal" id="crop-modal" hidden>
+  <div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="crop-title">
+    <strong id="crop-title">Encuadrar foto</strong>
+    <p class="hint">Tocá o arrastrá sobre la foto el punto que tiene que quedar siempre a la vista (por ejemplo, el mate).</p>
+    <div class="crop-src" id="crop-src"><img id="crop-img" alt=""/><div class="crop-dot" id="crop-dot"></div></div>
+    <div class="crop-quick">
+      <button type="button" class="btn-ghost" data-q="50,0">Arriba</button>
+      <button type="button" class="btn-ghost" data-q="50,100">Abajo</button>
+      <button type="button" class="btn-ghost" data-q="0,50">Izquierda</button>
+      <button type="button" class="btn-ghost" data-q="100,50">Derecha</button>
+      <button type="button" class="btn-ghost" data-q="50,50">Centro</button>
+    </div>
+    <label>Así se va a ver en la tienda</label>
+    <div class="crop-previews">
+      <figure><div class="pv" style="aspect-ratio:10/7"><img alt=""/></div><figcaption>Tarjeta del producto</figcaption></figure>
+      <figure><div class="pv" style="aspect-ratio:2/1"><img alt=""/></div><figcaption>Producto en celu</figcaption></figure>
+      <figure><div class="pv" style="aspect-ratio:7/8"><img alt=""/></div><figcaption>Producto en compu</figcaption></figure>
+      <figure><div class="pv" style="aspect-ratio:1/1"><img alt=""/></div><figcaption>Galería y carrito</figcaption></figure>
+    </div>
+    <div class="gh-actions" style="justify-content:flex-end">
+      <button type="button" class="btn-ghost" id="crop-cancel">Cancelar</button>
+      <button type="button" class="btn-primary" id="crop-ok">Listo</button>
+    </div>
+  </div>
+</div>
+
 <div class="bar">
   <button class="btn-primary" id="save">Guardar cambios</button>
   <div class="status" id="save-status" role="status" aria-live="polite"></div>
@@ -214,6 +255,20 @@ function imgSrc(v){
   if(preview[f]) return preview[f];
   return IMG_MAP[f]||f;
 }
+function splitVal(v){
+  const s=String(v||''); const i=s.indexOf('|');
+  return i===-1 ? {file:s,pos:''} : {file:s.slice(0,i),pos:s.slice(i+1)};
+}
+function parsePos(pos){
+  let x=null,y=null;
+  String(pos||'').trim().split(/\s+/).filter(Boolean).forEach(t=>{
+    t=t.toLowerCase();
+    if(t==='top') y=0; else if(t==='bottom') y=100;
+    else if(t==='left') x=0; else if(t==='right') x=100;
+    else if(/^-?[\d.]+%$/.test(t)){ const n=parseFloat(t); if(x===null) x=n; else y=n; }
+  });
+  return {x:x===null?50:x, y:y===null?50:y};
+}
 function slug(s){
   return (s||'foto').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase()
     .replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'').slice(0,30) || 'foto';
@@ -273,7 +328,8 @@ async function loadFromGitHub(){
   if(!Array.isArray(w.FALLBACK_PRODUCTOS)) throw new Error('fallback-data.js no tiene la lista de productos.');
   return {data:w, sha:meta.sha};
 }
-async function uploadImage(dataUrl, nombre){
+async function uploadImage(value, nombre){
+  const sv=splitVal(value); const dataUrl=sv.file;
   const m=/^data:image\/([a-z0-9+.-]+);base64,(.*)$/i.exec(dataUrl);
   if(!m) throw new Error('Una de las fotos no tiene un formato válido.');
   const ext = m[1]==='jpeg' ? 'jpg' : m[1].replace('+xml','');
@@ -281,7 +337,7 @@ async function uploadImage(dataUrl, nombre){
   const r=await gh(name,{method:'PUT', body:{message:'Foto nueva: '+name, content:m[2], branch:BRANCH}});
   if(!r.ok) throw new Error(await ghErr(r));
   preview[name]=dataUrl;
-  return name;
+  return name+(sv.pos?'|'+sv.pos:'');
 }
 
 /* ===== Fotos ===== */
@@ -291,9 +347,15 @@ function imageManager(getList, setList, opts){
   function render(){
     box.innerHTML='';
     getList().forEach(function(v,i){
-      const t=el('div',{class:'thumb'+(i===0&&opts.markMain?' main':''), title:isData(v)?'Foto nueva (se sube al guardar)':String(v)});
+      const t=el('div',{class:'thumb'+(i===0&&opts.markMain?' main':''), title:(isData(v)?'Foto nueva (se sube al guardar)':splitVal(v).file)+' — tocá para encuadrar'});
       const im=el('img',{src:imgSrc(v),alt:''});
-      im.onerror=function(){ t.classList.add('broken'); t.insertBefore(document.createTextNode(isData(v)?'foto':String(v).split('|')[0]), t.firstChild); };
+      const pp=parsePos(splitVal(v).pos); im.style.objectPosition=pp.x+'% '+pp.y+'%';
+      t.appendChild(el('span',{class:'crop-ic','aria-hidden':'true'},['✥']));
+      t.onclick=function(e){
+        if(e.target.closest('button')) return;
+        openCrop(getList()[i], function(nv){ const l=getList().slice(); l[i]=nv; setList(l); markDirty(); render(); });
+      };
+      im.onerror=function(){ t.classList.add('broken'); t.insertBefore(document.createTextNode(isData(v)?'foto':splitVal(v).file), t.firstChild); };
       t.appendChild(im);
       const x=el('button',{class:'x',title:'Quitar',type:'button'},['×']);
       x.onclick=function(){ const l=getList().slice(); l.splice(i,1); setList(l); markDirty(); render(); };
@@ -384,6 +446,7 @@ function renderProductos(){
     const r3=el('div',{class:'row'}); r3.append(f_cat.wrap,f_badge.wrap); card.appendChild(r3);
 
     card.appendChild(el('label',{},['Fotos (la primera es la principal)']));
+    card.appendChild(el('p',{class:'hint'},['Tocá una foto para encuadrarla. ★ la hace principal, × la quita.']));
     card.appendChild(imageManager(
       function(){return productos[idx].imagenes;},
       function(l){ productos[idx].imagenes=l; productos[idx].imagen=l[0]||''; },
@@ -622,6 +685,42 @@ document.getElementById('copy').onclick=async()=>{
   catch(e){ ta.select(); document.execCommand('copy'); }
   const msg=document.getElementById('msg');
   msg.className='msg ok'; msg.textContent='Copiado. Abrí el link a GitHub y pegá.';
+};
+
+/* ===== Encuadre ===== */
+const crop={x:50,y:50,file:'',done:null};
+const cropModal=document.getElementById('crop-modal'), cropSrc=document.getElementById('crop-src');
+function cropUpdate(){
+  const d=document.getElementById('crop-dot'); d.style.left=crop.x+'%'; d.style.top=crop.y+'%';
+  cropModal.querySelectorAll('.pv img').forEach(im=>{ im.style.objectPosition=crop.x+'% '+crop.y+'%'; });
+}
+function openCrop(value, done){
+  const sv=splitVal(value); const p=parsePos(sv.pos);
+  crop.x=p.x; crop.y=p.y; crop.file=sv.file; crop.done=done;
+  const src=imgSrc(sv.file);
+  document.getElementById('crop-img').src=src;
+  cropModal.querySelectorAll('.pv img').forEach(im=>{ im.src=src; });
+  cropUpdate(); cropModal.hidden=false; document.body.style.overflow='hidden';
+}
+function closeCrop(){ cropModal.hidden=true; document.body.style.overflow=''; crop.done=null; }
+function cropFromEvent(e){
+  const r=document.getElementById('crop-img').getBoundingClientRect();
+  if(!r.width||!r.height) return;
+  crop.x=Math.round(Math.min(100,Math.max(0,(e.clientX-r.left)/r.width*100)));
+  crop.y=Math.round(Math.min(100,Math.max(0,(e.clientY-r.top)/r.height*100)));
+  cropUpdate();
+}
+let cropDrag=false;
+cropSrc.addEventListener('pointerdown',e=>{ cropDrag=true; try{cropSrc.setPointerCapture(e.pointerId);}catch(_){} cropFromEvent(e); e.preventDefault(); });
+cropSrc.addEventListener('pointermove',e=>{ if(cropDrag) cropFromEvent(e); });
+['pointerup','pointercancel'].forEach(ev=>cropSrc.addEventListener(ev,()=>{ cropDrag=false; }));
+cropModal.querySelectorAll('[data-q]').forEach(b=>b.onclick=()=>{ const q=b.dataset.q.split(','); crop.x=+q[0]; crop.y=+q[1]; cropUpdate(); });
+document.getElementById('crop-cancel').onclick=closeCrop;
+cropModal.addEventListener('click',e=>{ if(e.target===cropModal) closeCrop(); });
+document.addEventListener('keydown',e=>{ if(e.key==='Escape' && !cropModal.hidden) closeCrop(); });
+document.getElementById('crop-ok').onclick=()=>{
+  const nv = crop.file + ((crop.x===50&&crop.y===50) ? '' : '|'+crop.x+'% '+crop.y+'%');
+  const done=crop.done; closeCrop(); if(done) done(nv);
 };
 
 document.getElementById('add-prod').onclick=()=>{
