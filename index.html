@@ -1974,7 +1974,7 @@ async function loadGallery(){
   if(galImgs.length){
     grid.innerHTML=galImgs.slice(0,8).map(name=>`
       <div class="gallery-item">
-        <img src="${getImg(name)}" alt="Oso Mates" loading="lazy"/>
+        <img src="${getImg(name)}" style="object-position:${getImgPos(name)}" alt="Oso Mates" loading="lazy"/>
         <div class="gallery-item-overlay"><span class="gallery-item-name">Oso Mates</span></div>
       </div>
     `).join('');
@@ -1985,7 +1985,7 @@ async function loadGallery(){
   if(!items.length){document.getElementById('galeria').style.display='none';return;}
   grid.innerHTML=items.map(p=>`
     <div class="gallery-item" onclick="viewProduct('${p.id}')">
-      <img src="${getImg(p.imagen)}" alt="${p.nombre}" loading="lazy"/>
+      <img src="${getImg(p.imagen)}" style="object-position:${getImgPos(p.imagen)}" alt="${p.nombre}" loading="lazy"/>
       <div class="gallery-item-overlay"><span class="gallery-item-name">${p.nombre}</span></div>
     </div>
   `).join('');
@@ -1999,7 +1999,7 @@ async function loadInstagramGrid(){
     if(data&&data[0]&&data[0].valor){galImgs=JSON.parse(data[0].valor)||[];}
   }catch(e){}
   if(galImgs.length){
-    grid.innerHTML=galImgs.slice(0,6).map(name=>`<img src="${getImg(name)}" alt="Oso Mates" loading="lazy"/>`).join('');
+    grid.innerHTML=galImgs.slice(0,6).map(name=>`<img src="${getImg(name)}" style="object-position:${getImgPos(name)}" alt="Oso Mates" loading="lazy"/>`).join('');
     return;
   }
   if(!allProds.length)return;
