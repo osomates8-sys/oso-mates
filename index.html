@@ -1613,8 +1613,8 @@ function applyCoupon(){
   }
   buildCheckoutTotal();
 }
-function cartTotal(){return cart.reduce((s,i)=>s+i.precio*i.qty,0);}
-function cartTransferTotal(){return cart.reduce((s,i)=>s+(getPrecioTransf(i))*i.qty,0);}
+function cartTotal(){return cart.reduce((s,i)=>s+itemUnitPrice(i,false)*i.qty,0);}
+function cartTransferTotal(){return cart.reduce((s,i)=>s+itemUnitPrice(i,true)*i.qty,0);}
 
 const DEFAULT_SHIPPING_ZONES=[
   {label:'CABA y GBA',cost:4500,days:'2-3 días hábiles'},
@@ -1651,7 +1651,7 @@ function updateCartShipEstimate(){
 }
 
 function lineKey(item){return item.id;}
-function itemUnitPrice(item,isTransfer){return isTransfer?getPrecioTransf(item):(item.precio||0);}
+function itemUnitPrice(item,isTransfer){return (isTransfer?getPrecioTransf(item):(item.precio||0))+(item.grabado?(item.grabadoPrecio||0):0);}
 function escapeHtml(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
 function updateCartUI(){saveCart();
   const count=cart.reduce((s,i)=>s+i.qty,0);
@@ -1723,8 +1723,9 @@ async function confirmOrder(){
     '<div class="confirm-step"><span class="confirm-step-num">3</span><span>Despachamos en 48hs h\u00e1biles</span></div>';
   document.getElementById('confirm-title').textContent=confirmTitle;
   document.getElementById('confirm-text').textContent=confirmText;
-  const waBtn='<a class="om-wa-btn" target="_blank" rel="noopener" href="'+'https://wa.me/542233061168?text='+encodeURIComponent('¡Hola! Hice un pedido en la web.\n'+'Nombre: '+name+'\nEmail: '+email+'\nPedido: '+detalle+'\nTotal: '+fmt(total)+'\nTe mando el comprobante de la transferencia.')+'"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2a8.2 8.2 0 0 1-4.2-1.1l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1l-.8 1c-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.2-.4.7-1.3.1-.2 0-.3 0-.4l-.8-1.9c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.8 12 12 0 0 0 4.6 4c1.7.7 2.4.8 3.2.7.5-.1 1.5-.6 1.8-1.2.2-.6.2-1.1.1-1.2l-.4-.2z"/></svg>Enviar pedido y comprobante por WhatsApp</a>';
-  document.getElementById('confirm-steps').innerHTML=cbuBox+steps+waBtn;
+  const waBtn='<a class="om-wa-btn" target="_blank" rel="noopener" href="'+'https://wa.me/542233061168?text='+encodeURIComponent('¡Hola! Hice un pedido en la web.\n'+'Nombre: '+name+'\nEmail: '+email+'\nPedido: '+detalle+'\nTotal: '+fmt(total)+'\nTe mando el comprobante de la transferencia'+(cart.some(function(i){return i.grabado;})?' y el diseño del grabado.':'.'))+'"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2a8.2 8.2 0 0 1-4.2-1.1l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1l-.8 1c-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.2-.4.7-1.3.1-.2 0-.3 0-.4l-.8-1.9c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.8 12 12 0 0 0 4.6 4c1.7.7 2.4.8 3.2.7.5-.1 1.5-.6 1.8-1.2.2-.6.2-1.1.1-1.2l-.4-.2z"/></svg>Enviar pedido y comprobante por WhatsApp</a>';
+  const grabStep=cart.some(function(i){return i.grabado;})?'<div class="confirm-step"><span class="confirm-step-num">✎</span><span>Por WhatsApp coordinamos el dise\u00f1o del grabado</span></div>':'';
+  document.getElementById('confirm-steps').innerHTML=cbuBox+steps+grabStep+waBtn;
   document.getElementById('confirm-page').classList.add('show');
   trackPurchase(total);
   const _dateStr=new Date().toLocaleDateString('es-AR',{day:'2-digit',month:'2-digit',year:'numeric'});
@@ -2095,7 +2096,8 @@ document.addEventListener('mouseleave',function(e){
      Para sacarlo del todo: borrar desde acá hasta "FIN DEL OSO".
      ============================================================ -->
 <style id="oso-css">
-.oso{position:fixed;bottom:0;right:96px;z-index:900;width:var(--oso-w,150px);color:var(--black);
+/* El oso es siempre blanco con líneas negras, como el logo (también en modo noche). */
+.oso{position:fixed;bottom:0;right:96px;z-index:900;width:var(--oso-w,150px);color:#1a1714;
   padding-bottom:env(safe-area-inset-bottom,0px);
   transform:translateY(105%);transition:transform .9s cubic-bezier(.34,1.4,.64,1);pointer-events:none}
 .oso.izq{right:auto;left:10px}
@@ -2106,8 +2108,8 @@ document.addEventListener('mouseleave',function(e){
 .oso-btn:focus-visible{outline:2px solid var(--warm);outline-offset:4px;border-radius:12px}
 .oso svg{display:block;width:100%;height:auto;overflow:visible}
 .oso.izq svg{transform:scaleX(-1)}
-.oso .sil{fill:var(--white);filter:drop-shadow(0 -4px 14px rgba(0,0,0,.10))}
-.oso .sil-arm{fill:var(--white)}
+.oso .sil{fill:#fbfaf7;filter:drop-shadow(0 -4px 14px rgba(0,0,0,.10))}
+.oso .sil-arm{fill:#fbfaf7}
 .oso .ink{fill:currentColor}
 .oso .claw{fill:none;stroke:currentColor;stroke-width:3.5;stroke-linecap:round}
 #oso-all{transform-box:view-box;transform-origin:175px 270px}
@@ -2117,7 +2119,7 @@ document.addEventListener('mouseleave',function(e){
 #oso-brow{transition:transform .35s ease}
 #oso-arm{transform-box:view-box;transform-origin:70px 300px;transform:translateY(26px) rotate(5deg);transition:transform .7s cubic-bezier(.34,1.4,.64,1)}
 #oso-mate .m-line{fill:none;stroke:#9aa0a6;stroke-width:5;stroke-linecap:round}
-#oso-mate .m-body{fill:var(--white);stroke:currentColor;stroke-width:5;stroke-linejoin:round}
+#oso-mate .m-body{fill:#fff;stroke:currentColor;stroke-width:5;stroke-linejoin:round}
 #oso-mate .m-band{fill:none;stroke:var(--warm);stroke-width:6}
 #oso-mate .steam{opacity:0;transition:opacity .5s}
 #oso-mate .steam path{fill:none;stroke:var(--gray);stroke-width:3.5;stroke-linecap:round;opacity:0;animation:oso-steam 2.6s ease-in-out infinite}

@@ -145,9 +145,8 @@
     <label class="chk" style="margin-top:0"><input type="checkbox" id="grab-activo"/> Ofrecer grabado en la página de cada producto</label>
     <div class="row">
       <div><label for="grab-precio">Precio del grabado ($)</label><input type="number" id="grab-precio" min="0" step="100"/></div>
-      <div><label for="grab-max">Máximo de letras</label><input type="number" id="grab-max" min="1" max="60"/></div>
     </div>
-    <p class="hint">El cliente escribe el texto y ve una vista previa sobre la foto del mate. El texto grabado te llega en el detalle del pedido.</p>
+    <p class="hint">El cliente solo marca que quiere grabado y se le suma el precio. En el pedido figura "Grabado: diseño a coordinar por WhatsApp", y el diseño lo arreglás con el cliente por WhatsApp después del pago.</p>
   </div>
 
   <h2>El oso</h2>
@@ -665,7 +664,6 @@ function loadGrabadoForm(){
   try{ if(config.grabado) Object.assign(g,JSON.parse(config.grabado)); }catch(e){}
   document.getElementById('grab-activo').checked=!!g.active;
   document.getElementById('grab-precio').value=g.price||0;
-  document.getElementById('grab-max').value=g.maxChars||20;
 }
 
 function loadConfigForm(){
@@ -707,7 +705,7 @@ function collectConfig(){
   c.oso_config = collectOso();
   const gActivo=document.getElementById('grab-activo').checked;
   const gPrecio=parseInt(document.getElementById('grab-precio').value,10)||0;
-  c.grabado = JSON.stringify({active:gActivo, price:gPrecio, maxChars:Math.min(60,Math.max(1,parseInt(document.getElementById('grab-max').value,10)||20))});
+  c.grabado = JSON.stringify({active:gActivo, price:gPrecio, maxChars:(function(){ try{ return JSON.parse(config.grabado||'{}').maxChars||20; }catch(e){ return 20; } })()});
   Object.keys(resenasDraft).forEach(id=>{
     const r=parseResenas(id,resenasDraft[id]);
     if(r.errs.length){ const pr=productos.find(x=>x.id===id); resenasErr.push((pr&&pr.nombre||'un producto')+' (renglón '+r.errs.join(', ')+')'); return; }

@@ -280,7 +280,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:500;display:flex;justify-content
 .gallery-nav-prev{left:1rem;}
 .gallery-nav-next{right:1rem;}
 </style>
-<style id="om-extra-css">.om-wa-btn{display:flex;align-items:center;justify-content:center;gap:.6rem;width:100%;margin:1.2rem 0 0;padding:1rem 1.2rem;background:#25D366;color:#fff!important;text-decoration:none;font-family:'Montserrat',sans-serif;font-size:.66rem;letter-spacing:.14em;text-transform:uppercase;font-weight:600;border:none;transition:background .2s}.om-wa-btn:hover{background:#1ebe5b}.om-wa-btn svg{width:18px;height:18px;fill:#fff;flex-shrink:0}.om-mail-warn{font-size:.72rem;color:#b3541e;margin-top:.8rem;line-height:1.6}.engrave-preview{position:relative;margin-top:1rem;height:220px;overflow:hidden;background:var(--light)}.engrave-preview img{width:100%;height:100%;object-fit:cover;display:block;filter:saturate(.9)}.engrave-preview-text{position:absolute;left:8%;right:8%;top:58%;transform:translateY(-50%);text-align:center;font-family:'Cormorant Garamond',Georgia,serif;font-style:italic;font-weight:400;line-height:1.1;color:rgba(58,33,14,.85);mix-blend-mode:multiply;text-shadow:0 1px 0 rgba(255,255,255,.25),0 -1px 1px rgba(0,0,0,.35);letter-spacing:.02em;word-break:break-word;font-size:32px;transition:font-size .15s}.engrave-preview-text.empty{opacity:.45}.engrave-preview.on-dark .engrave-preview-text{color:rgba(236,214,178,.92);mix-blend-mode:normal;text-shadow:0 -1px 0 rgba(0,0,0,.7),0 1px 1px rgba(255,235,200,.25)}.engrave-note{font-size:.62rem;color:var(--gray);margin-top:.5rem;line-height:1.5}@media(max-width:600px){.engrave-preview{height:180px}}</style>
+<style id="om-extra-css">.om-wa-btn{display:flex;align-items:center;justify-content:center;gap:.6rem;width:100%;margin:1.2rem 0 0;padding:1rem 1.2rem;background:#25D366;color:#fff!important;text-decoration:none;font-family:'Montserrat',sans-serif;font-size:.66rem;letter-spacing:.14em;text-transform:uppercase;font-weight:600;border:none;transition:background .2s}.om-wa-btn:hover{background:#1ebe5b}.om-wa-btn svg{width:18px;height:18px;fill:#fff;flex-shrink:0}.om-mail-warn{font-size:.72rem;color:#b3541e;margin-top:.8rem;line-height:1.6}.engrave-note{font-size:.72rem;color:var(--gray);line-height:1.6;margin:0}</style>
 </head>
 <body>
 <nav>
@@ -741,13 +741,7 @@ function renderProduct(p, related){
           <div class="engrave-title">${t('engrave_title')}</div>
           <label class="engrave-toggle"><input type="checkbox" id="engrave-check" onchange="toggleEngraveInput()"/> ${t('engrave_label')} (+${fmt(_grabado.price)})</label>
           <div class="engrave-input-wrap" id="engrave-input-wrap">
-            <input type="text" class="engrave-input" id="engrave-text" maxlength="${_grabado.maxChars}" placeholder="${t('engrave_ph')}" oninput="updateEngraveCount()"/>
-            <div class="engrave-count" id="engrave-count">0 / ${_grabado.maxChars}</div>
-            <div class="engrave-preview" id="engrave-preview" aria-hidden="true">
-              <img src="${getImg(imgs[0])}" style="object-position:${getImgPos(imgs[0])}" alt="" onload="engravePreviewTone(this)"/>
-              <span class="engrave-preview-text" id="engrave-preview-text">Tu grabado</span>
-            </div>
-            <div class="engrave-note">Vista previa aproximada. El grabado final se hace a mano y puede variar según la pieza.</div>
+            <p class="engrave-note">Después de confirmar el pago, nos mandás por WhatsApp el nombre, la fecha o el diseño que querés grabar y lo coordinamos con vos.</p>
           </div>
         </div>`:''}
         <ul class="product-features">
@@ -871,36 +865,13 @@ function toggleEngraveInput(){
   document.getElementById('engrave-input-wrap').classList.toggle('show',checked);
 }
 function updateEngraveCount(){
-  const el=document.getElementById('engrave-text');
+  const el=document.getElementById('engrave-text'); if(!el) return;
   document.getElementById('engrave-count').textContent=el.value.length+' / '+_grabado.maxChars;
-  const pv=document.getElementById('engrave-preview-text');
-  if(pv){
-    const txt=el.value.trim();
-    pv.textContent=txt||'Tu grabado';
-    pv.classList.toggle('empty',!txt);
-    const n=Math.max(txt.length,6);
-    pv.style.fontSize=Math.max(17,Math.min(42,560/n))+'px';
-  }
-}
-/* Mira si la foto es oscura o clara donde va el texto, para que el grabado se lea en los dos casos */
-function engravePreviewTone(img){
-  try{
-    const c=document.createElement('canvas'); c.width=40; c.height=40;
-    const x=c.getContext('2d');
-    const w=img.naturalWidth, h=img.naturalHeight;
-    x.drawImage(img, w*.3, h*.45, w*.4, h*.25, 0, 0, 40, 40);
-    const d=x.getImageData(0,0,40,40).data; let sum=0;
-    for(let i=0;i<d.length;i+=4) sum+=0.2126*d[i]+0.7152*d[i+1]+0.0722*d[i+2];
-    const lum=sum/(d.length/4)/255;
-    const box=document.getElementById('engrave-preview');
-    if(box) box.classList.toggle('on-dark', lum<0.42);
-  }catch(e){}
 }
 function getEngraveData(){
   const check=document.getElementById('engrave-check');
   if(check&&check.checked){
-    const text=(document.getElementById('engrave-text').value||'').trim();
-    if(text)return {grabado:text,grabadoPrecio:_grabado.price};
+    return {grabado:'diseño a coordinar por WhatsApp',grabadoPrecio:_grabado.price};
   }
   return {grabado:'',grabadoPrecio:0};
 }
@@ -1057,14 +1028,14 @@ async function confirmOrder(){
     await emailjs.send('service_s6si3n4','template_ulqz3nj',{...emailParams,email:'osomates8@gmail.com',cliente_nombre:'NUEVO PEDIDO — '+name+' ('+email+')'});
   }catch(e){mailOk=false;console.error(e);}
   closeCheckout();
-  document.getElementById('success-text').textContent=(mailOk?'Te mandamos los datos a '+email+'. ':'No pudimos mandarte el email. ')+'Para transferir: Banco Francés (BBVA) · CBU 0170090940000048482721 · Total '+fmt(total)+'. Después mandanos el comprobante por WhatsApp.';
+  document.getElementById('success-text').textContent=(mailOk?'Te mandamos los datos a '+email+'. ':'No pudimos mandarte el email. ')+'Para transferir: Banco Francés (BBVA) · CBU 0170090940000048482721 · Total '+fmt(total)+'. Después mandanos el comprobante por WhatsApp'+(cart.some(function(i){return i.grabado;})?' y coordinamos el diseño del grabado.':'.');
   (function(){
     var box=document.querySelector('#success-overlay .success-modal'); if(!box) return;
     var a=document.getElementById('success-wa');
     if(!a){ a=document.createElement('a'); a.id='success-wa'; a.className='om-wa-btn'; a.target='_blank'; a.rel='noopener';
       a.innerHTML='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2a8.2 8.2 0 0 1-4.2-1.1l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1l-.8 1c-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.2-.4.7-1.3.1-.2 0-.3 0-.4l-.8-1.9c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.8 12 12 0 0 0 4.6 4c1.7.7 2.4.8 3.2.7.5-.1 1.5-.6 1.8-1.2.2-.6.2-1.1.1-1.2l-.4-.2z"/></svg>Enviar pedido y comprobante por WhatsApp';
       box.insertBefore(a, box.querySelector('.success-close')); a.style.marginBottom='1rem'; }
-    a.href='https://wa.me/542233061168?text='+encodeURIComponent('¡Hola! Hice un pedido en la web.\n'+'Nombre: '+name+'\nEmail: '+email+'\nPedido: '+detalle+'\nTotal: '+fmt(total)+'\nTe mando el comprobante de la transferencia.');
+    a.href='https://wa.me/542233061168?text='+encodeURIComponent('¡Hola! Hice un pedido en la web.\n'+'Nombre: '+name+'\nEmail: '+email+'\nPedido: '+detalle+'\nTotal: '+fmt(total)+'\nTe mando el comprobante de la transferencia'+(cart.some(function(i){return i.grabado;})?' y el diseño del grabado.':'.'));
   })();
   document.getElementById('success-overlay').classList.add('open');
   const _isT2=payMethod==='transfer';
