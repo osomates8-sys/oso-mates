@@ -48,12 +48,53 @@
   .filename-row{display:flex;gap:.5rem;margin-top:.5rem}
   .filename-row input{flex:1}
   .filename-row button{white-space:nowrap}
+  .thumb.broken{display:flex;align-items:center;justify-content:center;font-size:.55rem;color:#8a7d6b;text-align:center;padding:4px;word-break:break-all}
+  .thumb.broken img{display:none}
+  .gh-card{border-color:var(--warm)}
+  .gh-card input[type=password]{width:100%;font:inherit;font-size:.92rem;padding:.55rem .7rem;border:1px solid var(--line);border-radius:7px;background:#fdfcf9}
+  .gh-actions{display:flex;gap:.6rem;flex-wrap:wrap;margin-top:.7rem}
+  .gh-ok{color:var(--ok);font-weight:600}
+  .gh-err{color:var(--err);font-weight:600}
+  details summary{cursor:pointer;font-weight:600;font-size:.9rem;color:var(--warm);margin-top:.8rem}
+  .bar .status{flex-basis:100%;text-align:center;font-size:.85rem;font-weight:600;min-height:1.2em}
+  .bar .status.ok{color:var(--ok)} .bar .status.err{color:var(--err)}
+  button:disabled{opacity:.55;cursor:wait}
+  button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible{outline:2px solid var(--warm);outline-offset:2px}
 </style>
 </head>
 <body>
 <div class="wrap">
   <h1>Editar la tienda</h1>
-  <p class="sub">Cambiá productos, precios, fotos y textos. Al terminar generás el archivo y lo guardás en GitHub — los cambios salen en vivo en ~1 minuto. No usa base de datos.</p>
+  <p class="sub">Cambiá productos, precios, fotos y textos y tocá <strong>Guardar cambios</strong>. La tienda se actualiza en 1 o 2 minutos.</p>
+
+  <div class="card gh-card" id="gh-card">
+    <div id="gh-off">
+      <strong>Conectá GitHub para poder guardar</strong>
+      <p class="hint">Se hace una sola vez en cada celu o compu. El token queda guardado solo en este dispositivo.</p>
+      <label for="gh-token">Token de GitHub</label>
+      <input type="password" id="gh-token" placeholder="github_pat_…" autocomplete="off"/>
+      <div class="gh-actions"><button class="btn-primary" id="gh-connect">Conectar</button></div>
+      <div id="gh-msg" class="msg"></div>
+      <details>
+        <summary>Cómo sacar el token</summary>
+        <ol class="hint" style="margin-left:1.1rem">
+          <li>Entrá a GitHub con la cuenta <strong>osomates8-sys</strong> y abrí <a href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener">este link</a>.</li>
+          <li>Nombre: "Editor tienda". Vencimiento: el que quieras (por ejemplo 1 año).</li>
+          <li>En <em>Repository access</em> elegí <em>Only select repositories</em> y marcá <strong>oso-mates</strong>.</li>
+          <li>En <em>Permissions</em> → <em>Repository permissions</em> → <strong>Contents</strong>: <em>Read and write</em>.</li>
+          <li>Tocá <em>Generate token</em>, copialo y pegalo acá arriba.</li>
+        </ol>
+      </details>
+    </div>
+    <div id="gh-on" style="display:none">
+      <span class="gh-ok">✓ Conectado a GitHub.</span>
+      <span class="hint" style="display:inline">Los datos se cargaron directo del repo, así que siempre ves la última versión.</span>
+      <div class="gh-actions">
+        <button class="btn-ghost" id="gh-reload">Recargar datos</button>
+        <button class="btn-del" id="gh-logout">Desconectar este dispositivo</button>
+      </div>
+    </div>
+  </div>
 
   <h2>Productos</h2>
   <div id="productos"></div>
@@ -88,45 +129,94 @@
     <textarea id="cfg-nosotros_content"></textarea>
   </div>
 
-  <div class="steps">
-    <strong>Cómo guardar</strong>
-    <ol>
-      <li>Tocá <em>Generar archivo</em> abajo.</li>
-      <li>Tocá <em>Copiar</em>.</li>
-      <li>Abrí el link a GitHub, borrá todo el contenido del archivo y pegá lo copiado.</li>
-      <li>Abajo de todo en GitHub, tocá <strong>Commit changes</strong>.</li>
-    </ol>
-  </div>
-
-  <div class="out">
-    <label>Archivo generado (fallback-data.js)</label>
-    <textarea id="output" readonly placeholder="Tocá 'Generar archivo'"></textarea>
-    <div id="msg" class="msg"></div>
-    <a class="gh" id="gh-link" href="https://github.com/osomates8-sys/oso-mates/edit/main/fallback-data.js" target="_blank" rel="noopener">→ Abrir fallback-data.js en GitHub para pegar y guardar</a>
-  </div>
+  <details style="margin-top:1.5rem">
+    <summary>Guardar a mano (sin token)</summary>
+    <div class="steps">
+      <ol>
+        <li>Tocá <em>Generar archivo</em>.</li>
+        <li>Tocá <em>Copiar</em>.</li>
+        <li>Abrí el link a GitHub, borrá todo el contenido del archivo y pegá lo copiado.</li>
+        <li>Abajo de todo en GitHub, tocá <strong>Commit changes</strong>.</li>
+      </ol>
+      <p class="hint">Ojo: de esta forma las fotos nuevas quedan metidas adentro del archivo y lo hacen pesado. Con el botón <em>Guardar cambios</em> se suben como archivos aparte.</p>
+    </div>
+    <div class="out">
+      <label>Archivo generado (fallback-data.js)</label>
+      <textarea id="output" readonly placeholder="Tocá 'Generar archivo'"></textarea>
+      <div class="gh-actions"><button class="btn-ghost" id="generate">Generar archivo</button><button class="btn-ghost" id="copy">Copiar</button></div>
+      <div id="msg" class="msg"></div>
+      <a class="gh" id="gh-link" href="https://github.com/osomates8-sys/oso-mates/edit/main/fallback-data.js" target="_blank" rel="noopener">Abrir fallback-data.js en GitHub para pegar y guardar</a>
+    </div>
+  </details>
 </div>
 
 <div class="bar">
-  <button class="btn-primary" id="generate">Generar archivo</button>
-  <button class="btn-ghost" id="copy">Copiar</button>
+  <button class="btn-primary" id="save">Guardar cambios</button>
+  <div class="status" id="save-status" role="status" aria-live="polite"></div>
 </div>
 
 <script>
+/* ===== Configuración ===== */
+const OWNER='osomates8-sys', REPO='oso-mates', BRANCH='main', DATA_PATH='fallback-data.js';
+const API='https://api.github.com/repos/'+OWNER+'/'+REPO+'/contents/';
+const TOKEN_KEY='osomates_gh_token';
 const CATS = ["calabaza","madera","bombillas","combos"];
 const MAX_DIM = 1200;
 const IMG_Q = 0.82;
 const SIZE_WARN = 1.8e6;
+/* Igual que en index.html / producto.html: nombres viejos .jpg que en el repo están como .webp */
+const IMG_MAP = {
+  'camionero.jpg':'camionero.webp','imperial_algarrobo.jpg':'imperial_algarrobo.webp','imperial_algarrobo2.jpg':'imperial_algarrobo2.webp',
+  'imperial_calabaza.jpg':'imperial_calabaza.webp','criollo.jpg':'criollo.webp','ranchero.jpg':'ranchero.webp','galleta.jpg':'galleta.webp',
+  'foto_camionero_v2.jpg':'camionero.webp','foto_imperial_v2.jpg':'imperial_algarrobo.webp',
+  'IMG_5190-Edit.jpg':'IMG_5190-Edit.webp','IMG_5206-Edit.jpg':'IMG_5206-Edit.webp','IMG_5161-Edit.jpg':'IMG_5161-Edit.webp',
+  'IMG_5218-Edit-2-Edit.jpg':'IMG_5218-Edit-2-Edit.webp','IMG_5145.jpg':'IMG_5145.webp','IMG_5139.jpg':'IMG_5139.webp',
+  'DSC08987.jpg':'DSC08987.webp','IMG_5233.jpg':'IMG_5233.webp','IMG_5277.jpg':'IMG_5277.webp','IMG_5272.jpg':'IMG_5272.webp'
+};
 
+/* ===== Estado ===== */
 function clone(o){return JSON.parse(JSON.stringify(o));}
-let productos = clone(window.FALLBACK_PRODUCTOS || []);
-let config = clone(window.FALLBACK_CONFIG || {});
+let productos = [];
+let config = {};
 let galeria = [];
+let token = null; try{ token = localStorage.getItem(TOKEN_KEY); }catch(e){}
+let dataSha = null;          // versión de fallback-data.js cargada desde GitHub
+let dirty = false;           // hay cambios sin guardar
+const preview = {};          // nombreArchivo -> dataURL (para ver fotos recién subidas)
 
 function el(tag, attrs, kids){
   const n = document.createElement(tag);
   for(const k in (attrs||{})){ if(k==='class')n.className=attrs[k]; else if(k==='html')n.innerHTML=attrs[k]; else n.setAttribute(k,attrs[k]); }
   (kids||[]).forEach(c=>n.appendChild(typeof c==='string'?document.createTextNode(c):c));
   return n;
+}
+function markDirty(){ dirty=true; }
+document.addEventListener('input', e=>{ if(!e.target.closest('#gh-card') && e.target.id!=='output') markDirty(); });
+document.addEventListener('change', e=>{ if(!e.target.closest('#gh-card')) markDirty(); });
+window.addEventListener('beforeunload', e=>{ if(dirty){ e.preventDefault(); e.returnValue=''; } });
+
+/* ===== Utilidades ===== */
+function b64FromUtf8(str){
+  const bytes=new TextEncoder().encode(str); let bin='';
+  for(let i=0;i<bytes.length;i+=0x8000) bin+=String.fromCharCode.apply(null,bytes.subarray(i,i+0x8000));
+  return btoa(bin);
+}
+function utf8FromB64(b){
+  const bin=atob(b.replace(/\s/g,'')); const bytes=new Uint8Array(bin.length);
+  for(let i=0;i<bin.length;i++) bytes[i]=bin.charCodeAt(i);
+  return new TextDecoder().decode(bytes);
+}
+function isData(v){ return typeof v==='string' && v.indexOf('data:')===0; }
+function imgSrc(v){
+  if(!v) return '';
+  let f=String(v); const i=f.indexOf('|'); if(i>-1) f=f.slice(0,i);
+  if(/^(data:|https?:)/.test(f)) return f;
+  if(preview[f]) return preview[f];
+  return IMG_MAP[f]||f;
+}
+function slug(s){
+  return (s||'foto').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase()
+    .replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'').slice(0,30) || 'foto';
 }
 
 function compressImage(file){
@@ -149,33 +239,84 @@ function compressImage(file){
   });
 }
 
-/* galería de imágenes reutilizable: getList()->array, setList(array) */
+/* ===== GitHub ===== */
+async function gh(path, opts){
+  opts=opts||{};
+  const headers=Object.assign({'Authorization':'Bearer '+token,'Accept':'application/vnd.github+json'}, opts.headers||{});
+  return fetch(API+path.split('/').map(encodeURIComponent).join('/')+(opts.query||''), {
+    method: opts.method||'GET', headers: headers, cache: 'no-store',
+    body: opts.body ? JSON.stringify(opts.body) : undefined
+  });
+}
+async function ghErr(r){
+  let detail=''; try{ detail=(await r.json()).message||''; }catch(e){}
+  if(r.status===401) return 'El token no es válido o ya venció. Desconectá y pegá uno nuevo.';
+  if(r.status===403 && /rate limit/i.test(detail)) return 'GitHub pidió esperar un rato (límite de uso). Probá de nuevo en unos minutos.';
+  if(r.status===403) return 'El token no tiene permiso para guardar. Tiene que tener "Contents: Read and write" sobre el repo oso-mates.';
+  if(r.status===404) return 'GitHub no encontró el repo oso-mates con este token. Revisá que al crearlo hayas elegido ese repo.';
+  if(r.status===409 || (r.status===422 && /sha/i.test(detail))) return 'El archivo cambió en GitHub desde que abriste esta página (quizás lo editaste desde otro lado). Tocá "Recargar datos" y volvé a hacer los cambios.';
+  return 'Error de GitHub ('+r.status+'): '+detail;
+}
+async function loadFromGitHub(){
+  const r=await gh(DATA_PATH,{query:'?ref='+BRANCH});
+  if(!r.ok) throw new Error(await ghErr(r));
+  const meta=await r.json();
+  let text;
+  if(meta.content){ text=utf8FromB64(meta.content); }
+  else {
+    const r2=await gh(DATA_PATH,{query:'?ref='+BRANCH, headers:{'Accept':'application/vnd.github.raw+json'}});
+    if(!r2.ok) throw new Error(await ghErr(r2));
+    text=await r2.text();
+  }
+  const w={};
+  try{ new Function('window', text)(w); }catch(e){ throw new Error('fallback-data.js tiene un error de formato: '+e.message); }
+  if(!Array.isArray(w.FALLBACK_PRODUCTOS)) throw new Error('fallback-data.js no tiene la lista de productos.');
+  return {data:w, sha:meta.sha};
+}
+async function uploadImage(dataUrl, nombre){
+  const m=/^data:image\/([a-z0-9+.-]+);base64,(.*)$/i.exec(dataUrl);
+  if(!m) throw new Error('Una de las fotos no tiene un formato válido.');
+  const ext = m[1]==='jpeg' ? 'jpg' : m[1].replace('+xml','');
+  const name = slug(nombre)+'-'+Date.now().toString(36)+Math.random().toString(36).slice(2,5)+'.'+ext;
+  const r=await gh(name,{method:'PUT', body:{message:'Foto nueva: '+name, content:m[2], branch:BRANCH}});
+  if(!r.ok) throw new Error(await ghErr(r));
+  preview[name]=dataUrl;
+  return name;
+}
+
+/* ===== Fotos ===== */
 function imageManager(getList, setList, opts){
   opts=opts||{};
   const box=el('div',{class:'imgs'});
   function render(){
     box.innerHTML='';
     getList().forEach(function(v,i){
-      const t=el('div',{class:'thumb'+(i===0&&opts.markMain?' main':'')});
-      t.appendChild(el('img',{src:v,alt:''}));
-      const x=el('button',{class:'x',title:'Quitar'},['×']);
-      x.onclick=function(){ const l=getList().slice(); l.splice(i,1); setList(l); render(); };
+      const t=el('div',{class:'thumb'+(i===0&&opts.markMain?' main':''), title:isData(v)?'Foto nueva (se sube al guardar)':String(v)});
+      const im=el('img',{src:imgSrc(v),alt:''});
+      im.onerror=function(){ t.classList.add('broken'); t.insertBefore(document.createTextNode(isData(v)?'foto':String(v).split('|')[0]), t.firstChild); };
+      t.appendChild(im);
+      const x=el('button',{class:'x',title:'Quitar',type:'button'},['×']);
+      x.onclick=function(){ const l=getList().slice(); l.splice(i,1); setList(l); markDirty(); render(); };
       t.appendChild(x);
       if(i>0){
-        const up=el('button',{class:'x',title:'Hacer principal'},['★']);
+        const up=el('button',{class:'x',title:'Hacer principal',type:'button'},['★']);
         up.style.right='24px'; up.style.background='rgba(168,112,63,.9)';
-        up.onclick=function(){ const l=getList().slice(); const m=l.splice(i,1)[0]; l.unshift(m); setList(l); render(); };
+        up.onclick=function(){ const l=getList().slice(); const m=l.splice(i,1)[0]; l.unshift(m); setList(l); markDirty(); render(); };
         t.appendChild(up);
       }
       box.appendChild(t);
     });
     const add=el('label',{class:'up-btn',title:'Subir foto'},['+']);
-    const inp=el('input',{type:'file',accept:'image/*'}); inp.style.display='none';
+    const inp=el('input',{type:'file',accept:'image/*',multiple:''}); inp.style.display='none';
     inp.onchange=async function(){
-      const f=inp.files&&inp.files[0]; if(!f)return;
-      add.textContent='…';
-      try{ const uri=await compressImage(f); const l=getList().slice(); l.push(uri); setList(l); render(); }
-      catch(e){ alert(e.message); render(); }
+      const files=Array.from(inp.files||[]); if(!files.length)return;
+      add.firstChild.textContent='…';
+      try{
+        const l=getList().slice();
+        for(const f of files){ l.push(await compressImage(f)); }
+        setList(l); markDirty();
+      }catch(e){ alert(e.message); }
+      render();
     };
     add.appendChild(inp);
     box.appendChild(add);
@@ -184,6 +325,7 @@ function imageManager(getList, setList, opts){
   return box;
 }
 
+/* ===== Productos ===== */
 function field(labelText, value, opts){
   opts=opts||{};
   const wrap=el('div');
@@ -192,7 +334,8 @@ function field(labelText, value, opts){
   if(opts.type==='textarea'){ inp=el('textarea'); inp.value=value==null?'':value; }
   else if(opts.type==='select'){
     inp=el('select');
-    (opts.options||[]).forEach(o=>{ const op=el('option',{value:o},[o]); if(o===value)op.selected=true; inp.appendChild(op); });
+    const list=(opts.options||[]).slice(); if(value && list.indexOf(value)===-1) list.push(value);
+    list.forEach(o=>{ const op=el('option',{value:o},[o]); if(o===value)op.selected=true; inp.appendChild(op); });
   } else {
     inp=el('input',{type:opts.type||'text'});
     inp.value=value==null?'':value;
@@ -202,6 +345,9 @@ function field(labelText, value, opts){
   return {wrap:wrap, input:inp};
 }
 
+/* Lee lo que está escrito en pantalla antes de redibujar, así no se pierde nada */
+function syncProductos(){ if(document.querySelector('#productos .card')) productos=collectProductos(); }
+
 function renderProductos(){
   const box=document.getElementById('productos');
   box.innerHTML='';
@@ -209,13 +355,18 @@ function renderProductos(){
     if(!Array.isArray(p.imagenes)) p.imagenes = p.imagen ? [p.imagen] : [];
     const card=el('div',{class:'card'});
     const head=el('div',{class:'prod-head'});
-    head.appendChild(el('strong',{},[p.nombre||('Producto '+(idx+1))]));
-    const del=el('button',{class:'btn-del'},['Eliminar']);
-    del.onclick=()=>{ if(confirm('¿Eliminar "'+(p.nombre||'este producto')+'"?')){ productos.splice(idx,1); renderProductos(); } };
+    const title=el('strong',{},[p.nombre||('Producto '+(idx+1))]);
+    head.appendChild(title);
+    const del=el('button',{class:'btn-del',type:'button'},['Eliminar']);
+    del.onclick=()=>{
+      if(!confirm('¿Eliminar "'+(p.nombre||'este producto')+'"?')) return;
+      syncProductos(); productos.splice(idx,1); markDirty(); renderProductos();
+    };
     head.appendChild(del);
     card.appendChild(head);
 
     const f_nombre=field('Nombre',p.nombre,{key:'nombre'});
+    f_nombre.input.addEventListener('input',()=>{ title.textContent=f_nombre.input.value||('Producto '+(idx+1)); });
     const f_material=field('Material',p.material,{key:'material'});
     const r1=el('div',{class:'row'}); r1.append(f_nombre.wrap,f_material.wrap); card.appendChild(r1);
 
@@ -240,8 +391,12 @@ function renderProductos(){
     ));
     const fnRow=el('div',{class:'filename-row'});
     const fnInp=el('input',{type:'text',placeholder:'o pegá un nombre de archivo del repo (ej: criollo.webp)'});
-    const fnBtn=el('button',{class:'btn-ghost'},['Agregar']);
-    fnBtn.onclick=function(){ const v=fnInp.value.trim(); if(!v)return; productos[idx].imagenes.push(v); productos[idx].imagen=productos[idx].imagenes[0]; fnInp.value=''; renderProductos(); };
+    const fnBtn=el('button',{class:'btn-ghost',type:'button'},['Agregar']);
+    fnBtn.onclick=function(){
+      const v=fnInp.value.trim(); if(!v)return;
+      syncProductos(); productos[idx].imagenes.push(v); productos[idx].imagen=productos[idx].imagenes[0];
+      markDirty(); renderProductos();
+    };
     fnRow.append(fnInp,fnBtn);
     card.appendChild(fnRow);
 
@@ -267,7 +422,8 @@ function collectProductos(){
       if(k==='activo'){ o.activo=inp.checked; return; }
       let v=inp.value;
       if(k==='precio'||k==='precio_transferencia'||k==='stock'){
-        o[k]= v==='' ? (k==='stock'?null:0) : parseInt(v,10);
+        const n=parseInt(v,10);
+        o[k]= (v===''||isNaN(n)) ? (k==='stock'?null:0) : n;
       } else if(k==='badge'){
         o.badge = v.trim()==='' ? null : v.trim();
       } else {
@@ -283,10 +439,11 @@ function collectProductos(){
   return out;
 }
 
+/* ===== Textos / config ===== */
 function renderGaleria(){
   const host=document.getElementById('galeria-imgs');
   host.innerHTML='';
-  host.appendChild(imageManager(function(){return galeria;}, function(l){galeria=l; renderGaleria();}, {markMain:false}));
+  host.appendChild(imageManager(function(){return galeria;}, function(l){galeria=l;}, {markMain:false}));
 }
 
 function loadConfigForm(){
@@ -346,13 +503,101 @@ function buildFile(prods,cfg){
     '})();\n';
 }
 
-document.getElementById('add-prod').onclick=()=>{
-  productos = collectProductos();
-  productos.push({id:'',nombre:'Nuevo mate',material:'',descripcion:'',precio:0,precio_transferencia:0,imagen:'',categoria:'madera',badge:null,activo:true,created_at:'',imagenes:[]});
+/* ===== Cargar datos en pantalla ===== */
+function applyData(w){
+  productos = clone(w.FALLBACK_PRODUCTOS || []);
+  config = clone(w.FALLBACK_CONFIG || {});
   renderProductos();
-  window.scrollTo(0,document.body.scrollHeight);
+  loadConfigForm();
+  dirty=false;
+}
+function setGhUI(on){
+  document.getElementById('gh-off').style.display = on?'none':'';
+  document.getElementById('gh-on').style.display = on?'':'none';
+}
+function ghMsg(cls,text){ const m=document.getElementById('gh-msg'); m.className='msg '+(cls||''); m.textContent=text||''; }
+function status(cls,text){ const s=document.getElementById('save-status'); s.className='status '+(cls||''); s.textContent=text||''; }
+
+async function connectAndLoad(){
+  const {data,sha}=await loadFromGitHub();
+  applyData(data); dataSha=sha; setGhUI(true);
+}
+
+document.getElementById('gh-connect').onclick=async()=>{
+  const v=document.getElementById('gh-token').value.trim();
+  if(!v){ ghMsg('err','Pegá el token primero.'); return; }
+  if(dirty && !confirm('Se van a cargar los datos desde GitHub y se pierden los cambios que no guardaste. ¿Seguimos?')) return;
+  const btn=document.getElementById('gh-connect'); btn.disabled=true; ghMsg('','Conectando…');
+  token=v;
+  try{
+    await connectAndLoad();
+    try{ localStorage.setItem(TOKEN_KEY,v); }catch(e){}
+    document.getElementById('gh-token').value=''; ghMsg('','');
+    status('ok','Conectado. Ya podés editar y guardar.');
+  }catch(e){ token=null; ghMsg('err',e.message); }
+  btn.disabled=false;
+};
+document.getElementById('gh-reload').onclick=async()=>{
+  if(dirty && !confirm('Se pierden los cambios que no guardaste. ¿Recargar igual?')) return;
+  status('','Cargando…');
+  try{ await connectAndLoad(); status('ok','Datos recargados.'); }catch(e){ status('err',e.message); }
+};
+document.getElementById('gh-logout').onclick=()=>{
+  if(!confirm('¿Desconectar GitHub en este dispositivo? Vas a tener que pegar el token de nuevo para guardar.')) return;
+  try{ localStorage.removeItem(TOKEN_KEY); }catch(e){}
+  token=null; dataSha=null; setGhUI(false); status('','');
 };
 
+/* ===== Guardar ===== */
+document.getElementById('save').onclick=async()=>{
+  if(!token){
+    status('err','Primero conectá GitHub (arriba de todo).');
+    document.getElementById('gh-card').scrollIntoView({behavior:'smooth',block:'center'});
+    return;
+  }
+  if(!dataSha){ status('err','No se pudieron cargar los datos desde GitHub. Tocá "Recargar datos" arriba.'); return; }
+  const prods=collectProductos();
+  const cc=collectConfig();
+  if(cc.errors.length){ status('err','Hay un error de formato en: '+cc.errors.join(', ')+'. Revisá comillas y llaves.'); return; }
+  for(const p of prods){ if(!p.nombre.trim()){ status('err','Hay un producto sin nombre.'); return; } }
+
+  const btn=document.getElementById('save'); btn.disabled=true;
+  try{
+    // 1) subir fotos nuevas como archivos en el repo
+    let gal=JSON.parse(cc.config.galeria_imgs);
+    const total=prods.reduce((n,p)=>n+p.imagenes.filter(isData).length,0)+gal.filter(isData).length;
+    let n=0;
+    for(const p of prods){
+      for(let i=0;i<p.imagenes.length;i++){
+        if(isData(p.imagenes[i])){ status('','Subiendo foto '+(++n)+' de '+total+'…'); p.imagenes[i]=await uploadImage(p.imagenes[i],p.nombre); }
+      }
+      p.imagen=p.imagenes[0]||'';
+    }
+    for(let i=0;i<gal.length;i++){
+      if(isData(gal[i])){ status('','Subiendo foto '+(++n)+' de '+total+'…'); gal[i]=await uploadImage(gal[i],'galeria'); }
+    }
+    cc.config.galeria_imgs=JSON.stringify(gal);
+    // las fotos ya quedaron subidas: actualizar pantalla para no subirlas dos veces si algo falla después
+    productos=prods; galeria=gal;
+    if(total){ renderProductos(); renderGaleria(); }
+
+    // 2) guardar los datos
+    status('','Guardando datos…');
+    const text=buildFile(prods,cc.config);
+    const r=await gh(DATA_PATH,{method:'PUT', body:{message:'Editar tienda desde editar.html', content:b64FromUtf8(text), sha:dataSha, branch:BRANCH}});
+    if(!r.ok) throw new Error(await ghErr(r));
+    const res=await r.json();
+    dataSha=res.content.sha;
+    config=cc.config;
+    dirty=false;
+    status('ok','¡Guardado! La tienda se actualiza en 1 o 2 minutos.');
+  }catch(e){
+    status('err',e.message);
+  }
+  btn.disabled=false;
+};
+
+/* ===== Guardado manual (sin token) ===== */
 document.getElementById('generate').onclick=()=>{
   const msg=document.getElementById('msg');
   const prods=collectProductos();
@@ -369,9 +614,7 @@ document.getElementById('generate').onclick=()=>{
   msg.textContent = text.length>SIZE_WARN
     ? ('Generado, pero el archivo pesa '+kb+' KB (muchas fotos subidas). Conviene usar menos fotos o más chicas.')
     : ('Listo ('+kb+' KB). Copiá el texto y pegalo en GitHub reemplazando todo el archivo.');
-  productos=prods; config=cc.config;
 };
-
 document.getElementById('copy').onclick=async()=>{
   const ta=document.getElementById('output');
   if(!ta.value){ document.getElementById('generate').click(); }
@@ -381,12 +624,28 @@ document.getElementById('copy').onclick=async()=>{
   msg.className='msg ok'; msg.textContent='Copiado. Abrí el link a GitHub y pegá.';
 };
 
-if(!window.FALLBACK_PRODUCTOS){
-  document.querySelector('.wrap').innerHTML='<h1>No se pudo cargar fallback-data.js</h1><p>Recargá la página.</p>';
-} else {
+document.getElementById('add-prod').onclick=()=>{
+  syncProductos();
+  productos.push({id:'',nombre:'Nuevo mate',material:'',descripcion:'',precio:0,precio_transferencia:0,imagen:'',categoria:'madera',badge:null,activo:true,created_at:'',imagenes:[]});
+  markDirty();
   renderProductos();
-  loadConfigForm();
-}
+  const cards=document.querySelectorAll('#productos .card');
+  cards[cards.length-1].scrollIntoView({behavior:'smooth',block:'start'});
+};
+
+/* ===== Inicio ===== */
+(async function init(){
+  if(token){
+    setGhUI(true); status('','Cargando datos desde GitHub…');
+    try{ await connectAndLoad(); status('',''); return; }
+    catch(e){
+      status('err',e.message);
+      if(/token|permiso|repo/.test(e.message)){ try{ localStorage.removeItem(TOKEN_KEY); }catch(_){} token=null; setGhUI(false); ghMsg('err',e.message); }
+    }
+  }
+  if(window.FALLBACK_PRODUCTOS){ applyData(window); }
+  else if(!token){ document.querySelector('.wrap').innerHTML='<h1>No se pudo cargar fallback-data.js</h1><p>Recargá la página.</p>'; }
+})();
 </script>
 </body>
 </html>
