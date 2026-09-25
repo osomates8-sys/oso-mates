@@ -1,4 +1,4 @@
-/* Oso Mates - datos de la tienda. Editado desde editar.html el 2026-09-24.
+/* Oso Mates - datos de la tienda. Editado desde editar.html el 2026-09-25.
    La tienda usa SOLO estos datos (no hay base de datos externa). */
 (function () {
   window.FALLBACK_PRODUCTOS = [
@@ -45,16 +45,16 @@
       "descripcion": "Porte elegante y tamaño generoso. El preferido de los entendidos.",
       "precio": 55000,
       "precio_transferencia": 49500,
-      "imagen": "DSC08987.jpg|53% 60%",
+      "imagen": "IMG_5139.jpg|48% 61%",
       "categoria": "madera",
       "badge": "Popular",
       "activo": true,
       "created_at": "2026-05-27T22:16:01.096033",
       "imagenes": [
-        "DSC08987.jpg|53% 60%",
         "IMG_5139.jpg|48% 61%",
         "IMG_5145.jpg|52% 55%",
-        "imperial-algarrobo-muftpl9nujl.webp|52% 61%"
+        "imperial-algarrobo-muftpl9nujl.webp|52% 61%",
+        "imperial-algarrobo-mugygxq5cvh.webp"
       ],
       "stock": null
     },
