@@ -331,6 +331,26 @@ function compressImage(file){
 }
 
 /* ===== GitHub ===== */
+/* Mapa del sitio para Google: se rearma con los productos visibles cada vez que guardás */
+function buildSitemap(prods){
+  const hoy=new Date().toISOString().slice(0,10);
+  const urls=[['https://osomates.com/','1.0']].concat(prods.filter(p=>p.activo!==false&&p.id).map(p=>['https://osomates.com/producto.html?id='+encodeURIComponent(p.id),'0.8']));
+  return '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'+
+    urls.map(u=>'  <url>\n    <loc>'+u[0].replace(/&/g,'&amp;')+'</loc>\n    <lastmod>'+hoy+'</lastmod>\n    <changefreq>weekly</changefreq>\n    <priority>'+u[1]+'</priority>\n  </url>\n').join('')+
+    '</urlset>\n';
+}
+async function updateSitemap(prods){
+  try{
+    const xml=buildSitemap(prods);
+    let sha;
+    const r0=await gh('sitemap.xml',{query:'?ref='+BRANCH});
+    if(r0.ok){ const m=await r0.json(); sha=m.sha; if(m.content&&utf8FromB64(m.content).replace(/<lastmod>[^<]*<\/lastmod>/g,'')===xml.replace(/<lastmod>[^<]*<\/lastmod>/g,'')) return true; }
+    const body={message:'Actualizar mapa del sitio',content:b64FromUtf8(xml),branch:BRANCH}; if(sha) body.sha=sha;
+    const r=await gh('sitemap.xml',{method:'PUT',body:body});
+    return r.ok;
+  }catch(e){ console.error(e); return false; }
+}
+
 async function gh(path, opts){
   opts=opts||{};
   const headers=Object.assign({'Authorization':'Bearer '+token,'Accept':'application/vnd.github+json'}, opts.headers||{});
@@ -827,7 +847,9 @@ document.getElementById('save').onclick=async()=>{
     Object.keys(resenasDraft).forEach(k=>delete resenasDraft[k]);
     loadResenas();
     dirty=false;
-    status('ok','¡Guardado! La tienda se actualiza en 1 o 2 minutos.');
+    status('','Actualizando el mapa del sitio para Google…');
+    const mapaOk=await updateSitemap(prods);
+    status('ok','¡Guardado! La tienda se actualiza en 1 o 2 minutos.'+(mapaOk?'':' (El mapa para Google no se pudo actualizar, se reintenta la próxima vez que guardes.)'));
   }catch(e){
     status('err',e.message);
   }

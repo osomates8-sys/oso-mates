@@ -279,6 +279,8 @@ nav{position:fixed;top:0;left:0;right:0;z-index:500;display:flex;justify-content
 .gallery-nav{position:absolute;top:50%;transform:translateY(-50%);background:rgba(10,10,10,.5);color:white;border:none;width:40px;height:40px;font-size:1.2rem;cursor:pointer;display:flex;align-items:center;justify-content:center;}
 .gallery-nav-prev{left:1rem;}
 .gallery-nav-next{right:1rem;}
+.btn-share{background:none;border:1px solid var(--light);color:var(--gray);font-family:'Montserrat',sans-serif;font-size:.6rem;letter-spacing:.15em;text-transform:uppercase;padding:.6rem 1.2rem;cursor:pointer;display:flex;align-items:center;gap:.5rem;transition:all .2s;width:fit-content;margin-top:.6rem;}
+.btn-share:hover{border-color:var(--black);color:var(--black);}
 </style>
 <style id="om-extra-css">.om-wa-btn{display:flex;align-items:center;justify-content:center;gap:.6rem;width:100%;margin:1.2rem 0 0;padding:1rem 1.2rem;background:#25D366;color:#fff!important;text-decoration:none;font-family:'Montserrat',sans-serif;font-size:.66rem;letter-spacing:.14em;text-transform:uppercase;font-weight:600;border:none;transition:background .2s}.om-wa-btn:hover{background:#1ebe5b}.om-wa-btn svg{width:18px;height:18px;fill:#fff;flex-shrink:0}.om-mail-warn{font-size:.72rem;color:#b3541e;margin-top:.8rem;line-height:1.6}.engrave-note{font-size:.72rem;color:var(--gray);line-height:1.6;margin:0}</style>
 </head>
@@ -1158,8 +1160,36 @@ loadCart();loadGrabado().then(loadProduct);loadCoupon();updateCartUI();updateFav
 <a href="https://wa.me/542233061168?text=Hola!%20Vi%20su%20tienda%20y%20quiero%20consultar." target="_blank" class="wa-float" title="Escribinos por WhatsApp">
   <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
 </a>
+
+<style id="envio-gratis-css">
+.fs-bar{margin:0 0 1.2rem;font-family:'Montserrat',sans-serif;font-size:.72rem;line-height:1.5;color:var(--black)}
+.fs-bar strong{font-weight:600}
+.fs-track{height:4px;background:var(--light);margin-top:.5rem;overflow:hidden}
+.fs-fill{height:100%;background:var(--warm,#c8956c);transition:width .4s ease}
+.fs-bar.done .fs-fill{background:#2a9d5c}
+</style>
+<script id="envio-gratis-js">
+/* En el carrito: "Te faltan $X para el envío gratis". Usa el mismo mínimo que el resto de la página. */
+(function(){
+  var MINIMO=100000;
+  if(typeof window.updateCartUI!=='function') return;
+  var orig=window.updateCartUI;
+  function render(){
+    var foot=document.querySelector('.cart-footer'); if(!foot) return;
+    var box=document.getElementById('fs-bar');
+    if(!box){ box=document.createElement('div'); box.id='fs-bar'; box.className='fs-bar'; box.setAttribute('aria-live','polite'); foot.insertBefore(box,foot.firstChild); }
+    if(typeof cart==='undefined'||!cart.length){ box.style.display='none'; return; }
+    box.style.display='';
+    var total=(typeof cartTotal==='function')?cartTotal():0;
+    var falta=MINIMO-total, pct=Math.max(0,Math.min(100,total/MINIMO*100));
+    var money=function(n){ return (typeof fmt==='function')?fmt(n):'$'+Math.round(n).toLocaleString('es-AR'); };
+    box.classList.toggle('done',falta<=0);
+    box.innerHTML=(falta<=0?'<strong>¡Tenés envío gratis!</strong> 🎉':'Te faltan <strong>'+money(falta)+'</strong> para el envío gratis')+
+      '<div class="fs-track"><div class="fs-fill" style="width:'+pct.toFixed(1)+'%"></div></div>';
+  }
+  window.updateCartUI=function(){ var r=orig.apply(this,arguments); try{ render(); }catch(e){} return r; };
+  try{ render(); }catch(e){}
+})();
+</script>
 </body>
-</html
-.btn-share{background:none;border:1px solid var(--light);color:var(--gray);font-family:'Montserrat',sans-serif;font-size:.6rem;letter-spacing:.15em;text-transform:uppercase;padding:.6rem 1.2rem;cursor:pointer;display:flex;align-items:center;gap:.5rem;transition:all .2s;width:fit-content;margin-top:.6rem;}
-.btn-share:hover{border-color:var(--black);color:var(--black);}
->
+</html>
