@@ -37,23 +37,27 @@ Lo que **ya está programado** en este proyecto:
 - [x] **Ajustes:** nombre del negocio, link de la tienda, WhatsApp y un botón para **compartir el catálogo** como texto.
 - [x] **Suscripción:** paywall con RevenueCat, límites del plan gratis, restaurar compras.
 - [x] Seguridad: RLS en Postgres, así que cada usuario sólo ve sus datos y el plan no se puede modificar desde la app.
+- [x] **Webhook de RevenueCat → Supabase** (Edge Function) que actualiza `stores.plan`. Los límites del plan gratis se validan también en la base.
+- [x] **Fotos de productos** (Supabase Storage, cada tienda sólo escribe en su carpeta).
+- [x] **Catálogo web público** con carrito que arma el pedido por WhatsApp. En el plan gratis lleva la marca "Creado con Vendé", que funciona como publicidad.
 
 Lo que falta para **publicar** (en orden):
 
 1. [ ] Crear el proyecto en Supabase y correr `supabase/schema.sql`.
 2. [ ] Crear las suscripciones en App Store Connect y Google Play Console.
 3. [ ] Configurar RevenueCat: productos, un *entitlement* `pro` y un *offering* por defecto.
-4. [ ] **Webhook de RevenueCat → Supabase** (una Edge Function) que actualice `stores.plan` a `pro` o `free`. Así los límites también se validan del lado del servidor y el plan se ve en la web.
-5. [ ] Ícono, splash, nombre final y capturas para las tiendas.
-6. [ ] Política de privacidad y términos (las tiendas los exigen para apps con suscripción).
-7. [ ] Builds con EAS (`eas build`) y envío a revisión (`eas submit`).
+4. [ ] Publicar la función `revenuecat` y cargar el webhook en RevenueCat (ver README).
+5. [ ] Publicar `catalogo-web/` en un hosting estático y cargar `EXPO_PUBLIC_CATALOG_URL`.
+6. [ ] Ícono, splash, nombre final y capturas para las tiendas.
+7. [ ] Política de privacidad y términos (las tiendas los exigen para apps con suscripción).
+8. [ ] Builds con EAS (`eas build`) y envío a revisión (`eas submit`).
 
 ## 4. Roadmap después del lanzamiento
 
 | Versión | Funcionalidad | Por qué |
 |---|---|---|
-| 1.1 | **Catálogo web público** (`vende.app/tu-tienda`) usando la función `public_catalog` | Es la función "wow" que justifica pagar Pro |
-| 1.1 | Fotos de productos (Supabase Storage) | Hace falta para el catálogo |
+| 1.1 | Pedidos del catálogo web que entran directo a la app (sin pasar por WhatsApp) | Menos trabajo manual para el vendedor |
+| 1.1 | Dominio propio para el catálogo (Pro) | Otro motivo para pagar |
 | 1.2 | Clientes: historial de compras y recordatorio de recompra | Retención |
 | 1.2 | Reporte mensual: productos más vendidos y ganancia neta | Valor del plan Pro |
 | 1.3 | Cobros con link de Mercado Pago dentro del pedido | Diferencial local |
@@ -63,6 +67,8 @@ Lo que falta para **publicar** (en orden):
 ## 5. Arquitectura
 
 ```
+Catálogo web (HTML estático) ── public_catalog() ──┐
+                                                    ▼
 App (Expo / React Native, iOS + Android + web)
  ├── Expo Router: navegación por archivos en src/app
  ├── Supabase JS: login + base de datos Postgres con RLS
@@ -78,7 +84,9 @@ Supabase Edge Function → actualiza stores.plan
 - `products`: precio, costo, stock, umbral de stock bajo, activo.
 - `orders`: cliente, estado, total y notas. `order_items` guarda el nombre y el precio al momento de la venta.
 - `create_order()` crea el pedido y descuenta stock en una sola transacción. `cancel_order()` devuelve el stock.
-- `public_catalog(slug)`: catálogo público sin datos sensibles (sin costos).
+- `public_catalog(slug)`: catálogo público en JSON, sin datos sensibles (ni costos ni stock exacto).
+- `enforce_free_limits()`: trigger que corta en 15 productos y 30 pedidos por mes si la tienda es `free`.
+- Bucket `product-images`: lectura pública; cada tienda escribe sólo en `<store_id>/`.
 
 ## 6. Métricas a seguir
 

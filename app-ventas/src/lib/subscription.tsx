@@ -3,6 +3,7 @@ import { Platform } from 'react-native';
 import Purchases, { type CustomerInfo, type PurchasesPackage } from 'react-native-purchases';
 
 import { useAuth } from './auth';
+import { supabase } from './supabase';
 
 // Nombre del "entitlement" que configurás en el panel de RevenueCat.
 export const PRO_ENTITLEMENT = 'pro';
@@ -28,8 +29,15 @@ const SubscriptionContext = createContext<SubscriptionState | null>(null);
 
 const hasPro = (info: CustomerInfo) => PRO_ENTITLEMENT in info.entitlements.active;
 
+// Le pide al servidor que consulte RevenueCat y actualice stores.plan.
+// El webhook hace lo mismo, pero esto evita esperar unos segundos después de comprar.
+async function syncPlanOnServer() {
+  const { error } = await supabase.functions.invoke('revenuecat', { method: 'POST' });
+  if (error) console.warn('No se pudo sincronizar el plan:', error.message);
+}
+
 export function SubscriptionProvider({ children }: { children: ReactNode }) {
-  const { session, store } = useAuth();
+  const { session, store, refreshStore } = useAuth();
   const [entitled, setEntitled] = useState(false);
   const [packages, setPackages] = useState<PurchasesPackage[]>([]);
   const userId = session?.user.id;
@@ -68,6 +76,14 @@ export function SubscriptionProvider({ children }: { children: ReactNode }) {
     };
   }, [userId]);
 
+  // Si RevenueCat dice Pro pero la base todavía no, sincronizamos
+  // (por ejemplo, si el webhook aún no llegó).
+  const storePlan = store?.plan;
+  useEffect(() => {
+    if (!entitled || !storePlan || storePlan === 'pro') return;
+    syncPlanOnServer().then(refreshStore);
+  }, [entitled, storePlan, refreshStore]);
+
   const purchase = useCallback(async (pkg: PurchasesPackage) => {
     try {
       const { customerInfo } = await Purchases.purchasePackage(pkg);
@@ -82,8 +98,9 @@ export function SubscriptionProvider({ children }: { children: ReactNode }) {
   const restore = useCallback(async () => {
     const info = await Purchases.restorePurchases();
     setEntitled(hasPro(info));
+    await syncPlanOnServer().then(refreshStore);
     return hasPro(info);
-  }, []);
+  }, [refreshStore]);
 
   // El plan guardado en la base (lo escribe el webhook) también cuenta, así funciona en web.
   const isPro = entitled || store?.plan === 'pro';

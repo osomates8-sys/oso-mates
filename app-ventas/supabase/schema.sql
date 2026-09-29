@@ -24,6 +24,7 @@ create table public.products (
   cost                 numeric(12, 2) check (cost >= 0),
   stock                integer not null default 0,
   low_stock_threshold  integer not null default 3,
+  image_url            text,
   active               boolean not null default true,
   created_at           timestamptz not null default now()
 );
@@ -86,16 +87,57 @@ create policy "dueño gestiona ítems" on public.order_items
   with check (order_id in (select id from public.orders where store_id = public.my_store_id()));
 
 -- Catálogo público para el link de la tienda: sólo datos que el cliente puede ver
--- (sin costo). Uso: select * from public_catalog('mi-tienda');
-create or replace function public.public_catalog(p_slug text)
-returns table (store_name text, whatsapp text, product_id uuid, name text, description text, price numeric, in_stock boolean)
+-- (sin costos ni stock exacto). Devuelve null si la tienda no existe.
+-- Uso: select public_catalog('mi-tienda');
+create or replace function public.public_catalog(p_slug text) returns jsonb
 language sql stable security definer set search_path = public as $$
-  select s.name, s.whatsapp, p.id, p.name, p.description, p.price, p.stock > 0
-  from public.stores s join public.products p on p.store_id = s.id
-  where s.slug = p_slug and p.active
-  order by p.name
+  select jsonb_build_object(
+    'name', s.name,
+    'whatsapp', s.whatsapp,
+    'branding', s.plan = 'free',
+    'products', coalesce((
+      select jsonb_agg(jsonb_build_object(
+        'id', p.id, 'name', p.name, 'description', p.description,
+        'price', p.price, 'image_url', p.image_url, 'in_stock', p.stock > 0
+      ) order by p.name)
+      from public.products p where p.store_id = s.id and p.active
+    ), '[]'::jsonb)
+  )
+  from public.stores s where s.slug = p_slug
 $$;
-grant execute on function public.public_catalog(text) to anon;
+grant execute on function public.public_catalog(text) to anon, authenticated;
+
+-- ─── Límites del plan gratis (validados en el servidor) ────────────────────
+-- Mantener en sincronía con FREE_LIMITS en src/lib/types.ts.
+create or replace function public.enforce_free_limits() returns trigger
+language plpgsql security definer set search_path = public as $$
+declare
+  v_plan text;
+begin
+  select plan into v_plan from public.stores where id = new.store_id;
+  if v_plan = 'pro' then
+    return new;
+  end if;
+
+  if tg_table_name = 'products'
+     and (select count(*) from public.products where store_id = new.store_id) >= 15 then
+    raise exception 'LIMIT_PRODUCTS' using hint = 'El plan gratis permite hasta 15 productos';
+  end if;
+
+  if tg_table_name = 'orders'
+     and (select count(*) from public.orders
+          where store_id = new.store_id and created_at >= date_trunc('month', now())) >= 30 then
+    raise exception 'LIMIT_ORDERS' using hint = 'El plan gratis permite hasta 30 pedidos por mes';
+  end if;
+
+  return new;
+end;
+$$;
+
+create trigger products_free_limit before insert on public.products
+  for each row execute function public.enforce_free_limits();
+create trigger orders_free_limit before insert on public.orders
+  for each row execute function public.enforce_free_limits();
 
 -- ─── Crear tienda automáticamente al registrarse ───────────────────────────
 create or replace function public.handle_new_user() returns trigger
@@ -177,3 +219,21 @@ begin
   where oi.order_id = p_order_id and oi.product_id = p.id;
 end;
 $$;
+
+-- ─── Fotos de productos (Supabase Storage) ─────────────────────────────────
+-- Bucket público de lectura. Cada tienda sólo escribe en su carpeta: <store_id>/archivo.jpg
+insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
+values ('product-images', 'product-images', true, 5242880, array['image/jpeg', 'image/png', 'image/webp'])
+on conflict (id) do nothing;
+
+create policy "dueño sube fotos" on storage.objects
+  for insert to authenticated
+  with check (bucket_id = 'product-images' and (storage.foldername(name))[1] = public.my_store_id()::text);
+
+create policy "dueño actualiza fotos" on storage.objects
+  for update to authenticated
+  using (bucket_id = 'product-images' and (storage.foldername(name))[1] = public.my_store_id()::text);
+
+create policy "dueño borra fotos" on storage.objects
+  for delete to authenticated
+  using (bucket_id = 'product-images' and (storage.foldername(name))[1] = public.my_store_id()::text);

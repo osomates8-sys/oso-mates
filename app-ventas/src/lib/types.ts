@@ -17,6 +17,7 @@ export type Product = {
   cost: number | null;
   stock: number;
   low_stock_threshold: number;
+  image_url: string | null;
   active: boolean;
   created_at: string;
 };
@@ -44,6 +45,7 @@ export type Order = {
 };
 
 // Límites del plan gratis. El plan Pro no tiene límites.
+// Se validan también en la base (enforce_free_limits en supabase/schema.sql).
 export const FREE_LIMITS = {
   products: 15,
   ordersPerMonth: 30,

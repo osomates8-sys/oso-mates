@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { Alert, Pressable, ScrollView, Text, View } from 'react-native';
 
 import { Button, Card, Empty, Field, Loading, styles } from '@/components/ui';
+import { showError } from '@/lib/errors';
 import { formatMoney } from '@/lib/format';
 import { supabase } from '@/lib/supabase';
 import { colors } from '@/lib/theme';
@@ -56,7 +57,7 @@ export default function NuevoPedido() {
     });
     setSaving(false);
 
-    if (error) return Alert.alert('No se pudo guardar', error.message);
+    if (error) return showError('No se pudo guardar', error);
     router.replace({ pathname: '/pedido/[id]', params: { id: orderId as string } });
   };
 

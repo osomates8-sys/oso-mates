@@ -1,6 +1,6 @@
 import { router } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { Alert, ScrollView, Share, Text } from 'react-native';
+import { Alert, Linking, ScrollView, Share, Text } from 'react-native';
 
 import { Button, Card, Field, styles } from '@/components/ui';
 import { useAuth } from '@/lib/auth';
@@ -8,6 +8,8 @@ import { formatMoney } from '@/lib/format';
 import { useSubscription } from '@/lib/subscription';
 import { supabase } from '@/lib/supabase';
 import { colors } from '@/lib/theme';
+
+const CATALOG_URL = process.env.EXPO_PUBLIC_CATALOG_URL ?? '';
 
 export default function Ajustes() {
   const { session, store, refreshStore, signOut } = useAuth();
@@ -45,6 +47,11 @@ export default function Ajustes() {
     Alert.alert('Listo', 'Datos guardados.');
   };
 
+  const storeLink = CATALOG_URL && store ? `${CATALOG_URL}?t=${store.slug}` : null;
+
+  const shareLink = () =>
+    Share.share({ message: `Mirá el catálogo de ${store?.name ?? 'mi tienda'} y hacé tu pedido: ${storeLink}` });
+
   // Arma el catálogo como texto para pegar en WhatsApp o Instagram.
   const shareCatalog = async () => {
     const { data, error } = await supabase
@@ -77,7 +84,18 @@ export default function Ajustes() {
         keyboardType="phone-pad"
       />
       <Button title="Guardar" onPress={save} loading={saving} />
-      <Button variant="secondary" title="Compartir catálogo" onPress={shareCatalog} />
+
+      <Text style={[styles.subtitle, { marginTop: 8 }]}>Tu tienda online</Text>
+      {storeLink ? (
+        <>
+          <Text style={styles.muted}>{storeLink}</Text>
+          <Button title="Compartir link de la tienda" onPress={shareLink} />
+          <Button variant="secondary" title="Ver mi tienda" onPress={() => Linking.openURL(storeLink)} />
+        </>
+      ) : (
+        <Text style={styles.muted}>Configurá EXPO_PUBLIC_CATALOG_URL para tener tu link (ver README).</Text>
+      )}
+      <Button variant="secondary" title="Compartir catálogo como texto" onPress={shareCatalog} />
 
       <Text style={[styles.muted, { marginTop: 16 }]}>Sesión: {session?.user.email}</Text>
       <Button variant="danger" title="Cerrar sesión" onPress={signOut} />

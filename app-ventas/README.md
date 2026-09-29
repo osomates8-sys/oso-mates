@@ -30,6 +30,36 @@ La idea de negocio, los precios y el roadmap están en [`PLAN.md`](./PLAN.md).
    - Creá un *offering* por defecto con los paquetes mensual y anual.
 3. Poné las API keys públicas en `.env.local` (`EXPO_PUBLIC_REVENUECAT_IOS_KEY` / `_ANDROID_KEY`).
 
+### Webhook: RevenueCat → Supabase
+
+La función [`supabase/functions/revenuecat`](./supabase/functions/revenuecat/index.ts) actualiza `stores.plan` (`free`/`pro`). La base usa ese dato para aplicar los límites del plan gratis, así que sin este paso los usuarios que pagan seguirían limitados.
+
+1. Instalá la [CLI de Supabase](https://supabase.com/docs/guides/cli) y vinculá el proyecto: `supabase link --project-ref TU-PROYECTO`.
+2. Cargá los secretos:
+   ```bash
+   supabase secrets set REVENUECAT_SECRET_API_KEY=sk_xxx          # RevenueCat → API keys → Secret key (v1)
+   supabase secrets set REVENUECAT_WEBHOOK_AUTH="Bearer <una-clave-larga-inventada>"
+   ```
+3. Publicá la función (sin verificación de JWT, porque RevenueCat no manda uno):
+   ```bash
+   supabase functions deploy revenuecat --no-verify-jwt
+   ```
+4. En RevenueCat → Integrations → **Webhooks**:
+   - URL: `https://TU-PROYECTO.supabase.co/functions/v1/revenuecat`
+   - Authorization header: exactamente el mismo valor que pusiste en `REVENUECAT_WEBHOOK_AUTH`.
+
+La app también llama a esta función justo después de comprar o restaurar, así el plan se activa al instante.
+
+## Catálogo web (link de la tienda)
+
+[`catalogo-web/`](./catalogo-web) es una página liviana, sin dependencias, donde los clientes ven los productos, arman el carrito y mandan el pedido por WhatsApp. El link de cada tienda es `https://tu-dominio/?t=<link-de-la-tienda>`.
+
+1. Completá `catalogo-web/config.js` con la URL y la anon key de Supabase.
+2. Publicá la carpeta en cualquier hosting estático gratis: Netlify (arrastrás la carpeta), Vercel, Cloudflare Pages o GitHub Pages.
+3. Poné esa dirección en `.env.local` como `EXPO_PUBLIC_CATALOG_URL`. La app va a mostrar el link en **Ajustes** para compartirlo.
+
+En el plan gratis el catálogo muestra "Creado con Vendé" al pie, lo que sirve como publicidad. En Pro, no.
+
 ## Estructura
 
 ```
@@ -43,12 +73,17 @@ src/
     pedido/[id].tsx     detalle, cambio de estado, WhatsApp
     paywall.tsx         planes Pro
   lib/
+    images.ts           elegir y subir fotos de productos
+    errors.ts           avisos de límites del plan gratis
     supabase.ts         cliente de Supabase
     auth.tsx            sesión y tienda del usuario
     subscription.tsx    RevenueCat: ¿es Pro?, comprar, restaurar
     types.ts            tipos y límites del plan gratis
   components/ui.tsx     botones, inputs, tarjetas
-supabase/schema.sql     tablas, seguridad (RLS) y funciones
+supabase/
+  schema.sql            tablas, seguridad (RLS), límites, fotos y funciones
+  functions/revenuecat/ webhook que sincroniza el plan
+catalogo-web/           catálogo público para los clientes
 ```
 
 ## Comandos útiles

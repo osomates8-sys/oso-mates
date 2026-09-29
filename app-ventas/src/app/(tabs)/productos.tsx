@@ -1,6 +1,6 @@
 import { router } from 'expo-router';
 import { useState } from 'react';
-import { FlatList, Pressable, RefreshControl, Text, TextInput, View } from 'react-native';
+import { FlatList, Image, Pressable, RefreshControl, Text, TextInput, View } from 'react-native';
 
 import { Card, Empty, Loading, styles } from '@/components/ui';
 import { formatMoney } from '@/lib/format';
@@ -50,6 +50,9 @@ export default function Productos() {
         renderItem={({ item }) => (
           <Pressable onPress={() => router.push({ pathname: '/producto/[id]', params: { id: item.id } })}>
             <Card style={[styles.row, !item.active && { opacity: 0.5 }]}>
+              {item.image_url ? (
+                <Image source={{ uri: item.image_url }} style={{ width: 44, height: 44, borderRadius: 8 }} />
+              ) : null}
               <View style={{ flex: 1, gap: 2 }}>
                 <Text style={styles.subtitle}>{item.name}</Text>
                 <Text style={styles.muted}>{formatMoney(item.price)}</Text>

@@ -1,10 +1,12 @@
 import { router, Stack, useLocalSearchParams } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { Alert, ScrollView, Switch, Text, View } from 'react-native';
+import { Alert, Image, Pressable, ScrollView, Switch, Text, View } from 'react-native';
 
 import { Button, Field, Loading, styles } from '@/components/ui';
 import { useAuth } from '@/lib/auth';
+import { showError } from '@/lib/errors';
 import { parseAmount } from '@/lib/format';
+import { deleteProductImage, pickProductImage, uploadProductImage } from '@/lib/images';
 import { supabase } from '@/lib/supabase';
 import { colors } from '@/lib/theme';
 
@@ -22,6 +24,8 @@ export default function ProductoForm() {
   const [stock, setStock] = useState('0');
   const [threshold, setThreshold] = useState('3');
   const [active, setActive] = useState(true);
+  const [imageUrl, setImageUrl] = useState<string | null>(null);
+  const [newImage, setNewImage] = useState<{ uri: string; mimeType: string } | null>(null);
 
   useEffect(() => {
     if (isNew) return;
@@ -43,6 +47,7 @@ export default function ProductoForm() {
         setStock(String(data.stock));
         setThreshold(String(data.low_stock_threshold));
         setActive(data.active);
+        setImageUrl(data.image_url);
         setLoading(false);
       });
   }, [id, isNew]);
@@ -59,6 +64,17 @@ export default function ProductoForm() {
     if (Number.isNaN(stockN) || Number.isNaN(thresholdN)) return Alert.alert('Stock inválido');
     if (!store) return;
 
+    setSaving(true);
+    let uploadedUrl: string | null = null;
+    if (newImage) {
+      try {
+        uploadedUrl = await uploadProductImage(store.id, newImage);
+      } catch (e: any) {
+        setSaving(false);
+        return Alert.alert('No se pudo subir la foto', e?.message ?? '');
+      }
+    }
+
     const row = {
       name: name.trim(),
       description: description.trim() || null,
@@ -67,16 +83,26 @@ export default function ProductoForm() {
       stock: stockN,
       low_stock_threshold: thresholdN,
       active,
+      image_url: uploadedUrl ?? imageUrl,
     };
 
-    setSaving(true);
     const { error } = isNew
       ? await supabase.from('products').insert({ ...row, store_id: store.id })
       : await supabase.from('products').update(row).eq('id', id);
     setSaving(false);
 
-    if (error) Alert.alert('No se pudo guardar', error.message);
-    else router.back();
+    if (error) {
+      await deleteProductImage(uploadedUrl);
+      showError('No se pudo guardar', error);
+      return;
+    }
+    if (uploadedUrl) await deleteProductImage(imageUrl);
+    router.back();
+  };
+
+  const choosePhoto = async () => {
+    const picked = await pickProductImage();
+    if (picked) setNewImage(picked);
   };
 
   const remove = () =>
@@ -87,8 +113,9 @@ export default function ProductoForm() {
         style: 'destructive',
         onPress: async () => {
           const { error } = await supabase.from('products').delete().eq('id', id);
-          if (error) Alert.alert('Error', error.message);
-          else router.back();
+          if (error) return Alert.alert('Error', error.message);
+          await deleteProductImage(imageUrl);
+          router.back();
         },
       },
     ]);
@@ -102,6 +129,29 @@ export default function ProductoForm() {
   return (
     <ScrollView style={styles.screen} contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
       <Stack.Screen options={{ title: isNew ? 'Nuevo producto' : 'Editar producto' }} />
+      <Pressable onPress={choosePhoto} style={{ alignSelf: 'center', alignItems: 'center', gap: 6 }}>
+        {newImage || imageUrl ? (
+          <Image source={{ uri: newImage?.uri ?? imageUrl! }} style={{ width: 140, height: 140, borderRadius: 12 }} />
+        ) : (
+          <View
+            style={{
+              width: 140,
+              height: 140,
+              borderRadius: 12,
+              borderWidth: 1,
+              borderStyle: 'dashed',
+              borderColor: colors.muted,
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            <Text style={{ fontSize: 32 }}>📷</Text>
+          </View>
+        )}
+        <Text style={{ color: colors.primary, fontWeight: '600' }}>
+          {newImage || imageUrl ? 'Cambiar foto' : 'Agregar foto'}
+        </Text>
+      </Pressable>
       <Field label="Nombre" value={name} onChangeText={setName} placeholder="Ej: Mate imperial" />
       <Field label="Descripción" value={description} onChangeText={setDescription} multiline />
       <View style={{ flexDirection: 'row', gap: 12 }}>

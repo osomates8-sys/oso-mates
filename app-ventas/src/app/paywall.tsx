@@ -12,7 +12,7 @@ const BENEFITS = [
   'Productos ilimitados',
   'Pedidos ilimitados',
   'Reportes de ventas y márgenes',
-  'Catálogo online con tu link',
+  'Catálogo online sin la marca Vendé',
   'Soporte prioritario por WhatsApp',
 ];
 
