@@ -23,5 +23,12 @@ export const parseAmount = (text: string): number | null => {
   return Number.isFinite(n) && n >= 0 ? n : null;
 };
 
+// wa.me necesita el número con código de país. Si viene un celular argentino
+// sin código (10 dígitos, ej. 1122334455), le agregamos el 549.
+export const whatsappNumber = (phone: string) => {
+  const digits = phone.replace(/\D/g, '').replace(/^0/, '');
+  return digits.length === 10 ? `549${digits}` : digits;
+};
+
 export const whatsappLink = (phone: string, text: string) =>
-  `https://wa.me/${phone.replace(/\D/g, '')}?text=${encodeURIComponent(text)}`;
+  `https://wa.me/${whatsappNumber(phone)}?text=${encodeURIComponent(text)}`;

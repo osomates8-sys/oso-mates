@@ -4,6 +4,7 @@ import { Pressable, RefreshControl, ScrollView, Text, View } from 'react-native'
 import { Card, Loading, styles } from '@/components/ui';
 import { useAuth } from '@/lib/auth';
 import { formatMoney, startOfMonth } from '@/lib/format';
+import { useLiveOrders } from '@/lib/live';
 import { useSubscription } from '@/lib/subscription';
 import { supabase } from '@/lib/supabase';
 import { colors } from '@/lib/theme';
@@ -13,6 +14,7 @@ import { unwrap, useData } from '@/lib/useData';
 export default function Dashboard() {
   const { store } = useAuth();
   const { isPro } = useSubscription();
+  const { version, pendingWeb } = useLiveOrders();
 
   const { data, refreshing, reload } = useData(async () => {
     const [orders, products] = await Promise.all([
@@ -23,7 +25,7 @@ export default function Dashboard() {
       orders: orders as Pick<Order, 'status' | 'total'>[],
       products: products as Pick<Product, 'id' | 'name' | 'stock' | 'low_stock_threshold' | 'active'>[],
     };
-  });
+  }, [version]);
 
   if (!data) return <Loading />;
 
@@ -48,6 +50,19 @@ export default function Dashboard() {
         <Stat label="Pendientes" value={String(pending)} color={pending ? colors.warning : undefined} />
         <Stat label="Ticket promedio" value={formatMoney(valid.length ? sales / valid.length : 0)} />
       </View>
+
+      {pendingWeb > 0 && (
+        <Link href="/pedidos" asChild>
+          <Pressable>
+            <Card style={{ borderColor: colors.primary, backgroundColor: '#E8F3E9' }}>
+              <Text style={styles.subtitle}>
+                🛍️ {pendingWeb} {pendingWeb === 1 ? 'pedido online nuevo' : 'pedidos online nuevos'}
+              </Text>
+              <Text style={styles.muted}>Entraron desde tu catálogo web. Tocá para verlos →</Text>
+            </Card>
+          </Pressable>
+        </Link>
+      )}
 
       {!isPro && (
         <Link href="/paywall" asChild>

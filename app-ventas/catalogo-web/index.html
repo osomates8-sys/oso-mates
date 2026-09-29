@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <title>Catálogo</title>
-  <meta name="description" content="Mirá el catálogo y hacé tu pedido por WhatsApp." />
+  <meta name="description" content="Mirá el catálogo y hacé tu pedido online." />
   <meta name="theme-color" content="#2E7D32" />
   <style>
     :root {
@@ -31,6 +31,7 @@
       }
     }
     * { box-sizing: border-box; }
+    [hidden] { display: none !important; }
     html, body { margin: 0; }
     body {
       font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
@@ -116,7 +117,12 @@
       padding: 11px 12px; font-size: 16px; border-radius: 10px;
       border: 1px solid var(--border); background: var(--bg); color: var(--text); font-family: inherit;
     }
-    .primary { padding: 14px; border: 0; border-radius: 12px; background: #25d366; color: #fff; font-weight: 700; font-size: 16px; }
+    .primary { padding: 14px; border: 0; border-radius: 12px; background: var(--primary); color: #fff; font-weight: 700; font-size: 16px; }
+    .primary:disabled { opacity: .6; cursor: default; }
+    .whatsapp { padding: 13px; border: 0; border-radius: 12px; background: #25d366; color: #fff; font-weight: 700; font-size: 15px; }
+    .check { width: 64px; height: 64px; margin: 8px auto 0; border-radius: 50%; background: var(--primary); color: #fff;
+      display: flex; align-items: center; justify-content: center; font-size: 34px; font-weight: 700; }
+    .done-text { text-align: center; color: var(--muted); margin: 0; line-height: 1.45; }
     .ghost { padding: 12px; border: 1px solid var(--border); border-radius: 12px; background: transparent; color: var(--text); }
     .error { color: var(--danger); font-size: 14px; margin: 0; }
 
@@ -144,12 +150,21 @@
       <h2>Tu pedido</h2>
       <div id="cart-lines"></div>
       <div class="line total"><span>Total</span><span id="cart-sum"></span></div>
-      <label>Tu nombre <input id="customer" autocomplete="name" required /></label>
-      <label>Aclaraciones (opcional) <textarea id="note" rows="2" placeholder="Envío, retiro, forma de pago…"></textarea></label>
+      <label>Tu nombre <input id="customer" autocomplete="name" maxlength="80" required /></label>
+      <label>Tu WhatsApp <input id="phone" type="tel" autocomplete="tel" inputmode="tel" placeholder="Ej: 11 2233 4455" required /></label>
+      <label>Aclaraciones (opcional) <textarea id="note" rows="2" maxlength="500" placeholder="Envío, retiro, forma de pago…"></textarea></label>
       <p class="error" id="cart-error" hidden></p>
-      <button class="primary" type="submit" value="send">Enviar pedido por WhatsApp</button>
+      <button class="primary" type="submit" id="confirm">Confirmar pedido</button>
+      <button class="whatsapp" type="button" id="send-wa" hidden>Enviar por WhatsApp</button>
       <button class="ghost" type="button" id="close-cart">Seguir comprando</button>
     </form>
+    <div class="sheet" id="done" hidden>
+      <div class="check" aria-hidden="true">✓</div>
+      <h2 style="text-align:center">¡Pedido enviado!</h2>
+      <p class="done-text" id="done-text"></p>
+      <button class="whatsapp" type="button" id="done-wa" hidden>Escribirle por WhatsApp</button>
+      <button class="ghost" type="button" id="done-close">Listo</button>
+    </div>
   </dialog>
 
   <script src="config.js"></script>
@@ -254,7 +269,12 @@
 
       function renderCart() {
         var items = cartItems();
-        if (!items.length) { $('cart').close(); return; }
+        $('confirm').disabled = items.length === 0;
+        if (!items.length) {
+          $('cart-lines').replaceChildren(el('p', { class: 'desc', text: 'No hay productos en tu pedido.' }));
+          $('cart-sum').textContent = money.format(0);
+          return;
+        }
         $('cart-lines').replaceChildren.apply($('cart-lines'), items.map(function (i) {
           return el('div', { class: 'line', style: 'padding: 6px 0' }, [
             el('div', {}, [
@@ -267,40 +287,120 @@
         $('cart-sum').textContent = money.format(items.reduce(function (s, i) { return s + i.qty * i.product.price; }, 0));
       }
 
-      function sendOrder(e) {
+      function rpc(fn, body) {
+        return fetch(cfg.supabaseUrl + '/rest/v1/rpc/' + fn, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            apikey: cfg.supabaseAnonKey,
+            Authorization: 'Bearer ' + cfg.supabaseAnonKey,
+          },
+          body: JSON.stringify(body),
+        });
+      }
+
+      function orderSummary(items) {
+        return items.map(function (i) { return '• ' + i.qty + ' x ' + i.product.name + ' (' + money.format(i.product.price * i.qty) + ')'; }).join('\n');
+      }
+
+      function openWhatsapp(text) {
+        window.open('https://wa.me/' + store.whatsapp.replace(/\D/g, '') + '?text=' + encodeURIComponent(text), '_blank');
+      }
+
+      // Traduce los errores de place_web_order a mensajes para el cliente.
+      function errorMessage(err) {
+        var msg = (err && err.message) || '';
+        if (msg === 'OUT_OF_STOCK') return 'No queda stock suficiente de "' + err.hint + '". Actualizamos el catálogo, revisá tu pedido.';
+        if (msg === 'RATE_LIMIT') return 'Hiciste muchos pedidos seguidos. Esperá un rato o escribile a la tienda.';
+        if (msg === 'LIMIT_ORDERS') return 'La tienda no puede recibir pedidos online en este momento.';
+        if (msg === 'INVALID_ORDER' && err.hint) return err.hint + '.';
+        return 'No pudimos enviar el pedido. Probá de nuevo.';
+      }
+
+      function showError(text) {
+        var box = $('cart-error');
+        box.textContent = text;
+        box.hidden = false;
+        // Si el pedido online falla, queda WhatsApp como alternativa.
+        $('send-wa').hidden = !store.whatsapp;
+      }
+
+      async function refreshCatalog() {
+        try {
+          var res = await rpc('public_catalog', { p_slug: slug });
+          if (res.ok) { var fresh = await res.json(); if (fresh) store = fresh; }
+        } catch (e) { /* seguimos con los datos que había */ }
+      }
+
+      async function confirmOrder(e) {
         e.preventDefault();
         var name = $('customer').value.trim();
-        var err = $('cart-error');
-        err.hidden = true;
-        if (!name) { err.textContent = 'Poné tu nombre así el vendedor sabe quién sos.'; err.hidden = false; return; }
-        if (!store.whatsapp) { err.textContent = 'Esta tienda todavía no cargó su WhatsApp.'; err.hidden = false; return; }
+        var phone = $('phone').value.replace(/\D/g, '');
+        var note = $('note').value.trim();
+        $('cart-error').hidden = true;
+        $('send-wa').hidden = true;
+
+        if (name.length < 2) return showError('Poné tu nombre así la tienda sabe quién sos.');
+        if (phone.length < 8 || phone.length > 15) return showError('Revisá tu número de WhatsApp (con código de área).');
 
         var items = cartItems();
-        var total = items.reduce(function (s, i) { return s + i.qty * i.product.price; }, 0);
-        var note = $('note').value.trim();
-        var text = '¡Hola ' + store.name + '! Soy ' + name + ' y quiero hacer este pedido:\n\n' +
-          items.map(function (i) { return '• ' + i.qty + ' x ' + i.product.name + ' (' + money.format(i.product.price * i.qty) + ')'; }).join('\n') +
-          '\n\nTotal: ' + money.format(total) + (note ? '\n\nAclaraciones: ' + note : '');
+        $('confirm').disabled = true;
+        $('confirm').textContent = 'Enviando…';
+        try {
+          var res = await rpc('place_web_order', {
+            p_slug: slug,
+            p_customer_name: name,
+            p_customer_phone: phone,
+            p_notes: note || null,
+            p_items: items.map(function (i) { return { product_id: i.product.id, quantity: i.qty }; }),
+          });
+          var data = await res.json().catch(function () { return null; });
+          if (!res.ok) {
+            if (data && data.message === 'OUT_OF_STOCK') { await refreshCatalog(); render(); }
+            showError(errorMessage(data));
+            return;
+          }
 
-        window.open('https://wa.me/' + store.whatsapp.replace(/\D/g, '') + '?text=' + encodeURIComponent(text), '_blank');
-        cart = {};
-        saveCart();
+          var code = String(data.id).slice(0, 6).toUpperCase();
+          var summary = orderSummary(items);
+          $('done-text').textContent = 'Pedido #' + code + ' por ' + money.format(data.total) + '. ' +
+            store.name + ' lo recibió y te va a contactar al ' + $('phone').value.trim() + '.';
+          $('done-wa').hidden = !store.whatsapp;
+          $('done-wa').onclick = function () {
+            openWhatsapp('¡Hola ' + store.name + '! Soy ' + name + ', te acabo de hacer el pedido #' + code + ':\n\n' + summary);
+          };
+          $('cart-form').hidden = true;
+          $('done').hidden = false;
+
+          cart = {};
+          saveCart();
+          await refreshCatalog();
+          render();
+        } catch (err) {
+          showError('No pudimos conectarnos. Revisá tu conexión y probá de nuevo.');
+        } finally {
+          $('confirm').disabled = cartItems().length === 0;
+          $('confirm').textContent = 'Confirmar pedido';
+        }
+      }
+
+      function sendByWhatsapp() {
+        var items = cartItems();
+        var name = $('customer').value.trim();
+        var note = $('note').value.trim();
+        var total = items.reduce(function (s, i) { return s + i.qty * i.product.price; }, 0);
+        openWhatsapp('¡Hola ' + store.name + '! ' + (name ? 'Soy ' + name + ' y q' : 'Q') + 'uiero hacer este pedido:\n\n' +
+          orderSummary(items) + '\n\nTotal: ' + money.format(total) + (note ? '\n\nAclaraciones: ' + note : ''));
+      }
+
+      function closeCart() {
         $('cart').close();
-        render();
       }
 
       async function init() {
         if (!slug) { $('store-name').textContent = 'Catálogo'; showState('Falta el link de la tienda', 'Abrí el link que te pasó el vendedor.'); return; }
         try {
-          var res = await fetch(cfg.supabaseUrl + '/rest/v1/rpc/public_catalog', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              apikey: cfg.supabaseAnonKey,
-              Authorization: 'Bearer ' + cfg.supabaseAnonKey,
-            },
-            body: JSON.stringify({ p_slug: slug }),
-          });
+          var res = await rpc('public_catalog', { p_slug: slug });
           if (!res.ok) throw new Error('HTTP ' + res.status);
           store = await res.json();
         } catch (e) {
@@ -313,7 +413,7 @@
 
         document.title = store.name;
         $('store-name').textContent = store.name;
-        $('store-sub').textContent = 'Elegí tus productos y mandá el pedido por WhatsApp.';
+        $('store-sub').textContent = 'Elegí tus productos y hacé tu pedido online.';
         $('search').hidden = store.products.length < 6;
 
         if (store.branding) {
@@ -330,9 +430,18 @@
       }
 
       $('search').addEventListener('input', render);
-      $('open-cart').addEventListener('click', function () { renderCart(); $('cart').showModal(); });
-      $('close-cart').addEventListener('click', function () { $('cart').close(); });
-      $('cart-form').addEventListener('submit', sendOrder);
+      $('open-cart').addEventListener('click', function () {
+        $('cart-form').hidden = false;
+        $('done').hidden = true;
+        $('cart-error').hidden = true;
+        $('send-wa').hidden = true;
+        renderCart();
+        $('cart').showModal();
+      });
+      $('close-cart').addEventListener('click', closeCart);
+      $('done-close').addEventListener('click', closeCart);
+      $('send-wa').addEventListener('click', sendByWhatsapp);
+      $('cart-form').addEventListener('submit', confirmOrder);
 
       init();
     })();

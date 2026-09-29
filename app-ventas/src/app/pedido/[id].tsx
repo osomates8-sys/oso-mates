@@ -65,6 +65,7 @@ export default function PedidoDetalle() {
         </View>
       </View>
       <Text style={styles.muted}>
+        {order.source === 'web' ? '🌐 Pedido online · ' : ''}
         {formatDate(order.created_at)}
         {order.customer_phone ? ` · ${order.customer_phone}` : ''}
       </Text>

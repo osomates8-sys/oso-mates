@@ -3,6 +3,7 @@ import { Tabs } from 'expo-router';
 import type { ComponentProps } from 'react';
 import type { ColorValue } from 'react-native';
 
+import { LiveOrdersProvider, useLiveOrders } from '@/lib/live';
 import { colors } from '@/lib/theme';
 
 type IconName = ComponentProps<typeof Ionicons>['name'];
@@ -13,6 +14,15 @@ const icon =
 
 export default function TabsLayout() {
   return (
+    <LiveOrdersProvider>
+      <TabsNavigator />
+    </LiveOrdersProvider>
+  );
+}
+
+function TabsNavigator() {
+  const { pendingWeb } = useLiveOrders();
+  return (
     <Tabs
       screenOptions={{
         tabBarActiveTintColor: colors.primary,
@@ -22,7 +32,14 @@ export default function TabsLayout() {
     >
       <Tabs.Screen name="index" options={{ title: 'Inicio', tabBarIcon: icon('home-outline') }} />
       <Tabs.Screen name="productos" options={{ title: 'Productos', tabBarIcon: icon('cube-outline') }} />
-      <Tabs.Screen name="pedidos" options={{ title: 'Pedidos', tabBarIcon: icon('receipt-outline') }} />
+      <Tabs.Screen
+        name="pedidos"
+        options={{
+          title: 'Pedidos',
+          tabBarIcon: icon('receipt-outline'),
+          tabBarBadge: pendingWeb > 0 ? pendingWeb : undefined,
+        }}
+      />
       <Tabs.Screen name="ajustes" options={{ title: 'Ajustes', tabBarIcon: icon('settings-outline') }} />
     </Tabs>
   );

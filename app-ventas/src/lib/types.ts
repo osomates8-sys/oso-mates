@@ -40,6 +40,7 @@ export type Order = {
   status: OrderStatus;
   total: number;
   notes: string | null;
+  source: 'app' | 'web';
   created_at: string;
   order_items?: OrderItem[];
 };

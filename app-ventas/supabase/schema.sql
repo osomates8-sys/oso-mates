@@ -40,6 +40,8 @@ create table public.orders (
                   check (status in ('pendiente', 'pagado', 'entregado', 'cancelado')),
   total           numeric(12, 2) not null default 0,
   notes           text,
+  -- 'app': lo cargó el vendedor. 'web': lo hizo un cliente desde el catálogo.
+  source          text not null default 'app' check (source in ('app', 'web')),
   created_at      timestamptz not null default now()
 );
 create index orders_store_created_idx on public.orders (store_id, created_at desc);
@@ -154,42 +156,53 @@ create trigger on_auth_user_created
   for each row execute function public.handle_new_user();
 
 -- ─── Crear pedido y descontar stock en una sola transacción ─────────────────
+-- Función interna: la usan create_order (vendedor) y place_web_order (cliente).
 -- items: [{ "product_id": "...", "quantity": 2 }, ...]
-create or replace function public.create_order(
+-- Con p_strict, rechaza productos inactivos o sin stock suficiente (pedidos web);
+-- sin p_strict, el vendedor puede dejar el stock en negativo.
+create or replace function public._insert_order(
+  p_store_id       uuid,
   p_customer_name  text,
   p_customer_phone text,
   p_notes          text,
-  p_items          jsonb
-) returns uuid
-language plpgsql security invoker set search_path = public as $$
+  p_items          jsonb,
+  p_source         text,
+  p_strict         boolean
+) returns jsonb
+language plpgsql security definer set search_path = public as $$
 declare
-  v_store_id uuid := public.my_store_id();
   v_order_id uuid;
   v_item     jsonb;
   v_product  public.products;
   v_qty      integer;
   v_total    numeric(12, 2) := 0;
 begin
-  if v_store_id is null then
-    raise exception 'No tenés una tienda';
+  if jsonb_typeof(p_items) is distinct from 'array' or jsonb_array_length(p_items) = 0 then
+    raise exception 'INVALID_ORDER' using hint = 'El pedido no tiene productos';
   end if;
-  if jsonb_array_length(p_items) = 0 then
-    raise exception 'El pedido no tiene productos';
+  if jsonb_array_length(p_items) > 50 then
+    raise exception 'INVALID_ORDER' using hint = 'Demasiados productos en un pedido';
   end if;
 
-  insert into public.orders (store_id, customer_name, customer_phone, notes)
-  values (v_store_id, p_customer_name, p_customer_phone, p_notes)
+  insert into public.orders (store_id, customer_name, customer_phone, notes, source)
+  values (p_store_id, p_customer_name, p_customer_phone, p_notes, p_source)
   returning id into v_order_id;
 
   for v_item in select * from jsonb_array_elements(p_items) loop
     v_qty := (v_item ->> 'quantity')::integer;
+    if v_qty is null or v_qty < 1 or v_qty > 999 then
+      raise exception 'INVALID_ORDER' using hint = 'Cantidad inválida';
+    end if;
 
     select * into v_product from public.products
-    where id = (v_item ->> 'product_id')::uuid and store_id = v_store_id
+    where id = (v_item ->> 'product_id')::uuid and store_id = p_store_id
     for update;
 
-    if not found then
-      raise exception 'Producto inexistente';
+    if not found or (p_strict and not v_product.active) then
+      raise exception 'INVALID_ORDER' using hint = 'Producto inexistente';
+    end if;
+    if p_strict and v_product.stock < v_qty then
+      raise exception 'OUT_OF_STOCK' using hint = v_product.name;
     end if;
 
     insert into public.order_items (order_id, product_id, product_name, unit_price, quantity)
@@ -200,9 +213,77 @@ begin
   end loop;
 
   update public.orders set total = v_total where id = v_order_id;
-  return v_order_id;
+  return jsonb_build_object('id', v_order_id, 'total', v_total);
 end;
 $$;
+revoke execute on function public._insert_order(uuid, text, text, text, jsonb, text, boolean) from public, anon, authenticated;
+
+-- Pedido cargado por el vendedor desde la app.
+create or replace function public.create_order(
+  p_customer_name  text,
+  p_customer_phone text,
+  p_notes          text,
+  p_items          jsonb
+) returns uuid
+language plpgsql security definer set search_path = public as $$
+declare
+  v_store_id uuid := public.my_store_id();
+begin
+  if v_store_id is null then
+    raise exception 'No tenés una tienda';
+  end if;
+  return (public._insert_order(v_store_id, p_customer_name, p_customer_phone, p_notes, p_items, 'app', false) ->> 'id')::uuid;
+end;
+$$;
+revoke execute on function public.create_order(text, text, text, jsonb) from public, anon;
+grant execute on function public.create_order(text, text, text, jsonb) to authenticated;
+
+-- Pedido hecho por un cliente desde el catálogo web (sin login).
+-- Precios y stock salen de la base, nunca del navegador. Tiene límites anti-abuso.
+create or replace function public.place_web_order(
+  p_slug           text,
+  p_customer_name  text,
+  p_customer_phone text,
+  p_notes          text,
+  p_items          jsonb
+) returns jsonb
+language plpgsql security definer set search_path = public as $$
+declare
+  v_store_id uuid;
+  v_name     text := btrim(coalesce(p_customer_name, ''));
+  v_phone    text := regexp_replace(coalesce(p_customer_phone, ''), '\D', '', 'g');
+  v_notes    text := nullif(btrim(coalesce(p_notes, '')), '');
+begin
+  select id into v_store_id from public.stores where slug = p_slug;
+  if v_store_id is null then
+    raise exception 'STORE_NOT_FOUND';
+  end if;
+
+  if length(v_name) < 2 or length(v_name) > 80 then
+    raise exception 'INVALID_ORDER' using hint = 'Nombre inválido';
+  end if;
+  if length(v_phone) < 8 or length(v_phone) > 15 then
+    raise exception 'INVALID_ORDER' using hint = 'Teléfono inválido';
+  end if;
+  if length(v_notes) > 500 then
+    raise exception 'INVALID_ORDER' using hint = 'Aclaración demasiado larga';
+  end if;
+
+  -- Anti-abuso: como mucho 5 pedidos por hora por teléfono y 60 por hora por tienda.
+  if (select count(*) from public.orders
+      where store_id = v_store_id and source = 'web' and customer_phone = v_phone
+        and created_at > now() - interval '1 hour') >= 5
+     or (select count(*) from public.orders
+         where store_id = v_store_id and source = 'web'
+           and created_at > now() - interval '1 hour') >= 60 then
+    raise exception 'RATE_LIMIT';
+  end if;
+
+  return public._insert_order(v_store_id, v_name, v_phone, v_notes, p_items, 'web', true);
+end;
+$$;
+revoke execute on function public.place_web_order(text, text, text, text, jsonb) from public;
+grant execute on function public.place_web_order(text, text, text, text, jsonb) to anon, authenticated;
 
 -- Al cancelar un pedido se devuelve el stock.
 create or replace function public.cancel_order(p_order_id uuid) returns void
@@ -237,3 +318,6 @@ create policy "dueño actualiza fotos" on storage.objects
 create policy "dueño borra fotos" on storage.objects
   for delete to authenticated
   using (bucket_id = 'product-images' and (storage.foldername(name))[1] = public.my_store_id()::text);
+
+-- ─── Tiempo real: la app se entera al instante de los pedidos nuevos ────────
+alter publication supabase_realtime add table public.orders;

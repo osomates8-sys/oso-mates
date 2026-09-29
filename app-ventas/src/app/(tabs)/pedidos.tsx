@@ -4,6 +4,7 @@ import { FlatList, Pressable, RefreshControl, ScrollView, Text, View } from 'rea
 
 import { Card, Empty, Loading, styles } from '@/components/ui';
 import { formatDate, formatMoney, startOfMonth } from '@/lib/format';
+import { useLiveOrders } from '@/lib/live';
 import { useSubscription } from '@/lib/subscription';
 import { supabase } from '@/lib/supabase';
 import { colors, statusColors } from '@/lib/theme';
@@ -13,11 +14,13 @@ import { unwrap, useData } from '@/lib/useData';
 export default function Pedidos() {
   const { isPro } = useSubscription();
   const [filter, setFilter] = useState<OrderStatus | 'todos'>('todos');
+  const { version } = useLiveOrders();
 
   const { data, refreshing, reload } = useData(async () =>
     unwrap(
       await supabase.from('orders').select('*').order('created_at', { ascending: false }).limit(200),
     ) as Order[],
+    [version],
   );
 
   if (!data) return <Loading />;
@@ -59,7 +62,10 @@ export default function Pedidos() {
           <Pressable onPress={() => router.push({ pathname: '/pedido/[id]', params: { id: item.id } })}>
             <Card style={styles.row}>
               <View style={{ flex: 1, gap: 2 }}>
-                <Text style={styles.subtitle}>{item.customer_name}</Text>
+                <Text style={styles.subtitle}>
+                  {item.customer_name}
+                  {item.source === 'web' ? <Text style={styles.muted}>  🌐 Web</Text> : null}
+                </Text>
                 <Text style={styles.muted}>
                   {formatDate(item.created_at)} · {formatMoney(item.total)}
                 </Text>

@@ -52,13 +52,19 @@ La app también llama a esta función justo después de comprar o restaurar, as�
 
 ## Catálogo web (link de la tienda)
 
-[`catalogo-web/`](./catalogo-web) es una página liviana, sin dependencias, donde los clientes ven los productos, arman el carrito y mandan el pedido por WhatsApp. El link de cada tienda es `https://tu-dominio/?t=<link-de-la-tienda>`.
+[`catalogo-web/`](./catalogo-web) es una página liviana, sin dependencias, donde los clientes ven los productos, arman el carrito y confirman el pedido. El pedido **entra directo a la app** (en tiempo real, con aviso y contador en la pestaña Pedidos) y descuenta el stock. Si algo falla, el cliente puede mandarlo por WhatsApp como alternativa. El link de cada tienda es `https://tu-dominio/?t=<link-de-la-tienda>`.
 
 1. Completá `catalogo-web/config.js` con la URL y la anon key de Supabase.
 2. Publicá la carpeta en cualquier hosting estático gratis: Netlify (arrastrás la carpeta), Vercel, Cloudflare Pages o GitHub Pages.
 3. Poné esa dirección en `.env.local` como `EXPO_PUBLIC_CATALOG_URL`. La app va a mostrar el link en **Ajustes** para compartirlo.
 
 En el plan gratis el catálogo muestra "Creado con Vendé" al pie, lo que sirve como publicidad. En Pro, no.
+
+Protecciones de los pedidos web (en `place_web_order`):
+- Los precios y el stock se toman de la base, no del navegador.
+- No deja pedir más de lo que hay en stock.
+- Como mucho 5 pedidos por hora por teléfono y 60 por hora por tienda.
+- Los pedidos web también cuentan para el límite de 30 por mes del plan gratis.
 
 ## Estructura
 
@@ -75,6 +81,7 @@ src/
   lib/
     images.ts           elegir y subir fotos de productos
     errors.ts           avisos de límites del plan gratis
+    live.tsx            pedidos en tiempo real (aviso + contador)
     supabase.ts         cliente de Supabase
     auth.tsx            sesión y tienda del usuario
     subscription.tsx    RevenueCat: ¿es Pro?, comprar, restaurar

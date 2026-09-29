@@ -8,10 +8,11 @@ const LIMITS: Record<string, string> = {
 };
 
 // Muestra el error al usuario. Si es un límite del plan, ofrece pasarse a Pro.
-export function showError(title: string, error: { message: string }) {
+export function showError(title: string, error: { message: string; hint?: string | null }) {
   const code = Object.keys(LIMITS).find((k) => error.message.includes(k));
   if (!code) {
-    Alert.alert(title, error.message);
+    // Las funciones de la base mandan un código (INVALID_ORDER) y el detalle legible en hint.
+    Alert.alert(title, /^[A-Z_]+$/.test(error.message) && error.hint ? error.hint : error.message);
     return;
   }
   Alert.alert('Plan gratis', LIMITS[code], [

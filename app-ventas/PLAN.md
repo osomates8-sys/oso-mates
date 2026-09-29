@@ -39,7 +39,7 @@ Lo que **ya está programado** en este proyecto:
 - [x] Seguridad: RLS en Postgres, así que cada usuario sólo ve sus datos y el plan no se puede modificar desde la app.
 - [x] **Webhook de RevenueCat → Supabase** (Edge Function) que actualiza `stores.plan`. Los límites del plan gratis se validan también en la base.
 - [x] **Fotos de productos** (Supabase Storage, cada tienda sólo escribe en su carpeta).
-- [x] **Catálogo web público** con carrito que arma el pedido por WhatsApp. En el plan gratis lleva la marca "Creado con Vendé", que funciona como publicidad.
+- [x] **Catálogo web público** con carrito. Los pedidos entran directo a la app en tiempo real y descuentan stock, con WhatsApp como alternativa. En el plan gratis lleva la marca "Creado con Vendé", que funciona como publicidad.
 
 Lo que falta para **publicar** (en orden):
 
@@ -56,7 +56,8 @@ Lo que falta para **publicar** (en orden):
 
 | Versión | Funcionalidad | Por qué |
 |---|---|---|
-| 1.1 | Pedidos del catálogo web que entran directo a la app (sin pasar por WhatsApp) | Menos trabajo manual para el vendedor |
+| 1.1 | **Notificaciones push** de pedidos nuevos, aunque la app esté cerrada (expo-notifications + Edge Function) | Hoy el aviso sólo aparece con la app abierta |
+| 1.1 | Captcha en el catálogo si aparece spam (Cloudflare Turnstile) | Ya hay límites por hora, esto sería el siguiente paso |
 | 1.1 | Dominio propio para el catálogo (Pro) | Otro motivo para pagar |
 | 1.2 | Clientes: historial de compras y recordatorio de recompra | Retención |
 | 1.2 | Reporte mensual: productos más vendidos y ganancia neta | Valor del plan Pro |
@@ -82,9 +83,10 @@ Supabase Edge Function → actualiza stores.plan
 
 - `stores`: una por usuario (nombre, slug del link, whatsapp, plan).
 - `products`: precio, costo, stock, umbral de stock bajo, activo.
-- `orders`: cliente, estado, total y notas. `order_items` guarda el nombre y el precio al momento de la venta.
+- `orders`: cliente, estado, total, notas y origen (`app` o `web`). `order_items` guarda el nombre y el precio al momento de la venta.
 - `create_order()` crea el pedido y descuenta stock en una sola transacción. `cancel_order()` devuelve el stock.
 - `public_catalog(slug)`: catálogo público en JSON, sin datos sensibles (ni costos ni stock exacto).
+- `place_web_order(slug, …)`: pedido desde el catálogo (sin login), con validaciones y límites anti-abuso. Comparte la lógica con `create_order` a través de `_insert_order`, que no es accesible desde afuera.
 - `enforce_free_limits()`: trigger que corta en 15 productos y 30 pedidos por mes si la tienda es `free`.
 - Bucket `product-images`: lectura pública; cada tienda escribe sólo en `<store_id>/`.
 
