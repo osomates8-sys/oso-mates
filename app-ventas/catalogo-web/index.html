@@ -287,14 +287,17 @@
         $('cart-sum').textContent = money.format(items.reduce(function (s, i) { return s + i.qty * i.product.price; }, 0));
       }
 
+      // Las claves nuevas (sb_publishable_…) van sólo en "apikey"; las viejas (JWT) también en Authorization.
+      function rpcHeaders() {
+        var h = { 'Content-Type': 'application/json', apikey: cfg.supabaseAnonKey };
+        if (/^eyJ/.test(cfg.supabaseAnonKey)) h.Authorization = 'Bearer ' + cfg.supabaseAnonKey;
+        return h;
+      }
+
       function rpc(fn, body) {
         return fetch(cfg.supabaseUrl + '/rest/v1/rpc/' + fn, {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            apikey: cfg.supabaseAnonKey,
-            Authorization: 'Bearer ' + cfg.supabaseAnonKey,
-          },
+          headers: rpcHeaders(),
           body: JSON.stringify(body),
         });
       }

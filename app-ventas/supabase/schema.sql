@@ -1,5 +1,6 @@
 -- Esquema de base de datos para Vendé (Supabase / Postgres).
 -- Pegalo en Supabase → SQL Editor y ejecutalo una vez.
+-- Ya está aplicado en el proyecto "vende" (dilxpuyfdbyswcjzeioe).
 
 -- ─── Tiendas ────────────────────────────────────────────────────────────────
 -- Una tienda por usuario. Se crea sola al registrarse (ver trigger abajo).
@@ -321,3 +322,33 @@ create policy "dueño borra fotos" on storage.objects
 
 -- ─── Tiempo real: la app se entera al instante de los pedidos nuevos ────────
 alter publication supabase_realtime add table public.orders;
+
+-- ─── Permisos: sólo lo que tiene que ser público lo es ─────────────────────
+-- Funciones de trigger: nadie las llama por la API.
+revoke execute on function public.enforce_free_limits() from public, anon, authenticated;
+revoke execute on function public.handle_new_user() from public, anon, authenticated;
+-- my_store_id y cancel_order sólo para usuarios logueados.
+revoke execute on function public.my_store_id() from public, anon;
+grant execute on function public.my_store_id() to authenticated;
+revoke execute on function public.cancel_order(uuid) from public, anon;
+grant execute on function public.cancel_order(uuid) to authenticated;
+-- Políticas sólo para usuarios logueados (los clientes usan public_catalog / place_web_order).
+alter policy "dueño lee su tienda" on public.stores to authenticated;
+alter policy "dueño edita su tienda" on public.stores to authenticated;
+alter policy "dueño gestiona productos" on public.products to authenticated;
+alter policy "dueño gestiona pedidos" on public.orders to authenticated;
+alter policy "dueño gestiona ítems" on public.order_items to authenticated;
+
+-- ─── Rendimiento ────────────────────────────────────────────────────────────
+create index if not exists order_items_product_idx on public.order_items (product_id);
+-- (select ...) hace que Postgres evalúe la función una sola vez por consulta, no por fila.
+alter policy "dueño lee su tienda" on public.stores using (owner_id = (select auth.uid()));
+alter policy "dueño edita su tienda" on public.stores
+  using (owner_id = (select auth.uid())) with check (owner_id = (select auth.uid()));
+alter policy "dueño gestiona productos" on public.products
+  using (store_id = (select public.my_store_id())) with check (store_id = (select public.my_store_id()));
+alter policy "dueño gestiona pedidos" on public.orders
+  using (store_id = (select public.my_store_id())) with check (store_id = (select public.my_store_id()));
+alter policy "dueño gestiona ítems" on public.order_items
+  using (order_id in (select id from public.orders where store_id = (select public.my_store_id())))
+  with check (order_id in (select id from public.orders where store_id = (select public.my_store_id())));

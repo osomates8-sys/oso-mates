@@ -11,9 +11,9 @@ La idea de negocio, los precios y el roadmap están en [`PLAN.md`](./PLAN.md).
    cd app-ventas
    npm install
    ```
-2. Creá un proyecto gratis en [supabase.com](https://supabase.com). En **SQL Editor** pegá y ejecutá [`supabase/schema.sql`](./supabase/schema.sql).
-3. Copiá `.env.example` como `.env.local` y completá la URL y la *anon key* de Supabase (Project Settings → API).
-4. Levantá la app:
+2. Supabase ya está listo: el proyecto **vende** (`dilxpuyfdbyswcjzeioe`, São Paulo) tiene cargado [`supabase/schema.sql`](./supabase/schema.sql) y publicada la función `revenuecat`. Las claves públicas están en `.env` y en `catalogo-web/config.js`.
+   (Para montarlo en otro proyecto: ejecutá `schema.sql` en el SQL Editor y cambiá la URL y la clave en esos dos archivos.)
+3. Levantá la app:
    ```bash
    npx expo start
    ```
