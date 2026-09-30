@@ -124,6 +124,8 @@
 
   <h2>Textos de la web</h2>
   <div class="card">
+    <label>Google Analytics — ID de medición (empieza con G-, dejalo vacío para desactivarlo)</label>
+    <input type="text" id="cfg-ga_id" placeholder="G-XXXXXXXXXX" autocomplete="off"/>
     <label>Barra superior (banner)</label>
     <input type="text" id="cfg-banner"/>
     <div class="row">
@@ -738,6 +740,7 @@ function loadConfigForm(){
   loadGrabadoForm();
   loadOsoForm();
   document.getElementById('cfg-banner').value = config.banner||'';
+  document.getElementById('cfg-ga_id').value = config.ga_id||'';
   document.getElementById('cfg-hero_h1').value = config.hero_h1||'';
   document.getElementById('cfg-hero_h2').value = config.hero_h2||'';
   document.getElementById('cfg-hero_desc').value = config.hero_desc||'';
@@ -761,6 +764,7 @@ function collectConfig(){
   resenasErr=[];
   const c=clone(config);
   c.banner = document.getElementById('cfg-banner').value;
+  c.ga_id = document.getElementById('cfg-ga_id').value.trim().toUpperCase();
   c.hero_h1 = document.getElementById('cfg-hero_h1').value;
   c.hero_h2 = document.getElementById('cfg-hero_h2').value;
   c.hero_desc = document.getElementById('cfg-hero_desc').value;
@@ -785,6 +789,7 @@ function collectConfig(){
     try{ c[k]=JSON.stringify(JSON.parse(raw)); }
     catch(e){ errs.push(k); }
   });
+  if(c.ga_id && !/^G-[A-Z0-9]{4,}$/.test(c.ga_id)) errs.push('Google Analytics (el ID tiene que ser tipo G-XXXXXXXXXX)');
   return {config:c, errors:errs.concat(resenasErr.map(x=>'opiniones de '+x))};
 }
 

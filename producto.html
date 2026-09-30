@@ -21,6 +21,7 @@
 <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 <script src="fallback-data.js"></script>
 <script src="seo-pages.js"></script>
+<script src="analytics.js"></script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{--black:#0a0a0a;--white:#f8f8f6;--gray:#888;--light:#ebebeb;--mid:#444;--blue:#009ee3;--green:#2a9d5c;--warm:#c8956c;}
@@ -591,6 +592,7 @@ async function loadProduct(){
       return;
     }
     currentProd = data;
+    omTrack('view_item', data);
     document.title = 'OSO MATES — '+data.nombre;
     if(!related){
       const r = await sb.from('productos').select('*').eq('activo',true).neq('id',prodId).limit(3);
@@ -834,6 +836,7 @@ function renderProduct(p, related){
 }
 function addToCartAndOpen(){
   if(!currentProd)return;
+  omTrack('add_to_cart', currentProd);
   const eng=getEngraveData();
   if(eng.grabado){
     const ex=cart.find(x=>x.id===currentProd.id&&x.grabado===eng.grabado);
@@ -846,6 +849,7 @@ function addToCartAndOpen(){
 }
 function addToCart(id){
   const p=allProds.find(x=>x.id===id);if(!p)return;
+  omTrack('add_to_cart', p);
   const ex=cart.find(x=>x.id===id&&!x.grabado);
   if(ex){ex.qty++;}else{cart.push({...p,qty:1,grabado:'',grabadoPrecio:0});}
   updateCartUI();showToast(p.nombre+' agregado 🛒');
@@ -1017,6 +1021,7 @@ async function confirmOrder(){
   if(!email||!email.includes('@')){showToast('Ingresá un email válido 👆');return;}
   const isT=payMethod==='transfer';
   const total=getCheckoutTotal();
+  omTrack('begin_checkout', { total: total, items: cart });
   let detalle=cart.map(i=>i.nombre+(i.grabado?' (Grabado: "'+i.grabado+'")':'')+' x'+i.qty+' = '+fmt(itemUnitPrice(i,isT)*i.qty)).join(' | ');
   if(_couponApplied&&_coupon.percent>0)detalle+=' | Cup\u00f3n '+_coupon.code+' (-'+_coupon.percent+'%)';
   const datosT=isT?'DATOS: Banco Frances BBVA | CBU: 0170090940000048482721 | Total: '+fmt(total):'';

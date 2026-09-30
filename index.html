@@ -26,6 +26,7 @@
 <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 <script src="fallback-data.js"></script>
 <script src="seo-pages.js"></script>
+<script src="analytics.js"></script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{--black:#0a0a0a;--white:#f8f8f6;--gray:#888;--light:#ebebeb;--mid:#444;--blue:#009ee3;--green:#2a9d5c;--warm:#c8956c;}
@@ -1287,6 +1288,7 @@ async function loadBestsellers() {
 
 // Track FB Pixel events
 function trackAddToCart(prod) {
+  omTrack('add_to_cart', prod);
   if (typeof fbq !== 'undefined') {
     fbq('track', 'AddToCart', {
       content_name: prod.nombre,
@@ -1298,6 +1300,7 @@ function trackAddToCart(prod) {
   }
 }
 function trackPurchase(total) {
+  omTrack('begin_checkout', { total: total, items: cart });
   // El pedido se confirma acá pero el pago (transferencia) todavía no ingresó,
   // por eso registramos InitiateCheckout y no Purchase.
   if (typeof fbq !== 'undefined') {
