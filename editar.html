@@ -7,6 +7,7 @@
 <title>Editar tienda — Oso Mates</title>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400&family=Montserrat:wght@400;500;600&display=swap" rel="stylesheet"/>
 <script src="fallback-data.js"></script>
+<script src="seo-pages.js"></script>
 <style>
   :root{--ink:#2c2620;--warm:#a8703f;--line:#e5ddd0;--bg:#f7f4ee;--card:#fff;--ok:#2a9d5c;--err:#c0392b}
   *{box-sizing:border-box;margin:0;padding:0}
@@ -123,6 +124,8 @@
 
   <h2>Textos de la web</h2>
   <div class="card">
+    <label>Google Analytics — ID de medición (empieza con G-, dejalo vacío para desactivarlo)</label>
+    <input type="text" id="cfg-ga_id" placeholder="G-XXXXXXXXXX" autocomplete="off"/>
     <label>Barra superior (banner)</label>
     <input type="text" id="cfg-banner"/>
     <div class="row">
@@ -331,23 +334,70 @@ function compressImage(file){
 }
 
 /* ===== GitHub ===== */
-/* Mapa del sitio para Google: se rearma con los productos visibles cada vez que guardás */
-function buildSitemap(prods){
-  const hoy=new Date().toISOString().slice(0,10);
-  const urls=[['https://osomates.com/','1.0']].concat(prods.filter(p=>p.activo!==false&&p.id).map(p=>['https://osomates.com/producto.html?id='+encodeURIComponent(p.id),'0.8']));
-  return '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'+
-    urls.map(u=>'  <url>\n    <loc>'+u[0].replace(/&/g,'&amp;')+'</loc>\n    <lastmod>'+hoy+'</lastmod>\n    <changefreq>weekly</changefreq>\n    <priority>'+u[1]+'</priority>\n  </url>\n').join('')+
-    '</urlset>\n';
+/* Mapa del sitio y páginas de producto para Google/WhatsApp (ver seo-pages.js).
+   Se rearman con los productos cada vez que guardás. Solo se sube lo que cambió. */
+async function putIfChanged(path, text, message, ignore){
+  let sha;
+  const r0=await gh(path,{query:'?ref='+BRANCH});
+  if(r0.ok){
+    const m=await r0.json(); sha=m.sha;
+    const norm=t=>ignore?t.replace(ignore,''):t;
+    if(m.content&&norm(utf8FromB64(m.content))===norm(text)) return true;
+  }
+  const body={message:message,content:b64FromUtf8(text),branch:BRANCH}; if(sha) body.sha=sha;
+  const r=await gh(path,{method:'PUT',body:body});
+  return r.ok;
 }
 async function updateSitemap(prods){
   try{
-    const xml=buildSitemap(prods);
-    let sha;
-    const r0=await gh('sitemap.xml',{query:'?ref='+BRANCH});
-    if(r0.ok){ const m=await r0.json(); sha=m.sha; if(m.content&&utf8FromB64(m.content).replace(/<lastmod>[^<]*<\/lastmod>/g,'')===xml.replace(/<lastmod>[^<]*<\/lastmod>/g,'')) return true; }
-    const body={message:'Actualizar mapa del sitio',content:b64FromUtf8(xml),branch:BRANCH}; if(sha) body.sha=sha;
-    const r=await gh('sitemap.xml',{method:'PUT',body:body});
+    return await putIfChanged('sitemap.xml', OM_SEO.buildSitemap(prods), 'Actualizar mapa del sitio', /<lastmod>[^<]*<\/lastmod>/g);
+  }catch(e){ console.error(e); return false; }
+}
+/* Imagen para compartir: JPG cuadrado recortado en el foco de la primera foto */
+async function ensureOgImage(og){
+  const r0=await gh(og.path,{query:'?ref='+BRANCH});
+  if(r0.ok) return true;
+  let src=preview[og.src], obj=null;
+  if(!src){
+    const rr=await gh(og.src,{query:'?ref='+BRANCH,headers:{'Accept':'application/vnd.github.raw'}});
+    if(!rr.ok) return false;
+    obj=URL.createObjectURL(await rr.blob()); src=obj;
+  }
+  try{
+    const img=await new Promise((res,rej)=>{const i=new Image();i.onload=()=>res(i);i.onerror=()=>rej(new Error('foto'));i.src=src;});
+    const w=img.naturalWidth,h=img.naturalHeight,side=Math.min(w,h),N=OM_SEO.OG_SIZE;
+    const c=document.createElement('canvas'); c.width=N; c.height=N;
+    c.getContext('2d').drawImage(img,Math.round((w-side)*og.x/100),Math.round((h-side)*og.y/100),side,side,0,0,N,N);
+    const b64=c.toDataURL('image/jpeg',0.82).split(',')[1];
+    const r=await gh(og.path,{method:'PUT',body:{message:'Imagen para compartir: '+og.path,content:b64,branch:BRANCH}});
     return r.ok;
+  }finally{ if(obj) URL.revokeObjectURL(obj); }
+}
+async function updateProductPages(prods){
+  try{
+    const rt=await gh('producto.html',{query:'?ref='+BRANCH});
+    if(!rt.ok) return false;
+    const tpl=utf8FromB64((await rt.json()).content);
+    const map=OM_SEO.pageMap(prods);
+    let ok=true;
+    for(const p of prods){
+      if(!p.id||!map[p.id]) continue;
+      const og=OM_SEO.ogImage(p);
+      if(og){ try{ if(!await ensureOgImage(og)) ok=false; }catch(e){ console.error(e); ok=false; } }
+      if(!await putIfChanged(map[p.id], OM_SEO.buildProductPage(tpl,p,prods), 'Página de producto: '+p.nombre)) ok=false;
+    }
+    /* borrar páginas de productos que ya no existen o cambiaron de nombre */
+    const rl=await gh('',{query:'?ref='+BRANCH});
+    if(rl.ok){
+      const vigentes=new Set(Object.values(map));
+      for(const f of await rl.json()){
+        if(f.type==='file'&&/^(mate|bombilla|combo)-.+\.html$/.test(f.name)&&!vigentes.has(f.name)){
+          const rd=await gh(f.name,{method:'DELETE',body:{message:'Borrar página de producto vieja: '+f.name,sha:f.sha,branch:BRANCH}});
+          if(!rd.ok) ok=false;
+        }
+      }
+    }
+    return ok;
   }catch(e){ console.error(e); return false; }
 }
 
@@ -690,6 +740,7 @@ function loadConfigForm(){
   loadGrabadoForm();
   loadOsoForm();
   document.getElementById('cfg-banner').value = config.banner||'';
+  document.getElementById('cfg-ga_id').value = config.ga_id||'';
   document.getElementById('cfg-hero_h1').value = config.hero_h1||'';
   document.getElementById('cfg-hero_h2').value = config.hero_h2||'';
   document.getElementById('cfg-hero_desc').value = config.hero_desc||'';
@@ -713,6 +764,7 @@ function collectConfig(){
   resenasErr=[];
   const c=clone(config);
   c.banner = document.getElementById('cfg-banner').value;
+  c.ga_id = document.getElementById('cfg-ga_id').value.trim().toUpperCase();
   c.hero_h1 = document.getElementById('cfg-hero_h1').value;
   c.hero_h2 = document.getElementById('cfg-hero_h2').value;
   c.hero_desc = document.getElementById('cfg-hero_desc').value;
@@ -737,6 +789,7 @@ function collectConfig(){
     try{ c[k]=JSON.stringify(JSON.parse(raw)); }
     catch(e){ errs.push(k); }
   });
+  if(c.ga_id && !/^G-[A-Z0-9]{4,}$/.test(c.ga_id)) errs.push('Google Analytics (el ID tiene que ser tipo G-XXXXXXXXXX)');
   return {config:c, errors:errs.concat(resenasErr.map(x=>'opiniones de '+x))};
 }
 
@@ -847,9 +900,9 @@ document.getElementById('save').onclick=async()=>{
     Object.keys(resenasDraft).forEach(k=>delete resenasDraft[k]);
     loadResenas();
     dirty=false;
-    status('','Actualizando el mapa del sitio para Google…');
-    const mapaOk=await updateSitemap(prods);
-    status('ok','¡Guardado! La tienda se actualiza en 1 o 2 minutos.'+(mapaOk?'':' (El mapa para Google no se pudo actualizar, se reintenta la próxima vez que guardes.)'));
+    status('','Actualizando páginas de producto y mapa del sitio para Google…');
+    const mapaOk=(await updateProductPages(prods)) & (await updateSitemap(prods));
+    status('ok','¡Guardado! La tienda se actualiza en 1 o 2 minutos.'+(mapaOk?'':' (Las páginas de producto o el mapa para Google no se pudieron actualizar del todo, se reintenta la próxima vez que guardes.)'));
   }catch(e){
     status('err',e.message);
   }

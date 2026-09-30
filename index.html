@@ -11,7 +11,7 @@
 <meta property="og:description" content="Mates tallados a mano con maderas nobles. Cada pieza es única. Envíos a todo el país."/>
 <meta property="og:url" content="https://osomates.com/"/>
 <meta property="og:type" content="website"/>
-<meta property="og:image" content="https://osomates.com/og-image.png"/>
+<meta property="og:image" content="https://osomates.com/og-image.jpg"/>
 <meta property="og:image:width" content="1080"/>
 <meta property="og:image:height" content="1080"/>
 <meta name="geo.region" content="AR-B"/>
@@ -25,6 +25,8 @@
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet"/>
 <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 <script src="fallback-data.js"></script>
+<script src="seo-pages.js"></script>
+<script src="analytics.js"></script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{--black:#0a0a0a;--white:#f8f8f6;--gray:#888;--light:#ebebeb;--mid:#444;--blue:#009ee3;--green:#2a9d5c;--warm:#c8956c;}
@@ -1286,6 +1288,7 @@ async function loadBestsellers() {
 
 // Track FB Pixel events
 function trackAddToCart(prod) {
+  omTrack('add_to_cart', prod);
   if (typeof fbq !== 'undefined') {
     fbq('track', 'AddToCart', {
       content_name: prod.nombre,
@@ -1297,6 +1300,7 @@ function trackAddToCart(prod) {
   }
 }
 function trackPurchase(total) {
+  omTrack('begin_checkout', { total: total, items: cart });
   // El pedido se confirma acá pero el pago (transferencia) todavía no ingresó,
   // por eso registramos InitiateCheckout y no Purchase.
   if (typeof fbq !== 'undefined') {
@@ -1525,7 +1529,7 @@ function injectCatalogLD(list){
         "@type":"Product","name":p.nombre,"image":[getImg(img)],
         "description":(p.descripcion||'').slice(0,200),"sku":p.id,
         "brand":{"@type":"Brand","name":"Oso Mates"},
-        "offers":{"@type":"Offer","url":"https://osomates.com/producto.html?id="+p.id,
+        "offers":{"@type":"Offer","url":OM_SEO.productUrl(p.id),
           "priceCurrency":"ARS","price":p.precio,"priceValidUntil":validUntil,
           "availability":(p.stock===0)?"https://schema.org/OutOfStock":"https://schema.org/InStock",
           "itemCondition":"https://schema.org/NewCondition"}
@@ -1560,13 +1564,13 @@ function renderGrid(listOrFilter){
   g.innerHTML=list.map((p,i)=>{
     const stockBadge=p.stock&&p.stock<=5?`<span class="stock-low">${t('ultimas')} ${p.stock}</span>`:'';
     const shipBadge=p.precio>=100000?`<span class="free-ship">${t('free_ship')}</span>`:'';
-    return `<div class="product-card"><div class="p-img-wrap" onclick="viewProduct('${p.id}')"><img src="${getImg(p.imagen)}" alt="${p.nombre}" class="p-img" style="object-position:${getImgPos(p.imagen)}" loading="lazy" onload="this.closest('.p-img-wrap').classList.add('loaded')" crossorigin="anonymous"/>${favBtnHtml(p.id)}</div><div class="p-body"><div class="p-num">N\u00b000${i+1}</div>${stockBadge}${shipBadge}${p.badge?`<div class="p-badge">${p.badge}</div>`:''}<div class="p-name" onclick="viewProduct('${p.id}')">${p.nombre}</div><div class="p-mat">${p.material}</div><div class="p-footer"><div>${hasDescuento(p)?`<div class="p-price-label">${t('transf_label')}</div><div class="p-price-orig">${fmt(p.precio)}</div>`:''}<div class="p-price"><strong>${fmt(getPrecioTransf(p))}</strong></div></div><div class="p-btns"><button class="p-view-btn" onclick="viewProduct('${p.id}')">${t('ver_btn')}</button><button class="p-add-btn" onclick="addToCart('${p.id}')">${t('add_btn')}</button></div></div></div></div>`;
+    return `<div class="product-card"><div class="p-img-wrap" onclick="viewProduct('${p.id}')"><img src="${getImg(p.imagen)}" alt="${p.nombre}" class="p-img" style="object-position:${getImgPos(p.imagen)}" loading="lazy" onload="this.closest('.p-img-wrap').classList.add('loaded')" crossorigin="anonymous"/>${favBtnHtml(p.id)}</div><div class="p-body"><div class="p-num">N\u00b000${i+1}</div>${stockBadge}${shipBadge}${p.badge?`<div class="p-badge">${p.badge}</div>`:''}<a class="p-name" href="${OM_SEO.productHref(p.id)}" style="display:block;text-decoration:none">${p.nombre}</a><div class="p-mat">${p.material}</div><div class="p-footer"><div>${hasDescuento(p)?`<div class="p-price-label">${t('transf_label')}</div><div class="p-price-orig">${fmt(p.precio)}</div>`:''}<div class="p-price"><strong>${fmt(getPrecioTransf(p))}</strong></div></div><div class="p-btns"><button class="p-view-btn" onclick="viewProduct('${p.id}')">${t('ver_btn')}</button><button class="p-add-btn" onclick="addToCart('${p.id}')">${t('add_btn')}</button></div></div></div></div>`;
   }).join('');
 }
 
 
 
-function viewProduct(id){window.location.href='producto.html?id='+id;}
+function viewProduct(id){window.location.href=OM_SEO.productHref(id);}
 
 function addToCart(id){
   const p=allProds.find(x=>x.id===id);if(!p)return;
@@ -2074,7 +2078,7 @@ document.addEventListener('mouseleave',function(e){
   </div>
 </div>
 <script type="application/ld+json">
-{"@context":"https://schema.org","@type":"Store","name":"Oso Mates","description":"Mates artesanales tallados a mano en Mar del Plata. Algarrobo, calabaza, cuero. Envíos a todo el país.","url":"https://osomates.com/","telephone":"+542233061168","email":"osomates8@gmail.com","address":{"@type":"PostalAddress","addressLocality":"Mar del Plata","addressRegion":"Buenos Aires","addressCountry":"AR"},"sameAs":["https://www.instagram.com/oso_mates"],"priceRange":"$$","image":"https://osomates.com/og-image.png","currenciesAccepted":"ARS","paymentAccepted":"Bank Transfer"}
+{"@context":"https://schema.org","@type":"Store","name":"Oso Mates","description":"Mates artesanales tallados a mano en Mar del Plata. Algarrobo, calabaza, cuero. Envíos a todo el país.","url":"https://osomates.com/","telephone":"+542233061168","email":"osomates8@gmail.com","address":{"@type":"PostalAddress","addressLocality":"Mar del Plata","addressRegion":"Buenos Aires","addressCountry":"AR"},"sameAs":["https://www.instagram.com/oso_mates"],"priceRange":"$$","image":"https://osomates.com/og-image.jpg","currenciesAccepted":"ARS","paymentAccepted":"Bank Transfer"}
 </script>
 <!-- POPUP SALIDA -->
 <div class="exit-overlay" id="exit-overlay">
