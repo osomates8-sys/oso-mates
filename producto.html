@@ -741,6 +741,7 @@ function renderProduct(p, related){
             ${sizeGuideSvg(p.categoria)}
             <p class="size-guide-text">${sizeGuideText(p.categoria)}</p>
           </div>
+          ${(p.categoria==='calabaza'||p.categoria==='madera')?`<p class="size-guide-text" style="margin-top:.9rem">Antes de usarlo: <a href="guia-como-curar-un-mate.html" style="color:var(--black)">cómo curar tu mate</a> · <a href="guia-como-cuidar-un-mate.html" style="color:var(--black)">cómo cuidarlo</a></p>`:''}
         </div>
         ${_grabado.active?`<div class="engrave-box">
           <div class="engrave-title">${t('engrave_title')}</div>
