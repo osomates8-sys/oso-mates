@@ -1,16 +1,21 @@
 #!/usr/bin/env node
-/* Genera las páginas de producto (mate-*.html, etc.) y sitemap.xml desde la terminal.
+/* Genera las páginas de producto (mate-*.html, etc.), las guías (guias.html y guia-*.html)
+   y sitemap.xml desde la terminal.
    Hace lo mismo que editar.html al guardar. Uso: node scripts/build-product-pages.js */
 const fs = require('fs');
 const path = require('path');
 const vm = require('vm');
 const { execFileSync } = require('child_process');
 const SEO = require('../seo-pages.js');
+const GP = require('../guias-pages.js');
 
 const root = path.join(__dirname, '..');
 const sandbox = { window: {} };
 vm.runInNewContext(fs.readFileSync(path.join(root, 'fallback-data.js'), 'utf8'), sandbox);
 const prods = sandbox.window.FALLBACK_PRODUCTOS || [];
+const gsandbox = { window: {} };
+vm.runInNewContext(fs.readFileSync(path.join(root, 'guias-data.js'), 'utf8'), gsandbox);
+const guides = gsandbox.window.OM_GUIAS || [];
 const tpl = fs.readFileSync(path.join(root, 'producto.html'), 'utf8');
 const map = SEO.pageMap(prods);
 
@@ -32,5 +37,18 @@ for (const f of fs.readdirSync(root)) {
     console.log('✗ borrada', f);
   }
 }
-fs.writeFileSync(path.join(root, 'sitemap.xml'), SEO.buildSitemap(prods));
+for (const g of guides) {
+  fs.writeFileSync(path.join(root, g.archivo), GP.buildGuidePage(g, guides));
+  console.log('✓', g.archivo);
+}
+fs.writeFileSync(path.join(root, 'guias.html'), GP.buildHub(guides));
+console.log('✓ guias.html');
+const guiasVigentes = new Set(guides.map(g => g.archivo));
+for (const f of fs.readdirSync(root)) {
+  if (/^guia-.+\.html$/.test(f) && !guiasVigentes.has(f)) {
+    fs.unlinkSync(path.join(root, f));
+    console.log('✗ borrada', f);
+  }
+}
+fs.writeFileSync(path.join(root, 'sitemap.xml'), SEO.buildSitemap(prods, guides));
 console.log('✓ sitemap.xml');
