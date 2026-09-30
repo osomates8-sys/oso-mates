@@ -8,6 +8,8 @@
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400&family=Montserrat:wght@400;500;600&display=swap" rel="stylesheet"/>
 <script src="fallback-data.js"></script>
 <script src="seo-pages.js"></script>
+<script src="guias-data.js"></script>
+<script src="guias-pages.js"></script>
 <style>
   :root{--ink:#2c2620;--warm:#a8703f;--line:#e5ddd0;--bg:#f7f4ee;--card:#fff;--ok:#2a9d5c;--err:#c0392b}
   *{box-sizing:border-box;margin:0;padding:0}
@@ -76,6 +78,14 @@
   .bar .status.ok{color:var(--ok)} .bar .status.err{color:var(--err)}
   button:disabled{opacity:.55;cursor:wait}
   button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible{outline:2px solid var(--warm);outline-offset:2px}
+  .guia-body{min-height:380px;font-family:'Montserrat',sans-serif;font-size:.88rem;line-height:1.6}
+  .guia-tools{display:flex;gap:.5rem;flex-wrap:wrap}
+  .help{background:#fbf8f2;border:1px solid var(--line);border-radius:9px;padding:.9rem 1.1rem;font-size:.84rem;margin-bottom:1rem}
+  .help table{border-collapse:collapse;width:100%;margin-top:.4rem}
+  .help td{padding:.3rem .5rem;border-top:1px solid var(--line);vertical-align:top}
+  .help code{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:.8rem;background:#f0ece3;padding:1px 4px;border-radius:4px;white-space:pre}
+  .count{font-size:.72rem;color:#8a7d6b;text-align:right;margin-top:.2rem}
+  .count.warn{color:var(--err)}
   .oso-zona{display:grid;grid-template-columns:160px 175px 1fr;gap:.6rem;align-items:end;padding:.55rem 0;border-top:1px solid var(--line)}
   .oso-zona:first-of-type{border-top:0}
   .oso-zona .zn{font-weight:600;font-size:.88rem;align-self:center}
@@ -142,6 +152,25 @@
     <label>Fotos de la galería</label>
     <div id="galeria-imgs"></div>
   </div>
+
+  <h2>Guías</h2>
+  <p class="hint" style="margin-bottom:.8rem">Las guías que aparecen en <strong>osomates.com/guias.html</strong>. Al guardar se actualizan las páginas, el índice de guías y el mapa para Google.</p>
+  <details class="help">
+    <summary style="margin-top:0">Cómo darle formato al texto</summary>
+    <table>
+      <tr><td><code>## Título de sección</code></td><td>Título grande. Con 2 o más aparece solo el índice "En esta guía".</td></tr>
+      <tr><td><code>### Subtítulo</code></td><td>Subtítulo chico.</td></tr>
+      <tr><td><code>- algo</code></td><td>Lista con viñetas (un renglón por punto).</td></tr>
+      <tr><td><code>1. algo</code></td><td>Lista numerada (paso a paso).</td></tr>
+      <tr><td><code>&gt; algo</code></td><td>Recuadro de consejo.</td></tr>
+      <tr><td><code>**negrita**</code> · <code>*cursiva*</code></td><td>Resaltar palabras.</td></tr>
+      <tr><td><code>[texto](guia-como-curar-un-mate.html)</code></td><td>Link (a otra guía, a un mate o a cualquier página).</td></tr>
+      <tr><td><code>| | Calabaza | Algarrobo |</code><br/><code>| Sabor | Intenso | Suave |</code></td><td>Tabla: la primera fila son los títulos.</td></tr>
+    </table>
+    <p class="hint">Dejá un renglón vacío entre párrafos. El primer párrafo sale un poco más grande. Usá <strong>Vista previa</strong> para ver cómo queda antes de guardar.</p>
+  </details>
+  <div id="guias"></div>
+  <button class="btn-ghost" id="add-guia">+ Agregar guía</button>
 
   <h2>Grabado personalizado</h2>
   <div class="card">
@@ -255,6 +284,7 @@ const IMG_MAP = {
 /* ===== Estado ===== */
 function clone(o){return JSON.parse(JSON.stringify(o));}
 let productos = [];
+let guias = [];
 let config = {};
 let galeria = [];
 let resenas = {};       // id de producto -> [{nombre,rating,comentario,fecha}]
@@ -348,9 +378,9 @@ async function putIfChanged(path, text, message, ignore){
   const r=await gh(path,{method:'PUT',body:body});
   return r.ok;
 }
-async function updateSitemap(prods){
+async function updateSitemap(prods, guides){
   try{
-    return await putIfChanged('sitemap.xml', OM_SEO.buildSitemap(prods), 'Actualizar mapa del sitio', /<lastmod>[^<]*<\/lastmod>/g);
+    return await putIfChanged('sitemap.xml', OM_SEO.buildSitemap(prods, guides), 'Actualizar mapa del sitio', /<lastmod>[^<]*<\/lastmod>/g);
   }catch(e){ console.error(e); return false; }
 }
 /* Imagen para compartir: JPG cuadrado recortado en el foco de la primera foto */
@@ -809,6 +839,127 @@ function buildFile(prods,cfg){
     '})();\n';
 }
 
+/* ===== Guías ===== */
+const GP = window.OM_GUIAS_PAGES;
+const GUIAS_PATH = 'guias-data.js';
+function hoyISO(){ return new Date().toISOString().slice(0,10); }
+function syncGuias(){ if(document.querySelector('#guias .card')) guias=collectGuias(); }
+function renderGuias(){
+  const box=document.getElementById('guias');
+  box.innerHTML='';
+  guias.forEach((g,idx)=>{
+    const card=el('div',{class:'card'});
+    card.dataset.archivo=g.archivo||'';
+    card.dataset.fecha=g.fecha||hoyISO();
+    const head=el('div',{class:'prod-head'});
+    head.appendChild(el('strong',{},[GP.fullTitle(g)||('Guía '+(idx+1))]));
+    const tools=el('div',{class:'guia-tools'});
+    const up=el('button',{class:'btn-ghost',type:'button',title:'Subir'},['↑']);
+    const down=el('button',{class:'btn-ghost',type:'button',title:'Bajar'},['↓']);
+    const prev=el('button',{class:'btn-ghost',type:'button'},['Vista previa']);
+    const del=el('button',{class:'btn-del',type:'button'},['Eliminar']);
+    up.disabled=idx===0; down.disabled=idx===guias.length-1;
+    up.onclick=()=>{ syncGuias(); [guias[idx-1],guias[idx]]=[guias[idx],guias[idx-1]]; markDirty(); renderGuias(); };
+    down.onclick=()=>{ syncGuias(); [guias[idx+1],guias[idx]]=[guias[idx],guias[idx+1]]; markDirty(); renderGuias(); };
+    prev.onclick=()=>previewGuia(idx);
+    del.onclick=()=>{
+      if(!confirm('¿Eliminar la guía "'+(GP.fullTitle(g)||'sin título')+'"? Al guardar se borra su página de la web.')) return;
+      syncGuias(); guias.splice(idx,1); markDirty(); renderGuias();
+    };
+    [up,down,prev,del].forEach(b=>tools.appendChild(b));
+    head.appendChild(tools);
+    card.appendChild(head);
+
+    const r1=el('div',{class:'row'});
+    r1.appendChild(field('Título',g.titulo,{key:'titulo'}).wrap);
+    r1.appendChild(field('Segunda parte en cursiva (opcional)',g.titulo_cursiva,{key:'titulo_cursiva'}).wrap);
+    card.appendChild(r1);
+    card.appendChild(field('Etiqueta chica arriba del título (ej: Guía · Curado)',g.etiqueta,{key:'etiqueta'}).wrap);
+    card.appendChild(field('Título para Google (lo que aparece en el buscador)',g.titulo_seo,{key:'titulo_seo'}).wrap);
+    const d=field('Descripción para Google (ideal: entre 120 y 160 letras)',g.descripcion,{type:'textarea',key:'descripcion'});
+    d.input.style.minHeight='64px'; d.input.style.fontFamily="'Montserrat',sans-serif";
+    const cnt=el('div',{class:'count'});
+    const upd=()=>{ const n=d.input.value.length; cnt.textContent=n+' letras'; cnt.className='count'+(n>170||n<60?' warn':''); };
+    d.input.addEventListener('input',upd); upd();
+    d.wrap.appendChild(cnt); card.appendChild(d.wrap);
+    const r2=el('div',{class:'row'});
+    const sel=field('Mates recomendados al final','',{key:'recomendados'});
+    const s2=el('select'); s2.dataset.key='recomendados';
+    Object.keys(GP.CATS).forEach(k=>{ const o=el('option',{value:k},[GP.CATS[k]]); if(k===(g.recomendados||'*')) o.selected=true; s2.appendChild(o); });
+    sel.input.replaceWith(s2);
+    r2.appendChild(sel.wrap);
+    r2.appendChild(field('Título de esa sección',g.recomendados_titulo,{key:'recomendados_titulo'}).wrap);
+    card.appendChild(r2);
+    const t=field('Texto de la guía',g.texto,{type:'textarea',key:'texto'});
+    t.input.classList.add('guia-body');
+    card.appendChild(t.wrap);
+    card.appendChild(el('p',{class:'hint'},[g.archivo ? 'Dirección: osomates.com/'+g.archivo : 'La dirección se crea al guardar, a partir del título.']));
+    box.appendChild(card);
+  });
+}
+function collectGuias(){
+  return Array.from(document.querySelectorAll('#guias .card')).map(card=>{
+    const g={archivo:card.dataset.archivo||'', fecha:card.dataset.fecha||hoyISO()};
+    card.querySelectorAll('[data-key]').forEach(i=>{ if(i.dataset.key) g[i.dataset.key]=i.value; });
+    ['titulo','titulo_cursiva','etiqueta','titulo_seo','descripcion','recomendados_titulo'].forEach(k=>{ g[k]=String(g[k]||'').trim(); });
+    g.texto=String(g.texto||'').replace(/\s+$/,'');
+    return g;
+  });
+}
+/* Pone nombre de archivo a las guías nuevas (sin pisar los existentes) */
+function assignFiles(list){
+  list.forEach(g=>{ if(!g.archivo) g.archivo=GP.fileFor(g,list); });
+  return list.map(g=>({archivo:g.archivo, etiqueta:g.etiqueta, titulo:g.titulo, titulo_cursiva:g.titulo_cursiva,
+    titulo_seo:g.titulo_seo, descripcion:g.descripcion, recomendados:g.recomendados||'*',
+    recomendados_titulo:g.recomendados_titulo, fecha:g.fecha, texto:g.texto}));
+}
+function previewGuia(idx){
+  const list=assignFiles(clone(collectGuias()));
+  const g=list[idx];
+  let h=GP.buildGuidePage(g,list).replace('<head>','<head>\n<base href="https://osomates.com/"/>');
+  h=h.replace('<nav>','<div style="position:fixed;bottom:0;left:0;right:0;z-index:999;background:#a8703f;color:#fff;text-align:center;font:600 13px Montserrat,sans-serif;padding:8px">Vista previa — todavía no está guardada</div>\n<nav>');
+  const url=URL.createObjectURL(new Blob([h],{type:'text/html'}));
+  const w=window.open(url,'_blank');
+  if(!w) status('err','El navegador bloqueó la ventana de vista previa. Permití las ventanas emergentes para esta página.');
+  setTimeout(()=>URL.revokeObjectURL(url),60000);
+}
+async function loadGuiasFromGitHub(){
+  const r=await gh(GUIAS_PATH,{query:'?ref='+BRANCH, headers:{'Accept':'application/vnd.github.raw+json'}});
+  if(r.status===404) return window.OM_GUIAS||[];
+  if(!r.ok) throw new Error(await ghErr(r));
+  const w={};
+  try{ new Function('window', await r.text())(w); }catch(e){ throw new Error('guias-data.js tiene un error de formato: '+e.message); }
+  return Array.isArray(w.OM_GUIAS)?w.OM_GUIAS:[];
+}
+/* Sube guias-data.js, cada página de guía, el índice guias.html y borra las guías eliminadas */
+async function updateGuias(list){
+  let ok=true;
+  if(!await putIfChanged(GUIAS_PATH, GP.buildDataFile(list), 'Editar guías desde editar.html')) throw new Error('No se pudieron guardar las guías.');
+  for(const g of list){
+    if(!await putIfChanged(g.archivo, GP.buildGuidePage(g,list), 'Guía: '+GP.fullTitle(g))) ok=false;
+  }
+  if(!await putIfChanged('guias.html', GP.buildHub(list), 'Índice de guías')) ok=false;
+  const rl=await gh('',{query:'?ref='+BRANCH});
+  if(rl.ok){
+    const vigentes=new Set(list.map(g=>g.archivo));
+    for(const f of await rl.json()){
+      if(f.type==='file'&&/^guia-.+\.html$/.test(f.name)&&!vigentes.has(f.name)){
+        const rd=await gh(f.name,{method:'DELETE',body:{message:'Borrar guía eliminada: '+f.name,sha:f.sha,branch:BRANCH}});
+        if(!rd.ok) ok=false;
+      }
+    }
+  } else ok=false;
+  return ok;
+}
+document.getElementById('add-guia').onclick=()=>{
+  syncGuias();
+  guias.push({archivo:'',etiqueta:'Guía',titulo:'Nueva guía',titulo_cursiva:'',titulo_seo:'',descripcion:'',recomendados:'*',recomendados_titulo:'Nuestros mates',fecha:hoyISO(),
+    texto:'Escribí acá la introducción.\n\n## Primera sección\n\nTexto de la sección.\n\n## Segunda sección\n\n- Un punto\n- Otro punto'});
+  markDirty(); renderGuias();
+  const cards=document.querySelectorAll('#guias .card');
+  cards[cards.length-1].scrollIntoView({behavior:'smooth',block:'start'});
+};
+
 /* ===== Cargar datos en pantalla ===== */
 function applyData(w){
   productos = clone(w.FALLBACK_PRODUCTOS || []);
@@ -828,7 +979,9 @@ function status(cls,text){ const s=document.getElementById('save-status'); s.cla
 
 async function connectAndLoad(){
   const {data,sha}=await loadFromGitHub();
+  const gl=await loadGuiasFromGitHub();
   applyData(data); dataSha=sha; setGhUI(true);
+  guias=clone(gl); renderGuias(); dirty=false;
 }
 
 document.getElementById('gh-connect').onclick=async()=>{
@@ -868,6 +1021,12 @@ document.getElementById('save').onclick=async()=>{
   const cc=collectConfig();
   if(cc.errors.length){ status('err','Hay un error de formato en: '+cc.errors.join(', ')+'. Revisá esos datos antes de guardar.'); return; }
   for(const p of prods){ if(!p.nombre.trim()){ status('err','Hay un producto sin nombre.'); return; } }
+  const gl=collectGuias();
+  for(const g of gl){
+    const e=GP.validate(g);
+    if(e.length){ status('err','En la guía "'+(GP.fullTitle(g)||'sin título')+'" '+e.join(', ')+'.'); return; }
+  }
+  const guiasList=assignFiles(gl);
 
   const btn=document.getElementById('save'); btn.disabled=true;
   try{
@@ -900,10 +1059,14 @@ document.getElementById('save').onclick=async()=>{
     Object.keys(resenasDraft).forEach(k=>delete resenasDraft[k]);
     loadResenas();
     dirty=false;
+    status('','Guardando guías…');
+    const guiasOk=await updateGuias(guiasList);
+    guias=guiasList; renderGuias();
     status('','Actualizando páginas de producto y mapa del sitio para Google…');
-    const mapaOk=(await updateProductPages(prods)) & (await updateSitemap(prods));
-    status('ok','¡Guardado! La tienda se actualiza en 1 o 2 minutos.'+(mapaOk?'':' (Las páginas de producto o el mapa para Google no se pudieron actualizar del todo, se reintenta la próxima vez que guardes.)'));
+    const mapaOk=guiasOk & (await updateProductPages(prods)) & (await updateSitemap(prods, guiasList));
+    status('ok','¡Guardado! La tienda se actualiza en 1 o 2 minutos.'+(mapaOk?'':' (Algunas páginas de producto, guías o el mapa para Google no se pudieron actualizar del todo, se reintenta la próxima vez que guardes.)'));
   }catch(e){
+    dirty=true;
     status('err',e.message);
   }
   btn.disabled=false;
@@ -991,7 +1154,7 @@ document.getElementById('add-prod').onclick=()=>{
       if(/token|permiso|repo/.test(e.message)){ try{ localStorage.removeItem(TOKEN_KEY); }catch(_){} token=null; setGhUI(false); ghMsg('err',e.message); }
     }
   }
-  if(window.FALLBACK_PRODUCTOS){ applyData(window); }
+  if(window.FALLBACK_PRODUCTOS){ applyData(window); guias=clone(window.OM_GUIAS||[]); renderGuias(); dirty=false; }
   else if(!token){ document.querySelector('.wrap').innerHTML='<h1>No se pudo cargar fallback-data.js</h1><p>Recargá la página.</p>'; }
 })();
 </script>

@@ -10,9 +10,6 @@
 (function (root) {
   var SITE = 'https://osomates.com/';
   var OG_SIZE = 900;
-  /* Guías (páginas fijas): se incluyen en el sitemap */
-  var GUIDES = ['guias.html', 'guia-como-curar-un-mate.html', 'guia-como-cebar-un-mate.html',
-    'guia-como-cuidar-un-mate.html', 'guia-mate-calabaza-vs-algarrobo.html', 'guia-que-mate-regalar.html'];
   var PREFIX = { calabaza: 'mate-', madera: 'mate-', bombillas: 'bombilla-', combos: 'combo-' };
   /* Nombres viejos .jpg que en el repo están como .webp (igual que en index/producto/editar) */
   var IMG_MAP = {
@@ -165,12 +162,15 @@
     return h;
   }
 
-  function buildSitemap(prods) {
+  /* guides: lista de guías (guias-data.js). Si no se pasa, usa window.OM_GUIAS */
+  function buildSitemap(prods, guides) {
+    guides = guides || root.OM_GUIAS || [];
     var hoy = new Date().toISOString().slice(0, 10);
     var map = pageMap(prods);
     var urls = [[SITE, '1.0']].concat((prods || []).filter(function (p) { return p.activo !== false && p.id; })
       .map(function (p) { return [SITE + map[p.id], '0.8']; }))
-      .concat(GUIDES.map(function (f) { return [SITE + f, '0.6']; }));
+      .concat(guides.length ? [[SITE + 'guias.html', '0.6']] : [])
+      .concat(guides.map(function (g) { return [SITE + g.archivo, '0.6']; }));
     return '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' +
       urls.map(function (u) {
         return '  <url>\n    <loc>' + u[0].replace(/&/g, '&amp;') + '</loc>\n    <lastmod>' + hoy +
