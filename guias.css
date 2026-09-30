@@ -1,0 +1,76 @@
+/* Oso Mates - estilos de las guías (guias.html y guia-*.html) */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--black:#0a0a0a;--white:#f8f8f6;--gray:#888;--light:#ebebeb;--mid:#444;--warm:#c8956c;--soft:#f1efe9;}
+[data-theme="dark"]{--black:#f0f0ee;--white:#15151a;--light:#2a2a30;--mid:#bbb;--gray:#999;--soft:#1d1d22;}
+html{scroll-behavior:smooth}
+body{font-family:'Montserrat',sans-serif;background:var(--white);color:var(--black);overflow-x:hidden;}
+nav{position:fixed;top:0;left:0;right:0;z-index:500;display:flex;justify-content:space-between;align-items:center;gap:1rem;padding:1.5rem 4rem;background:rgba(248,248,246,0.97);backdrop-filter:blur(8px);border-bottom:1px solid var(--light);}
+[data-theme="dark"] nav{background:rgba(21,21,26,0.97);}
+.logo{font-family:'Cormorant Garamond',serif;font-size:1.3rem;font-weight:300;letter-spacing:.35em;text-transform:uppercase;color:var(--black);text-decoration:none;white-space:nowrap;}
+.nav-links{display:flex;gap:2rem;align-items:center;}
+.nav-links a{font-size:.62rem;letter-spacing:.2em;text-transform:uppercase;color:var(--gray);text-decoration:none;transition:color .2s;white-space:nowrap;}
+.nav-links a:hover{color:var(--black)}
+main{max-width:760px;margin:0 auto;padding:9rem 1.5rem 5rem;}
+.crumbs{font-size:.62rem;letter-spacing:.12em;color:var(--gray);margin-bottom:2rem;}
+.crumbs a{color:var(--gray);text-decoration:none;}
+.crumbs a:hover{color:var(--black);}
+.page-eyebrow{font-size:.62rem;letter-spacing:.28em;text-transform:uppercase;color:var(--warm);margin-bottom:1.2rem;}
+.page-title{font-family:'Cormorant Garamond',serif;font-size:clamp(2.3rem,5vw,3.4rem);font-weight:300;line-height:1.05;letter-spacing:-.02em;margin-bottom:1.2rem;}
+.page-title em{font-style:italic;}
+.lead{font-size:.95rem;font-weight:300;line-height:1.9;color:var(--mid);margin-bottom:.8rem;}
+.meta{font-size:.68rem;color:var(--gray);letter-spacing:.05em;margin-bottom:3rem;}
+.toc{border:1px solid var(--light);padding:1.4rem 1.8rem;margin-bottom:3rem;}
+.toc-title{font-size:.6rem;letter-spacing:.25em;text-transform:uppercase;color:var(--gray);margin-bottom:.8rem;}
+.toc ol{margin:0 0 0 1.2rem;}
+.toc li{font-size:.82rem;line-height:1.9;}
+.toc a{color:var(--black);text-decoration:none;}
+.toc a:hover{text-decoration:underline;}
+h2{font-family:'Cormorant Garamond',serif;font-weight:400;font-size:1.75rem;margin:3.2rem 0 1rem;letter-spacing:-.01em;line-height:1.15;scroll-margin-top:100px;}
+h3{font-size:.8rem;letter-spacing:.12em;text-transform:uppercase;font-weight:600;margin:2rem 0 .8rem;}
+p{font-size:.88rem;font-weight:300;line-height:1.95;color:var(--mid);margin-bottom:1.1rem;}
+ul,ol{margin:0 0 1.2rem 1.4rem;}
+li{font-size:.88rem;font-weight:300;line-height:1.9;color:var(--mid);margin-bottom:.45rem;}
+strong{color:var(--black);font-weight:600;}
+a{color:var(--black);}
+.tip{background:var(--soft);border-left:2px solid var(--warm);padding:1.1rem 1.4rem;margin:1.6rem 0;}
+.tip p{margin:0;}
+.compare{width:100%;border-collapse:collapse;margin:1.4rem 0 2rem;font-size:.8rem;}
+.compare th,.compare td{border-bottom:1px solid var(--light);padding:.8rem .6rem;text-align:left;vertical-align:top;font-weight:300;color:var(--mid);line-height:1.6;}
+.compare th{font-weight:600;color:var(--black);font-size:.62rem;letter-spacing:.15em;text-transform:uppercase;}
+.compare td:first-child{font-weight:500;color:var(--black);}
+.table-wrap{overflow-x:auto;}
+/* Tarjetas de guías (guias.html) */
+.guide-list{display:grid;gap:1.2rem;margin-top:2.5rem;}
+.guide-card{display:block;border:1px solid var(--light);padding:1.6rem 1.8rem;text-decoration:none;color:inherit;transition:border-color .2s,transform .2s;}
+.guide-card:hover{border-color:var(--gray);transform:translateY(-2px);}
+.guide-card .g-eyebrow{font-size:.58rem;letter-spacing:.25em;text-transform:uppercase;color:var(--warm);margin-bottom:.5rem;}
+.guide-card .g-title{font-family:'Cormorant Garamond',serif;font-size:1.55rem;font-weight:400;line-height:1.15;color:var(--black);margin-bottom:.5rem;}
+.guide-card .g-desc{font-size:.8rem;font-weight:300;line-height:1.7;color:var(--mid);}
+/* Productos recomendados (los arma guias.js con el catálogo actual) */
+.recos{margin-top:4rem;padding-top:2.5rem;border-top:1px solid var(--light);}
+.recos-title{font-family:'Cormorant Garamond',serif;font-size:1.6rem;font-weight:300;margin-bottom:1.5rem;}
+.recos-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.2rem;}
+.reco{text-decoration:none;color:inherit;display:block;}
+.reco img{width:100%;aspect-ratio:3/4;object-fit:cover;display:block;background:var(--light);margin-bottom:.7rem;}
+.reco-name{font-family:'Cormorant Garamond',serif;font-size:1.2rem;color:var(--black);}
+.reco-mat{font-size:.62rem;letter-spacing:.12em;text-transform:uppercase;color:var(--gray);margin-top:.2rem;}
+.cta{margin-top:3.5rem;text-align:center;border:1px solid var(--light);padding:2.2rem 1.5rem;}
+.cta p{margin-bottom:1.2rem;}
+.btn{display:inline-block;background:var(--black);color:var(--white);text-decoration:none;font-size:.62rem;letter-spacing:.2em;text-transform:uppercase;padding:.95rem 1.8rem;margin:.3rem;}
+.btn.ghost{background:none;color:var(--black);border:1px solid var(--black);}
+.more{margin-top:3rem;}
+.more-title{font-size:.6rem;letter-spacing:.25em;text-transform:uppercase;color:var(--gray);margin-bottom:.8rem;}
+.more a{display:block;font-family:'Cormorant Garamond',serif;font-size:1.25rem;color:var(--black);text-decoration:none;padding:.5rem 0;border-bottom:1px solid var(--light);}
+.more a:hover{color:var(--warm);}
+footer{text-align:center;padding:3rem 1.5rem;border-top:1px solid var(--light);}
+.footer-logo{font-family:'Cormorant Garamond',serif;font-size:1rem;font-weight:300;letter-spacing:.35em;text-transform:uppercase;color:var(--black);margin-bottom:.6rem;}
+.footer-copy{font-size:.58rem;letter-spacing:.15em;color:var(--gray);}
+.footer-copy a{color:inherit;}
+@media(max-width:768px){
+  nav{padding:1.2rem 1rem;}
+  .nav-links{gap:1rem;}
+  .nav-links .hide-sm{display:none;}
+  main{padding:7rem 1rem 4rem;}
+  .recos-grid{grid-template-columns:repeat(2,1fr);}
+  .toc{padding:1.1rem 1.2rem;}
+}

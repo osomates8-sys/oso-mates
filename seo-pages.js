@@ -10,6 +10,9 @@
 (function (root) {
   var SITE = 'https://osomates.com/';
   var OG_SIZE = 900;
+  /* Guías (páginas fijas): se incluyen en el sitemap */
+  var GUIDES = ['guias.html', 'guia-como-curar-un-mate.html', 'guia-como-cebar-un-mate.html',
+    'guia-como-cuidar-un-mate.html', 'guia-mate-calabaza-vs-algarrobo.html', 'guia-que-mate-regalar.html'];
   var PREFIX = { calabaza: 'mate-', madera: 'mate-', bombillas: 'bombilla-', combos: 'combo-' };
   /* Nombres viejos .jpg que en el repo están como .webp (igual que en index/producto/editar) */
   var IMG_MAP = {
@@ -166,7 +169,8 @@
     var hoy = new Date().toISOString().slice(0, 10);
     var map = pageMap(prods);
     var urls = [[SITE, '1.0']].concat((prods || []).filter(function (p) { return p.activo !== false && p.id; })
-      .map(function (p) { return [SITE + map[p.id], '0.8']; }));
+      .map(function (p) { return [SITE + map[p.id], '0.8']; }))
+      .concat(GUIDES.map(function (f) { return [SITE + f, '0.6']; }));
     return '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' +
       urls.map(function (u) {
         return '  <url>\n    <loc>' + u[0].replace(/&/g, '&amp;') + '</loc>\n    <lastmod>' + hoy +
@@ -176,7 +180,7 @@
 
   var api = {
     SITE: SITE, OG_SIZE: OG_SIZE, slugify: slugify, pageMap: pageMap, productHref: productHref, productUrl: productUrl,
-    ogImage: ogImage, buildProductPage: buildProductPage, buildSitemap: buildSitemap
+    imgUrl: imgUrl, ogImage: ogImage, buildProductPage: buildProductPage, buildSitemap: buildSitemap
   };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   else root.OM_SEO = api;
