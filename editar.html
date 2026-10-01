@@ -172,6 +172,16 @@
   <div id="guias"></div>
   <button class="btn-ghost" id="add-guia">+ Agregar guía</button>
 
+  <h2>Pago con tarjeta</h2>
+  <div class="card">
+    <label class="chk" style="margin-top:0"><input type="checkbox" id="tarj-activo"/> Ofrecer "Tarjeta" en el checkout (además de transferencia)</label>
+    <div class="row">
+      <div><label for="tarj-cuotas">Cuotas sin interés que ofrecés (0 = sin cuotas)</label><input type="number" id="tarj-cuotas" min="0" max="24" step="1"/></div>
+      <div><label for="tarj-prov">Con qué cobrás (lo ve el cliente)</label><input type="text" id="tarj-prov" placeholder="Naranja X"/></div>
+    </div>
+    <p class="hint">Con tarjeta se cobra el precio de lista (sin el 10% de la transferencia). El pedido te llega por mail como siempre, marcado "Tarjeta", y le mandás al cliente el link de pago por WhatsApp.</p>
+  </div>
+
   <h2>Bombilla para sumar al mate</h2>
   <div class="card">
     <label class="chk" style="margin-top:0"><input type="checkbox" id="bomb-activo"/> Ofrecer agregar una bombilla en la página de cada mate</label>
@@ -778,6 +788,13 @@ function parseResenas(id,txt){
 }
 
 /* ===== Grabado ===== */
+function loadTarjetaForm(){
+  let t={active:false,cuotas:0,proveedor:''};
+  try{ if(config.pago_tarjeta) Object.assign(t,JSON.parse(config.pago_tarjeta)); }catch(e){}
+  document.getElementById('tarj-activo').checked=!!t.active;
+  document.getElementById('tarj-cuotas').value=t.cuotas||0;
+  document.getElementById('tarj-prov').value=t.proveedor||'';
+}
 function loadBombillaForm(){
   let b={active:false,price:0,nombre:'Bombilla'};
   try{ if(config.bombilla_extra) Object.assign(b,JSON.parse(config.bombilla_extra)); }catch(e){}
@@ -795,6 +812,7 @@ function loadGrabadoForm(){
 function loadConfigForm(){
   loadGrabadoForm();
   loadBombillaForm();
+  loadTarjetaForm();
   loadOsoForm();
   document.getElementById('cfg-banner').value = config.banner||'';
   document.getElementById('cfg-ga_id').value = config.ga_id||'';
@@ -834,6 +852,7 @@ function collectConfig(){
   c.oso_config = collectOso();
   const gActivo=document.getElementById('grab-activo').checked;
   const gPrecio=parseInt(document.getElementById('grab-precio').value,10)||0;
+  c.pago_tarjeta = JSON.stringify({active:document.getElementById('tarj-activo').checked, cuotas:Math.max(0,parseInt(document.getElementById('tarj-cuotas').value,10)||0), proveedor:document.getElementById('tarj-prov').value.trim()});
   c.bombilla_extra = JSON.stringify({active:document.getElementById('bomb-activo').checked, nombre:document.getElementById('bomb-nombre').value.trim()||'Bombilla', price:parseInt(document.getElementById('bomb-precio').value,10)||0});
   c.grabado = JSON.stringify({active:gActivo, price:gPrecio, maxChars:(function(){ try{ return JSON.parse(config.grabado||'{}').maxChars||20; }catch(e){ return 20; } })()});
   Object.keys(resenasDraft).forEach(id=>{
