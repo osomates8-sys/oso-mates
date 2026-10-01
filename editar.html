@@ -172,6 +172,16 @@
   <div id="guias"></div>
   <button class="btn-ghost" id="add-guia">+ Agregar guía</button>
 
+  <h2>Bombilla para sumar al mate</h2>
+  <div class="card">
+    <label class="chk" style="margin-top:0"><input type="checkbox" id="bomb-activo"/> Ofrecer agregar una bombilla en la página de cada mate</label>
+    <div class="row">
+      <div><label for="bomb-nombre">Nombre que ve el cliente</label><input type="text" id="bomb-nombre" placeholder="Bombilla de alpaca"/></div>
+      <div><label for="bomb-precio">Precio de la bombilla ($)</label><input type="number" id="bomb-precio" min="0" step="100"/></div>
+    </div>
+    <p class="hint">El cliente la marca en la página del mate y se suma al precio. En cada producto podés elegir si se ofrece o no (más arriba, en "Productos").</p>
+  </div>
+
   <h2>Grabado personalizado</h2>
   <div class="card">
     <label class="chk" style="margin-top:0"><input type="checkbox" id="grab-activo"/> Ofrecer grabado en la página de cada producto</label>
@@ -603,6 +613,15 @@ function renderProductos(){
     const cb=el('input',{type:'checkbox'}); cb.checked=p.activo!==false; cb.dataset.key='activo';
     chk.append(cb,document.createTextNode('Producto visible en la tienda'));
     card.appendChild(chk);
+    /* Extras que se pueden sumar en este producto (si no se eligió nunca: sí en mates de calabaza y madera) */
+    const extraDef=(p.categoria==='calabaza'||p.categoria==='madera');
+    [['bombilla','Ofrecer agregar bombilla'],['grabado','Ofrecer grabado']].forEach(([k,txt])=>{
+      const l=el('label',{class:'chk'});
+      const c=el('input',{type:'checkbox'}); c.dataset.key='ofrece_'+k;
+      c.checked=typeof p['ofrece_'+k]==='boolean'?p['ofrece_'+k]:extraDef;
+      l.append(c,document.createTextNode(txt));
+      card.appendChild(l);
+    });
 
     if(p.id){
       const lista=resenas[p.id]||[];
@@ -634,7 +653,7 @@ function collectProductos(){
     delete o.link_mp;
     card.querySelectorAll('[data-key]').forEach(inp=>{
       const k=inp.dataset.key; if(!k)return;
-      if(k==='activo'){ o.activo=inp.checked; return; }
+      if(k==='activo'||k==='ofrece_bombilla'||k==='ofrece_grabado'){ o[k]=inp.checked; return; }
       let v=inp.value;
       if(k==='precio'||k==='precio_transferencia'||k==='stock'){
         const n=parseInt(v,10);
@@ -759,6 +778,13 @@ function parseResenas(id,txt){
 }
 
 /* ===== Grabado ===== */
+function loadBombillaForm(){
+  let b={active:false,price:0,nombre:'Bombilla'};
+  try{ if(config.bombilla_extra) Object.assign(b,JSON.parse(config.bombilla_extra)); }catch(e){}
+  document.getElementById('bomb-activo').checked=!!b.active;
+  document.getElementById('bomb-nombre').value=b.nombre||'';
+  document.getElementById('bomb-precio').value=b.price||0;
+}
 function loadGrabadoForm(){
   let g={active:false,price:0,maxChars:20};
   try{ if(config.grabado) Object.assign(g,JSON.parse(config.grabado)); }catch(e){}
@@ -768,6 +794,7 @@ function loadGrabadoForm(){
 
 function loadConfigForm(){
   loadGrabadoForm();
+  loadBombillaForm();
   loadOsoForm();
   document.getElementById('cfg-banner').value = config.banner||'';
   document.getElementById('cfg-ga_id').value = config.ga_id||'';
@@ -807,6 +834,7 @@ function collectConfig(){
   c.oso_config = collectOso();
   const gActivo=document.getElementById('grab-activo').checked;
   const gPrecio=parseInt(document.getElementById('grab-precio').value,10)||0;
+  c.bombilla_extra = JSON.stringify({active:document.getElementById('bomb-activo').checked, nombre:document.getElementById('bomb-nombre').value.trim()||'Bombilla', price:parseInt(document.getElementById('bomb-precio').value,10)||0});
   c.grabado = JSON.stringify({active:gActivo, price:gPrecio, maxChars:(function(){ try{ return JSON.parse(config.grabado||'{}').maxChars||20; }catch(e){ return 20; } })()});
   Object.keys(resenasDraft).forEach(id=>{
     const r=parseResenas(id,resenasDraft[id]);
