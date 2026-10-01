@@ -1,4 +1,4 @@
-/* Oso Mates - datos de la tienda. Editado desde editar.html el 2026-09-25.
+/* Oso Mates - datos de la tienda. Editado desde editar.html el 2026-10-01.
    La tienda usa SOLO estos datos (no hay base de datos externa). */
 (function () {
   window.FALLBACK_PRODUCTOS = [
@@ -116,7 +116,6 @@
   ];
 
   window.FALLBACK_CONFIG = {
-    "ga_id": "G-74Q6C5ZQMS",
     "galeria_imgs": "[\"IMG_5233.jpg\",\"IMG_5277.jpg\",\"IMG_5272.jpg\"]",
     "faq_items": "[{\"q\":\"¿Cuánto tarda en llegar el pedido?\",\"a\":\"Despachamos en 48 horas hábiles desde que confirmamos el pago. El tiempo de entrega depende de tu ubicación: CABA y GBA 2-3 días, interior del país 3-7 días hábiles. Te enviamos el número de seguimiento por email.\"},{\"q\":\"¿Los mates vienen curados?\",\"a\":\"Los mates se entregan sin curar. Pero no te preocupes: junto a cada mate enviamos una guía práctica con el paso a paso para que puedas curarlo fácilmente y empezar a disfrutarlo.\"},{\"q\":\"¿Cómo funciona el descuento por transferencia?\",\"a\":\"Al elegir el método de pago \\\"Transferencia\\\" en el checkout, el 10% de descuento se aplica automáticamente. Los datos bancarios (CBU del Banco Francés) aparecen en pantalla y te los enviamos por email.\"},{\"q\":\"¿Puedo pedir un mate personalizado?\",\"a\":\"¡Sí! Podés agregar grabado personalizado (nombres, fechas o diseños) marcando la casilla en la página de cada mate; el precio se suma solo. Después de confirmar el pago coordinamos el diseño por WhatsApp. El tiempo de producción es de 1 a 3 días hábiles.\"},{\"q\":\"¿Tienen local físico?\",\"a\":\"Somos un emprendimiento online con taller en Mar del Plata. Por el momento no tenemos local físico, pero podés coordinar retiro en mano si estás en MDP escribiéndonos por WhatsApp.\"}]",
     "hero_h1": "Hechos",
@@ -126,6 +125,7 @@
     "nosotros_content": "{\"title1\":\"Hechos a mano\",\"title2\":\"para cada encuentro\",\"body\":\"Cada mate es trabajado artesanalmente, respetando la forma y la esencia de la madera. Seleccionamos cada pieza con dedicación para ofrecer productos únicos, pensados para acompañar tus momentos más importantes.\",\"values\":[{\"icon\":\"🌲\",\"name\":\"Piezas únicas\",\"desc\":\"La veta, el color y la forma hacen que cada mate sea irrepetible.\"},{\"icon\":\"✋\",\"name\":\"A mano\",\"desc\":\"Elaborados con dedicación y oficio, manteniendo viva una tradición.\"},{\"icon\":\"📦\",\"name\":\"Envíos a todo el país\",\"desc\":\"Llevamos Oso Mates a cada rincón de Argentina.\"},{\"icon\":\"💬\",\"name\":\"Atención real\",\"desc\":\"Respondemos el mismo día\"}]}",
     "testimonios": "[{\"stars\":5,\"text\":\"Compré el Imperial Algarrobo y es una joya. La madera tiene una textura increíble, se nota que es tallado a mano. Llegó en perfectas condiciones.\",\"author\":\"Martina G.\",\"location\":\"Buenos Aires\"},{\"stars\":5,\"text\":\"Pedí uno para regalar y quedaron fascinados. La calidad es impresionante para el precio. La bombilla artesanal también es hermosa. 100% lo recomiendo.\",\"author\":\"Federico R.\",\"location\":\"Rosario\"},{\"stars\":5,\"text\":\"Un lujo la atención y los productos, los mejores de Mar del plata!!\",\"author\":\"Agustin F.\",\"location\":\"Mar del plata\"}]",
     "coupon": "{\"code\":\"OSO10\",\"percent\":10,\"active\":true}",
+    "ga_id": "G-74Q6C5ZQMS",
     "oso_config": "{\"activo\":true,\"lado\":\"der\",\"tamano\":\"mediano\",\"celular\":true,\"zonas\":{\"inicio\":{\"accion\":\"saluda\",\"frase\":\"¡Hola! Encontrá tu próximo mate\"},\"productos\":{\"accion\":\"mate\",\"frase\":\"Un mate y seguimos!\"},\"galeria\":{\"accion\":\"mira\",\"frase\":\"Elegi el tuyo\"},\"info\":{\"accion\":\"quieto\",\"frase\":\"Este es para vos\"},\"contacto\":{\"accion\":\"asiente\",\"frase\":\"¿Te cebo uno? Escribinos.\"}},\"tocar\":[\"¡Cebame uno!\",\"Hechos a mano en Mar del Plata.\",\"¿Ya viste los bombillones?\",\"El ranchero es mi favorito.\"]}",
     "grabado": "{\"active\":true,\"price\":9000,\"maxChars\":20}"
   };
