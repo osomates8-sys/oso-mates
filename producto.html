@@ -328,6 +328,18 @@ nav{position:fixed;top:0;left:0;right:0;z-index:500;display:flex;justify-content
 </style>
 <style id="om-extra-css">.om-wa-btn{display:flex;align-items:center;justify-content:center;gap:.6rem;width:100%;margin:1.2rem 0 0;padding:1rem 1.2rem;background:#25D366;color:#fff!important;text-decoration:none;font-family:'Montserrat',sans-serif;font-size:.66rem;letter-spacing:.14em;text-transform:uppercase;font-weight:600;border:none;transition:background .2s}.om-wa-btn:hover{background:#1ebe5b}.om-wa-btn svg{width:18px;height:18px;fill:#fff;flex-shrink:0}.om-mail-warn{font-size:.72rem;color:#b3541e;margin-top:.8rem;line-height:1.6}.engrave-note{font-size:.72rem;color:var(--gray);line-height:1.6;margin:0}</style>
 <style id="om-contraste">
+/* Elección de medio de pago en el checkout */
+.pay-choice{display:grid;grid-template-columns:1fr 1fr;gap:.6rem;margin:1.2rem 0 1rem;}
+.pay-opt{border:1.5px solid var(--light);background:var(--white);color:var(--black);padding:.85rem .8rem;text-align:left;cursor:pointer;font-family:'Montserrat',sans-serif;display:flex;flex-direction:column;gap:.25rem;transition:border-color .2s;}
+.pay-opt strong{font-size:.68rem;letter-spacing:.14em;text-transform:uppercase;font-weight:600;}
+.pay-opt span{font-size:.68rem;color:var(--gray);line-height:1.35;}
+.pay-opt.active{border-color:var(--black);box-shadow:inset 0 0 0 1px var(--black);}
+.card-box{display:none;border:1px solid var(--light);padding:1.1rem 1.3rem;margin-bottom:1.5rem;font-size:.78rem;line-height:1.75;color:var(--mid);}
+.card-box.show{display:block;}
+.card-box strong{color:var(--black);}
+.product-cuotas{font-size:.72rem;color:var(--mid);margin-top:.35rem;}
+.product-cuotas strong{color:var(--black);}
+
 /* En pantallas táctiles el cursor decorativo quedaba como un círculo fijo arriba a la izquierda */
 @media(hover:none){.cursor,.cursor-ring{display:none!important;}}
 /* Legibilidad en modo claro y oscuro */
@@ -401,6 +413,11 @@ nav{position:fixed;top:0;left:0;right:0;z-index:500;display:flex;justify-content
         <div class="co-total"><span class="co-total-label" id="co-total-label" data-i18n="co_total">Total</span><span class="co-total-amount" id="co-total-amount"></span></div>
         <div class="coupon-box"><input id="coupon-input" type="text" placeholder="Código de cupón" data-i18n-ph="coupon_ph"/><button class="coupon-btn" onclick="applyCoupon()" data-i18n="coupon_btn">Aplicar</button></div>
         <div class="coupon-msg" id="coupon-msg"></div>
+        <div class="pay-choice" id="pay-choice">
+          <button type="button" class="pay-opt active" data-pay="transfer" onclick="selectPay('transfer')"><strong>Transferencia</strong><span>10% de descuento</span></button>
+          <button type="button" class="pay-opt" data-pay="card" onclick="selectPay('card')"><strong>Tarjeta</strong><span id="pay-opt-card-sub">Crédito o débito</span></button>
+        </div>
+        <div class="card-box" id="card-box"></div>
         <div class="transfer-box show" id="transfer-box">
           <div class="transfer-box-title" data-i18n="transfer_title">&#x2713; Datos para transferir</div>
           <div class="trow"><span class="tlabel" data-i18n="transfer_banco">Banco</span><span class="tval" data-i18n="transfer_banco_val">Francés (BBVA)</span></div>
@@ -804,6 +821,7 @@ function renderProduct(p, related){
         <div class="product-price-box">
           <div class="product-price" id="product-price">${fmt(p.precio)}</div>
           <div class="product-transfer">${t('product_transfer_label')} <strong id="product-price-transf">${fmt(p.precio_transferencia)}</strong> (&#x2212;10%)</div>
+          <div class="product-cuotas" id="product-cuotas"></div>
         </div>
         ${extrasBox}
         <div class="product-actions">
@@ -974,6 +992,8 @@ function updateExtras(){
   const at=document.getElementById('add-total'); if(at) at.textContent=extra?'· '+fmt(total):'';
   const bp=document.getElementById('buy-bar-price'); if(bp) bp.textContent=fmt(total);
   const bs=document.getElementById('buy-bar-sub'); if(bs) bs.innerHTML=t('product_transfer_label')+' <strong>'+fmt(totalT)+'</strong>';
+  const pc=document.getElementById('product-cuotas');
+  if(pc) pc.innerHTML=(PAGO_TARJETA.active&&PAGO_TARJETA.cuotas>1)?'o hasta <strong>'+cuotasTxt(total)+'</strong> con tarjeta':'';
 }
 function toggleEngraveInput(){
   const checked=document.getElementById('engrave-check').checked;
@@ -1009,12 +1029,6 @@ async function loadCoupon(){
   if((!_coupon||!_coupon.code)&&window.FALLBACK_CONFIG&&window.FALLBACK_CONFIG.coupon){
     try{_coupon=JSON.parse(window.FALLBACK_CONFIG.coupon);}catch(e){}
   }
-}
-function getCheckoutTotal(){
-  const isT=payMethod==='transfer';
-  let total=isT?cartTransferTotal():cartTotal();
-  if(_couponApplied&&_coupon.percent>0)total=total*(1-_coupon.percent/100);
-  return total;
 }
 function applyCoupon(){
   const msg=document.getElementById('coupon-msg');
@@ -1106,21 +1120,63 @@ function goToStep2(){
 }
 function openCheckout(m){if(!cart.length){showToast('Agregá productos primero 👆');return;}toggleCart();payMethod='transfer';buildCheckout();goToStep1();document.getElementById('co-overlay').classList.add('open');}
 function closeCheckout(){document.getElementById('co-overlay').classList.remove('open');}
-function selectPay(m){payMethod='transfer';buildCheckoutTotal();}
+/* Pago con tarjeta: el cliente confirma el pedido y le mandás por WhatsApp un link de pago
+   (Naranja X u otro). Se configura en editar.html → "Pago con tarjeta". Con tarjeta se cobra el precio de lista. */
+const PAGO_TARJETA=(function(){
+  try{const v=(window.FALLBACK_CONFIG||{}).pago_tarjeta; if(!v) return {active:false,cuotas:0,proveedor:''};
+    const o=typeof v==='string'?JSON.parse(v):v;
+    return {active:o.active!==false, cuotas:parseInt(o.cuotas,10)||0, proveedor:String(o.proveedor||'').trim()};
+  }catch(e){return {active:false,cuotas:0,proveedor:''};}
+})();
+function cuotasTxt(total){
+  const c=PAGO_TARJETA.cuotas;
+  return c>1?(c+' cuotas sin interés de '+fmt(Math.round(total/c))):'';
+}
+function getCheckoutTotal(){
+  const isT=payMethod==='transfer';
+  let total=isT?cartTransferTotal():cartTotal();
+  if(_couponApplied&&_coupon.percent>0)total=total*(1-_coupon.percent/100);
+  return total;
+}
+function renderCoItems(){
+  const isT=payMethod==='transfer';
+  document.getElementById('co-items').innerHTML=cart.map(item=>`<div class="co-item"><span class="co-item-name">${item.nombre}${item.bombilla?` + ${escapeHtml(item.bombilla)}`:''}${item.grabado?` (${t('cart_item_grabado')}: "${escapeHtml(item.grabado)}")`:''} \xd7 ${item.qty}</span><span>${fmt(itemUnitPrice(item,isT)*item.qty)}</span></div>`).join('');
+}
+function selectPay(m){
+  payMethod=(m==='card'&&PAGO_TARJETA.active)?'card':'transfer';
+  const isT=payMethod==='transfer';
+  const pc=document.getElementById('pay-choice'); if(pc) pc.style.display=PAGO_TARJETA.active?'':'none';
+  document.querySelectorAll('.pay-opt').forEach(b=>b.classList.toggle('active',b.dataset.pay===payMethod));
+  const tb=document.getElementById('transfer-box'); if(tb) tb.classList.toggle('show',isT);
+  const cb=document.getElementById('card-box'); if(cb) cb.classList.toggle('show',!isT);
+  renderCoItems();
+  buildCheckoutTotal();
+}
 function buildCheckout(){
-  document.getElementById('co-items').innerHTML=cart.map(item=>`<div class="co-item"><span class="co-item-name">${item.nombre}${item.bombilla?` + ${escapeHtml(item.bombilla)}`:''}${item.grabado?` (${t('cart_item_grabado')}: "${escapeHtml(item.grabado)}")`:''} × ${item.qty}</span><span>${fmt(itemUnitPrice(item,payMethod==='transfer')*item.qty)}</span></div>`).join('');
   _couponApplied=false;
   const ci=document.getElementById('coupon-input');if(ci)ci.value='';
   const cm=document.getElementById('coupon-msg');if(cm){cm.textContent='';cm.className='coupon-msg';}
+  const sub=document.getElementById('pay-opt-card-sub');
+  if(sub) sub.textContent=PAGO_TARJETA.cuotas>1?('Hasta '+PAGO_TARJETA.cuotas+' cuotas sin interés'):'Crédito o débito';
   selectPay(payMethod);
 }
 function buildCheckoutTotal(){
   const isT=payMethod==='transfer';
   const total=getCheckoutTotal();
-  let label=isT?'Total (con 10% dcto.)':'Total';
-  if(_couponApplied&&_coupon.percent>0)label+=' (cup\u00f3n -'+_coupon.percent+'%)';
+  let label=isT?'Total (con 10% dcto.)':'Total con tarjeta';
+  if(_couponApplied&&_coupon.percent>0)label+=' (cupón -'+_coupon.percent+'%)';
   document.getElementById('co-total-label').textContent=label;
   document.getElementById('co-total-amount').textContent=fmt(total);
+  const cb=document.getElementById('card-box');
+  if(cb&&!isT){
+    const cu=cuotasTxt(total);
+    cb.innerHTML='&#x1F4B3; Pagás con <strong>tarjeta de crédito o débito</strong>'+(cu?', en hasta <strong>'+cu+'</strong>':'')+'.<br>'+
+      'Al confirmar te enviamos por WhatsApp un <strong>link de pago seguro'+(PAGO_TARJETA.proveedor?' de '+escapeHtml(PAGO_TARJETA.proveedor):'')+'</strong> por el total. Pagás desde el celu en un minuto.';
+  }
+}
+function metodoTxt(isT){
+  if(isT) return 'Transferencia (10% dcto.)';
+  return 'Tarjeta — link de pago'+(PAGO_TARJETA.proveedor?' '+PAGO_TARJETA.proveedor:'')+(PAGO_TARJETA.cuotas>1?' (hasta '+PAGO_TARJETA.cuotas+' cuotas s/i)':'');
 }
 async function confirmOrder(){
   const name=document.getElementById('client-name').value.trim();
@@ -1132,8 +1188,8 @@ async function confirmOrder(){
   omTrack('begin_checkout', { total: total, items: cart });
   let detalle=cart.map(i=>i.nombre+(i.bombilla?' + '+i.bombilla:'')+(i.grabado?' (Grabado: "'+i.grabado+'")':'')+' x'+i.qty+' = '+fmt(itemUnitPrice(i,isT)*i.qty)).join(' | ');
   if(_couponApplied&&_coupon.percent>0)detalle+=' | Cup\u00f3n '+_coupon.code+' (-'+_coupon.percent+'%)';
-  const datosT=isT?'DATOS: Banco Frances BBVA | CBU: 0170090940000048482721 | Total: '+fmt(total):'';
-  const metodo='Transferencia (10% dcto.)';
+  const datosT=isT?'DATOS: Banco Frances BBVA | CBU: 0170090940000048482721 | Total: '+fmt(total):'PAGO CON TARJETA: en unos minutos te enviamos por WhatsApp el link de pago'+(PAGO_TARJETA.proveedor?' de '+PAGO_TARJETA.proveedor:'')+(PAGO_TARJETA.cuotas>1?' (hasta '+cuotasTxt(total)+')':'')+'. Total: '+fmt(total);
+  const metodo=metodoTxt(isT);
   const btn=document.getElementById('confirm-btn');
   btn.textContent='Procesando...';btn.disabled=true;
   await sb.from('ventas').insert({cliente_nombre:name,cliente_email:email,detalle:detalle,metodo_pago:metodo,total:total,estado:'pendiente'});
@@ -1144,19 +1200,20 @@ async function confirmOrder(){
     await emailjs.send('service_s6si3n4','template_ulqz3nj',{...emailParams,email:'osomates8@gmail.com',cliente_nombre:'NUEVO PEDIDO — '+name+' ('+email+')'});
   }catch(e){mailOk=false;console.error(e);}
   closeCheckout();
-  document.getElementById('success-text').textContent=(mailOk?'Te mandamos los datos a '+email+'. ':'No pudimos mandarte el email. ')+'Para transferir: Banco Francés (BBVA) · CBU 0170090940000048482721 · Total '+fmt(total)+'. Después mandanos el comprobante por WhatsApp'+(cart.some(function(i){return i.grabado;})?' y coordinamos el diseño del grabado.':'.');
+  document.getElementById('success-text').textContent=isT?((mailOk?'Te mandamos los datos a '+email+'. ':'No pudimos mandarte el email. ')+'Para transferir: Banco Francés (BBVA) · CBU 0170090940000048482721 · Total '+fmt(total)+'. Después mandanos el comprobante por WhatsApp'+(cart.some(function(i){return i.grabado;})?' y coordinamos el diseño del grabado.':'.')):((mailOk?'Te mandamos el detalle a '+email+'. ':'')+'Total con tarjeta: '+fmt(total)+(PAGO_TARJETA.cuotas>1?' (hasta '+cuotasTxt(total)+')':'')+'. Tocá el botón de abajo para avisarnos por WhatsApp y te mandamos el link de pago seguro'+(PAGO_TARJETA.proveedor?' de '+PAGO_TARJETA.proveedor:'')+'.'+(cart.some(function(i){return i.grabado;})?' Ahí también coordinamos el diseño del grabado.':''));
   (function(){
     var box=document.querySelector('#success-overlay .success-modal'); if(!box) return;
     var a=document.getElementById('success-wa');
     if(!a){ a=document.createElement('a'); a.id='success-wa'; a.className='om-wa-btn'; a.target='_blank'; a.rel='noopener';
-      a.innerHTML='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2a8.2 8.2 0 0 1-4.2-1.1l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1l-.8 1c-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.2-.4.7-1.3.1-.2 0-.3 0-.4l-.8-1.9c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.8 12 12 0 0 0 4.6 4c1.7.7 2.4.8 3.2.7.5-.1 1.5-.6 1.8-1.2.2-.6.2-1.1.1-1.2l-.4-.2z"/></svg>Enviar pedido y comprobante por WhatsApp';
+      a.innerHTML='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2a8.2 8.2 0 0 1-4.2-1.1l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1l-.8 1c-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.2-.4.7-1.3.1-.2 0-.3 0-.4l-.8-1.9c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.8 12 12 0 0 0 4.6 4c1.7.7 2.4.8 3.2.7.5-.1 1.5-.6 1.8-1.2.2-.6.2-1.1.1-1.2l-.4-.2z"/></svg>Enviar pedido por WhatsApp';
       box.insertBefore(a, box.querySelector('.success-close')); a.style.marginBottom='1rem'; }
-    a.href='https://wa.me/542233061168?text='+encodeURIComponent('¡Hola! Hice un pedido en la web.\n'+'Nombre: '+name+'\nEmail: '+email+'\nPedido: '+detalle+'\nTotal: '+fmt(total)+'\nTe mando el comprobante de la transferencia'+(cart.some(function(i){return i.grabado;})?' y el diseño del grabado.':'.'));
+    a.lastChild.textContent=isT?'Enviar pedido y comprobante por WhatsApp':'Pedir link de pago por WhatsApp';
+    a.href='https://wa.me/542233061168?text='+encodeURIComponent('¡Hola! Hice un pedido en la web.\n'+'Nombre: '+name+'\nEmail: '+email+'\nPedido: '+detalle+'\nTotal: '+fmt(total)+'\n'+(isT?'Te mando el comprobante de la transferencia'+(cart.some(function(i){return i.grabado;})?' y el diseño del grabado.':'.'):'Quiero pagar con tarjeta'+(PAGO_TARJETA.cuotas>1?' en hasta '+PAGO_TARJETA.cuotas+' cuotas sin inter\u00e9s':'')+'. \u00bfMe mand\u00e1s el link de pago?'));
   })();
   document.getElementById('success-overlay').classList.add('open');
   const _isT2=payMethod==='transfer';
   const _dateStr2=new Date().toLocaleDateString('es-AR',{day:'2-digit',month:'2-digit',year:'numeric'});
-  saveOrder({name,total:fmt(getCheckoutTotal()),date:_dateStr2,metodo:_isT2?'Transferencia':'Mercado Pago',detalle:cart.slice(0,2).map(i=>i.nombre+' x'+i.qty).join(', ')+(cart.length>2?' y más':'')});
+  saveOrder({name,total:fmt(getCheckoutTotal()),date:_dateStr2,metodo:_isT2?'Transferencia':'Tarjeta',detalle:cart.slice(0,2).map(i=>i.nombre+' x'+i.qty).join(', ')+(cart.length>2?' y más':'')});
   cart=[];updateCartUI();
 }
 function copyCBU(){navigator.clipboard.writeText('0170090940000048482721');showToast('CBU copiado ✓');}
