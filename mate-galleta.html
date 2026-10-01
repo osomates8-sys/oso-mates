@@ -33,8 +33,8 @@
 <script src="analytics.js"></script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-:root{--black:#0a0a0a;--white:#f8f8f6;--gray:#888;--light:#ebebeb;--mid:#444;--blue:#009ee3;--green:#2a9d5c;--warm:#c8956c;}
-[data-theme="dark"]{--black:#f0f0ee;--white:#15151a;--light:#2a2a30;--mid:#bbb;--gray:#999;}
+:root{--black:#0a0a0a;--white:#f8f8f6;--gray:#6f6f6f;--light:#ebebeb;--mid:#444;--blue:#009ee3;--green:#2a9d5c;--warm:#946437;}
+[data-theme="dark"]{--black:#f0f0ee;--white:#15151a;--light:#2a2a30;--mid:#bbb;--gray:#a3a3a3;--warm:#c8956c;}
 body{font-family:'Montserrat',sans-serif;background:var(--white);color:var(--black);transition:background-color .3s ease,color .3s ease;}
 nav{position:fixed;top:0;left:0;right:0;z-index:500;display:flex;justify-content:space-between;align-items:center;padding:1.5rem 4rem;background:rgba(248,248,246,0.97);backdrop-filter:blur(8px);border-bottom:1px solid var(--light);transition:background-color .3s ease,border-color .3s ease;}
 [data-theme="dark"] nav{background:rgba(21,21,26,0.97);}
@@ -334,6 +334,25 @@ nav{position:fixed;top:0;left:0;right:0;z-index:500;display:flex;justify-content
 }
 </style>
 <style id="om-extra-css">.om-wa-btn{display:flex;align-items:center;justify-content:center;gap:.6rem;width:100%;margin:1.2rem 0 0;padding:1rem 1.2rem;background:#25D366;color:#fff!important;text-decoration:none;font-family:'Montserrat',sans-serif;font-size:.66rem;letter-spacing:.14em;text-transform:uppercase;font-weight:600;border:none;transition:background .2s}.om-wa-btn:hover{background:#1ebe5b}.om-wa-btn svg{width:18px;height:18px;fill:#fff;flex-shrink:0}.om-mail-warn{font-size:.72rem;color:#b3541e;margin-top:.8rem;line-height:1.6}.engrave-note{font-size:.72rem;color:var(--gray);line-height:1.6;margin:0}</style>
+<style id="om-contraste">
+/* En pantallas táctiles el cursor decorativo quedaba como un círculo fijo arriba a la izquierda */
+@media(hover:none){.cursor,.cursor-ring{display:none!important;}}
+/* Legibilidad en modo claro y oscuro */
+.theme-toggle,.qty-btn{color:var(--black);}
+.om-wa-btn{background:#168a43!important;}
+.om-wa-btn:hover{background:#127538!important;}
+/* "Datos para transferir": el fondo verde clarito era fijo y en modo oscuro el texto quedaba blanco sobre claro */
+[data-theme="dark"] .transfer-box{background:#11241a;border-color:#2b5a3f;}
+[data-theme="dark"] .trow{border-color:#2b5a3f;}
+[data-theme="dark"] .transfer-box .tval{color:var(--black);}
+[data-theme="dark"] #newsletter-section{background:#1a1a1f;}
+.fav-btn:not(.active){color:#8a8a8a;}
+[data-theme="dark"] .cart-count{color:#15151a;}
+/* Franjas que son oscuras en los dos modos (portada, cinta, pie, WhatsApp, Instagram, aviso de cookies):
+   conservan sus colores originales aunque el modo oscuro invierta la paleta */
+.hero-left,.marquee-strip,.wa-block,footer,#instagram-section,.promo-banner,.cookie-banner{--warm:#c8956c;--gray:#9a9a9a;}
+[data-theme="dark"] .hero-left,[data-theme="dark"] .marquee-strip,[data-theme="dark"] .wa-block,[data-theme="dark"] footer,[data-theme="dark"] #instagram-section,[data-theme="dark"] .promo-banner,[data-theme="dark"] .cookie-banner{--black:#0a0a0a;--white:#f8f8f6;--light:#2a2a30;--mid:#bbb;}
+</style>
 </head>
 <body>
 <nav>
@@ -478,7 +497,7 @@ const I18N = {
     success_title:'¡Pedido confirmado!', success_close:'Cerrar',
     cookie_text:'Usamos cookies para mejorar tu experiencia y analizar el tráfico del sitio. Al continuar navegando aceptás nuestra <a href="legales.html">política de privacidad</a>.', cookie_btn:'Aceptar',
     ship_est_title:'Calculá tu envío', size_guide_title:'Guía de tamaños',
-    engrave_title:'Personalización', engrave_label:'Agregar grabado personalizado', extras_title:'Sumale a tu mate', btn_add_short:'Agregar', engrave_ph:'Texto a grabar',
+    engrave_title:'Personalización', engrave_label:'Agregar grabado personalizado', extras_title:'Sumale a tu mate', btn_add_short:'Agregar', co_step1_label:'Resumen', co_step2_label:'Tus datos', co_next_btn:'Continuar →', co_back_btn:'Volver al resumen', engrave_ph:'Texto a grabar',
     feat1:'Tallado artesanal a mano', feat2:'Envío a todo el país', feat3:'Garantía de satisfacción',
     btn_add:'Agregar al carrito', btn_buy:'Comprar ahora',
     fav_added:'♥ En tus favoritos', fav_add:'♡ Agregar a favoritos',
@@ -498,7 +517,7 @@ const I18N = {
     success_title:'Order confirmed!', success_close:'Close',
     cookie_text:'We use cookies to improve your experience and analyze site traffic. By continuing to browse you accept our <a href="legales.html">privacy policy</a>.', cookie_btn:'Accept',
     ship_est_title:'Calculate your shipping', size_guide_title:'Size guide',
-    engrave_title:'Personalization', engrave_label:'Add custom engraving', extras_title:'Add to your mate', btn_add_short:'Add', engrave_ph:'Text to engrave',
+    engrave_title:'Personalization', engrave_label:'Add custom engraving', extras_title:'Add to your mate', btn_add_short:'Add', co_step1_label:'Summary', co_step2_label:'Your details', co_next_btn:'Continue →', co_back_btn:'Back to summary', engrave_ph:'Text to engrave',
     feat1:'Hand-carved craftsmanship', feat2:'Nationwide shipping', feat3:'Satisfaction guarantee',
     btn_add:'Add to cart', btn_buy:'Buy now',
     fav_added:'♥ In your favorites', fav_add:'♡ Add to favorites',

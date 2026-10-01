@@ -1,7 +1,7 @@
 /* Oso Mates - estilos de las guías (guias.html y guia-*.html) */
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-:root{--black:#0a0a0a;--white:#f8f8f6;--gray:#888;--light:#ebebeb;--mid:#444;--warm:#c8956c;--soft:#f1efe9;}
-[data-theme="dark"]{--black:#f0f0ee;--white:#15151a;--light:#2a2a30;--mid:#bbb;--gray:#999;--soft:#1d1d22;}
+:root{--black:#0a0a0a;--white:#f8f8f6;--gray:#6f6f6f;--light:#ebebeb;--mid:#444;--warm:#946437;--soft:#f1efe9;}
+[data-theme="dark"]{--black:#f0f0ee;--white:#15151a;--light:#2a2a30;--mid:#bbb;--gray:#a3a3a3;--warm:#c8956c;--soft:#1d1d22;}
 html{scroll-behavior:smooth}
 body{font-family:'Montserrat',sans-serif;background:var(--white);color:var(--black);overflow-x:hidden;}
 nav{position:fixed;top:0;left:0;right:0;z-index:500;display:flex;justify-content:space-between;align-items:center;gap:1rem;padding:1.5rem 4rem;background:rgba(248,248,246,0.97);backdrop-filter:blur(8px);border-bottom:1px solid var(--light);}
