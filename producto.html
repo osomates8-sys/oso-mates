@@ -670,6 +670,12 @@ async function loadReviews(productId){
     return;
   }
   const avg=reviews.reduce((s,r)=>s+r.rating,0)/reviews.length;
+  /* Estrellas para Google: sumar las opiniones a los datos del producto */
+  try{
+    const ldEl=document.getElementById('product-ld');
+    const rt=OM_SEO.ratingLD(OM_SEO.reviewsFor({id:productId},{['resenas_'+productId]:reviews}));
+    if(ldEl&&rt){const ld=JSON.parse(ldEl.textContent||'{}');ld.aggregateRating=rt.aggregateRating;ld.review=rt.review;ldEl.textContent=JSON.stringify(ld);}
+  }catch(e){}
   if(sumEl)sumEl.innerHTML='<strong>'+avg.toFixed(1)+'</strong> / 5 \u00b7 '+reviews.length+' opini\u00f3n'+(reviews.length===1?'':'es');
   if(topEl)topEl.innerHTML='\u2605'.repeat(Math.round(avg))+'\u2606'.repeat(5-Math.round(avg))+' <span class="prt-count">'+avg.toFixed(1)+' \u00b7 '+reviews.length+' opini\u00f3n'+(reviews.length===1?'':'es')+'</span>';
   listEl.innerHTML=reviews.slice().reverse().map(function(r){

@@ -403,7 +403,7 @@ async function ensureOgImage(og){
     return r.ok;
   }finally{ if(obj) URL.revokeObjectURL(obj); }
 }
-async function updateProductPages(prods){
+async function updateProductPages(prods, cfg){
   try{
     const rt=await gh('producto.html',{query:'?ref='+BRANCH});
     if(!rt.ok) return false;
@@ -414,7 +414,7 @@ async function updateProductPages(prods){
       if(!p.id||!map[p.id]) continue;
       const og=OM_SEO.ogImage(p);
       if(og){ try{ if(!await ensureOgImage(og)) ok=false; }catch(e){ console.error(e); ok=false; } }
-      if(!await putIfChanged(map[p.id], OM_SEO.buildProductPage(tpl,p,prods), 'Página de producto: '+p.nombre)) ok=false;
+      if(!await putIfChanged(map[p.id], OM_SEO.buildProductPage(tpl,p,prods,cfg), 'Página de producto: '+p.nombre)) ok=false;
     }
     /* borrar páginas de productos que ya no existen o cambiaron de nombre */
     const rl=await gh('',{query:'?ref='+BRANCH});
@@ -1063,7 +1063,7 @@ document.getElementById('save').onclick=async()=>{
     const guiasOk=await updateGuias(guiasList);
     guias=guiasList; renderGuias();
     status('','Actualizando páginas de producto y mapa del sitio para Google…');
-    const mapaOk=guiasOk & (await updateProductPages(prods)) & (await updateSitemap(prods, guiasList));
+    const mapaOk=guiasOk & (await updateProductPages(prods, cc.config)) & (await updateSitemap(prods, guiasList));
     status('ok','¡Guardado! La tienda se actualiza en 1 o 2 minutos.'+(mapaOk?'':' (Algunas páginas de producto, guías o el mapa para Google no se pudieron actualizar del todo, se reintenta la próxima vez que guardes.)'));
   }catch(e){
     dirty=true;
