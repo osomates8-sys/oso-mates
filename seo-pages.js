@@ -97,9 +97,44 @@
     return (d ? d + ' ' : '') + extra;
   }
 
-  function productLD(p, url) {
-    var imgs = (p.imagenes && p.imagenes.length ? p.imagenes : [p.imagen]).filter(Boolean).map(imgUrl);
+  /* Opiniones de un producto (las que se cargan en editar.html → producto → Opiniones) */
+  function reviewsFor(p, config) {
+    var raw = config && config['resenas_' + p.id];
+    if (!raw) return [];
+    try {
+      var list = typeof raw === 'string' ? JSON.parse(raw) : raw;
+      return (Array.isArray(list) ? list : []).filter(function (r) {
+        return r && r.nombre && r.comentario && r.rating >= 1 && r.rating <= 5;
+      });
+    } catch (e) { return []; }
+  }
+  /* "5/9/2026" (formato del editor) -> "2026-09-05" */
+  function isoDate(f) {
+    var m = /^(\d{1,2})\/(\d{1,2})\/(\d{4})$/.exec(String(f || '').trim());
+    if (m) return m[3] + '-' + ('0' + m[2]).slice(-2) + '-' + ('0' + m[1]).slice(-2);
+    return /^\d{4}-\d{2}-\d{2}/.test(f || '') ? String(f).slice(0, 10) : undefined;
+  }
+  /* Estrellas para Google: promedio + las últimas opiniones */
+  function ratingLD(reviews) {
+    if (!reviews || !reviews.length) return null;
+    var avg = reviews.reduce(function (s, r) { return s + Number(r.rating); }, 0) / reviews.length;
     return {
+      aggregateRating: { '@type': 'AggregateRating', ratingValue: Math.round(avg * 10) / 10, reviewCount: reviews.length, bestRating: 5, worstRating: 1 },
+      review: reviews.slice(-5).reverse().map(function (r) {
+        return {
+          '@type': 'Review',
+          author: { '@type': 'Person', name: String(r.nombre) },
+          datePublished: isoDate(r.fecha),
+          reviewRating: { '@type': 'Rating', ratingValue: Number(r.rating), bestRating: 5, worstRating: 1 },
+          reviewBody: String(r.comentario)
+        };
+      })
+    };
+  }
+
+  function productLD(p, url, reviews) {
+    var imgs = (p.imagenes && p.imagenes.length ? p.imagenes : [p.imagen]).filter(Boolean).map(imgUrl);
+    var ld = {
       '@context': 'https://schema.org',
       '@type': 'Product',
       name: p.nombre,
@@ -118,6 +153,9 @@
         seller: { '@type': 'Organization', name: 'Oso Mates' }
       }
     };
+    var rt = ratingLD(reviews);
+    if (rt) { ld.aggregateRating = rt.aggregateRating; ld.review = rt.review; }
+    return ld;
   }
 
   function setAttrById(html, id, attr, value) {
@@ -129,7 +167,8 @@
   }
 
   /* Arma la página de un producto a partir del HTML de producto.html */
-  function buildProductPage(template, p, prods) {
+  /* config: FALLBACK_CONFIG (para leer las opiniones del producto) */
+  function buildProductPage(template, p, prods, config) {
     var file = pageMap(prods)[p.id];
     var url = SITE + file;
     var title = p.nombre + ' — ' + (p.material ? p.material + ' | ' : '') + 'Oso Mates, mates artesanales';
@@ -145,7 +184,7 @@
     h = setAttrById(h, 'meta-og-url', 'content', url);
     h = setAttrById(h, 'link-canonical', 'href', url);
     h = h.replace(/(<script type="application\/ld\+json" id="product-ld">)[\s\S]*?(<\/script>)/,
-      function (m, a, b) { return a + JSON.stringify(productLD(p, url)).replace(/</g, '\\u003c') + b; });
+      function (m, a, b) { return a + JSON.stringify(productLD(p, url, reviewsFor(p, config))).replace(/</g, '\\u003c') + b; });
     var extraMeta =
       '<meta property="product:price:amount" content="' + esc(p.precio) + '"/>\n' +
       '<meta property="product:price:currency" content="ARS"/>\n' +
@@ -180,7 +219,7 @@
 
   var api = {
     SITE: SITE, OG_SIZE: OG_SIZE, slugify: slugify, pageMap: pageMap, productHref: productHref, productUrl: productUrl,
-    imgUrl: imgUrl, ogImage: ogImage, buildProductPage: buildProductPage, buildSitemap: buildSitemap
+    imgUrl: imgUrl, ogImage: ogImage, reviewsFor: reviewsFor, ratingLD: ratingLD, buildProductPage: buildProductPage, buildSitemap: buildSitemap
   };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   else root.OM_SEO = api;

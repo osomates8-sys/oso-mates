@@ -122,6 +122,8 @@ section{padding:8rem 4rem}
 .p-badge{display:inline-block;font-size:.55rem;letter-spacing:.18em;text-transform:uppercase;background:var(--black);color:var(--white);padding:.3rem .8rem;margin-bottom:.8rem;}
 .p-name{font-family:'Cormorant Garamond',serif;font-size:1.4rem;color:var(--black);line-height:1.1;margin-bottom:.3rem;cursor:pointer;}
 .p-name:hover{text-decoration:underline;text-underline-offset:4px;}
+.p-stars{font-size:.7rem;color:var(--warm);letter-spacing:.08em;margin:-.1rem 0 .35rem;}
+.p-stars span{color:var(--gray);letter-spacing:0;margin-left:.3rem;}
 .p-mat{font-size:.65rem;letter-spacing:.12em;text-transform:uppercase;color:var(--gray);margin-bottom:1rem;font-weight:300;}
 .p-footer{display:flex;justify-content:space-between;align-items:flex-end;}
 .p-price{font-family:'Cormorant Garamond',serif;font-size:1.5rem;font-weight:300;color:var(--black);}
@@ -1567,12 +1569,19 @@ function renderGrid(listOrFilter){
   g.innerHTML=list.map((p,i)=>{
     const stockBadge=p.stock&&p.stock<=5?`<span class="stock-low">${t('ultimas')} ${p.stock}</span>`:'';
     const shipBadge=p.precio>=100000?`<span class="free-ship">${t('free_ship')}</span>`:'';
-    return `<div class="product-card"><div class="p-img-wrap" onclick="viewProduct('${p.id}')"><img src="${getImg(p.imagen)}" alt="${p.nombre}" class="p-img" style="object-position:${getImgPos(p.imagen)}" loading="lazy" onload="this.closest('.p-img-wrap').classList.add('loaded')" crossorigin="anonymous"/>${favBtnHtml(p.id)}</div><div class="p-body"><div class="p-num">N\u00b000${i+1}</div>${stockBadge}${shipBadge}${p.badge?`<div class="p-badge">${p.badge}</div>`:''}<a class="p-name" href="${OM_SEO.productHref(p.id)}" style="display:block;text-decoration:none">${p.nombre}</a><div class="p-mat">${p.material}</div><div class="p-footer"><div>${hasDescuento(p)?`<div class="p-price-label">${t('transf_label')}</div><div class="p-price-orig">${fmt(p.precio)}</div>`:''}<div class="p-price"><strong>${fmt(getPrecioTransf(p))}</strong></div></div><div class="p-btns"><button class="p-view-btn" onclick="viewProduct('${p.id}')">${t('ver_btn')}</button><button class="p-add-btn" onclick="addToCart('${p.id}')">${t('add_btn')}</button></div></div></div></div>`;
+    return `<div class="product-card"><div class="p-img-wrap" onclick="viewProduct('${p.id}')"><img src="${getImg(p.imagen)}" alt="${p.nombre}" class="p-img" style="object-position:${getImgPos(p.imagen)}" loading="lazy" onload="this.closest('.p-img-wrap').classList.add('loaded')" crossorigin="anonymous"/>${favBtnHtml(p.id)}</div><div class="p-body"><div class="p-num">N\u00b000${i+1}</div>${stockBadge}${shipBadge}${p.badge?`<div class="p-badge">${p.badge}</div>`:''}<a class="p-name" href="${OM_SEO.productHref(p.id)}" style="display:block;text-decoration:none">${p.nombre}</a>${starsHtml(p)}<div class="p-mat">${p.material}</div><div class="p-footer"><div>${hasDescuento(p)?`<div class="p-price-label">${t('transf_label')}</div><div class="p-price-orig">${fmt(p.precio)}</div>`:''}<div class="p-price"><strong>${fmt(getPrecioTransf(p))}</strong></div></div><div class="p-btns"><button class="p-view-btn" onclick="viewProduct('${p.id}')">${t('ver_btn')}</button><button class="p-add-btn" onclick="addToCart('${p.id}')">${t('add_btn')}</button></div></div></div></div>`;
   }).join('');
 }
 
 
 
+/* Estrellas de las opiniones publicadas (editar.html → producto → Opiniones) */
+function starsHtml(p){
+  const rv=OM_SEO.reviewsFor(p,window.FALLBACK_CONFIG||{});
+  if(!rv.length)return '';
+  const avg=rv.reduce((s,r)=>s+Number(r.rating),0)/rv.length, n=Math.round(avg);
+  return '<div class="p-stars" aria-label="'+avg.toFixed(1)+' de 5">'+'\u2605'.repeat(n)+'\u2606'.repeat(5-n)+'<span>'+avg.toFixed(1)+' ('+rv.length+')</span></div>';
+}
 function viewProduct(id){window.location.href=OM_SEO.productHref(id);}
 
 function addToCart(id){

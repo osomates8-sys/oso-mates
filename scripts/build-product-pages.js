@@ -27,7 +27,7 @@ for (const p of prods) {
       String(og.x), String(og.y), String(SEO.OG_SIZE)], { stdio: 'inherit' });
     console.log('✓', og.path);
   }
-  fs.writeFileSync(path.join(root, map[p.id]), SEO.buildProductPage(tpl, p, prods));
+  fs.writeFileSync(path.join(root, map[p.id]), SEO.buildProductPage(tpl, p, prods, sandbox.window.FALLBACK_CONFIG || {}));
   console.log('✓', map[p.id]);
 }
 const vigentes = new Set(Object.values(map));
