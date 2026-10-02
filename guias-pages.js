@@ -146,7 +146,7 @@
       '  <div class="nav-links">\n    <a href="guias.html">Guías</a>\n    <a href="index.html#catalogo">Ver mates &#8594;</a>\n  </div>\n</nav>\n<main>\n';
   }
   var FOOT = '\n</main>\n<footer>\n  <div class="footer-logo">Oso Mates</div>\n' +
-    '  <div class="footer-copy">&#169; 2026 &#8212; Mates artesanales hechos en Mar del Plata</div>\n' +
+    '  <div class="footer-copy">&#169; 2026 &#8212; Mates artesanales desde Mar del Plata</div>\n' +
     '  <div class="footer-copy" style="margin-top:.6rem"><a href="guias.html">Guías</a> · <a href="index.html#catalogo">Catálogo</a> · <a href="legales.html">Política de privacidad y términos</a></div>\n' +
     '</footer>\n<script src="guias.js"></script>\n</body>\n</html>\n';
 
