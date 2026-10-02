@@ -217,9 +217,53 @@
       }).join('') + '</urlset>\n';
   }
 
+  /* Catálogo de productos (productos.xml) para Google Merchant Center (Google Shopping)
+     y Meta Commerce Manager (Instagram/Facebook). Formato RSS 2.0 con campos g:. */
+  var CAT_GOOGLE = 'Home & Garden > Kitchen & Dining > Tableware > Drinkware';
+  var TIPO = { calabaza: 'Mates > Calabaza', madera: 'Mates > Madera', bombillas: 'Bombillas', combos: 'Combos' };
+  function xml(s) {
+    return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;').replace(/'/g, '&apos;');
+  }
+  function feedTitle(p) {
+    var n = String(p.nombre || '').trim();
+    var base = /^(mate|bombilla|combo)\b/i.test(n) ? n
+      : (p.categoria === 'bombillas' ? 'Bombilla ' : p.categoria === 'combos' ? 'Combo ' : 'Mate ') + n;
+    return (base + (p.material ? ' — ' + p.material : '') + ' | Tallado a mano').slice(0, 150);
+  }
+  function buildFeed(prods) {
+    var map = pageMap(prods);
+    var items = (prods || []).filter(function (p) { return p && p.id && p.activo !== false && map[p.id]; }).map(function (p) {
+      var og = ogImage(p);
+      var img = og ? SITE + og.path : imgUrl((p.imagenes && p.imagenes[0]) || p.imagen);
+      var stock = (p.stock === null || p.stock === undefined || p.stock === '') ? null : Math.max(0, parseInt(p.stock, 10) || 0);
+      var desc = describe(p).slice(0, 5000);
+      return '    <item>\n' +
+        '      <g:id>' + xml(p.id) + '</g:id>\n' +
+        '      <g:title>' + xml(feedTitle(p)) + '</g:title>\n' +
+        '      <g:description>' + xml(desc) + '</g:description>\n' +
+        '      <g:link>' + xml(SITE + map[p.id]) + '</g:link>\n' +
+        '      <g:image_link>' + xml(img) + '</g:image_link>\n' +
+        '      <g:availability>' + (stock === 0 ? 'out_of_stock' : 'in_stock') + '</g:availability>\n' +
+        (stock !== null ? '      <g:quantity_to_sell_on_facebook>' + stock + '</g:quantity_to_sell_on_facebook>\n' : '') +
+        '      <g:price>' + (Number(p.precio) || 0).toFixed(2) + ' ARS</g:price>\n' +
+        '      <g:condition>new</g:condition>\n' +
+        '      <g:brand>Oso Mates</g:brand>\n' +
+        '      <g:identifier_exists>no</g:identifier_exists>\n' +
+        '      <g:google_product_category>' + xml(CAT_GOOGLE) + '</g:google_product_category>\n' +
+        '      <g:product_type>' + xml(TIPO[p.categoria] || 'Mates') + '</g:product_type>\n' +
+        '    </item>\n';
+    });
+    return '<?xml version="1.0" encoding="UTF-8"?>\n' +
+      '<rss version="2.0" xmlns:g="http://base.google.com/ns/1.0">\n  <channel>\n' +
+      '    <title>Oso Mates</title>\n    <link>' + SITE + '</link>\n' +
+      '    <description>Mates artesanales tallados a mano en Mar del Plata</description>\n' +
+      items.join('') + '  </channel>\n</rss>\n';
+  }
+
   var api = {
     SITE: SITE, OG_SIZE: OG_SIZE, slugify: slugify, pageMap: pageMap, productHref: productHref, productUrl: productUrl,
-    imgUrl: imgUrl, ogImage: ogImage, reviewsFor: reviewsFor, ratingLD: ratingLD, buildProductPage: buildProductPage, buildSitemap: buildSitemap
+    imgUrl: imgUrl, ogImage: ogImage, reviewsFor: reviewsFor, ratingLD: ratingLD, buildProductPage: buildProductPage, buildSitemap: buildSitemap, buildFeed: buildFeed
   };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   else root.OM_SEO = api;

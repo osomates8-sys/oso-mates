@@ -398,6 +398,11 @@ async function putIfChanged(path, text, message, ignore){
   const r=await gh(path,{method:'PUT',body:body});
   return r.ok;
 }
+/* Catálogo para Google Shopping e Instagram/Facebook (osomates.com/productos.xml) */
+async function updateFeed(prods){
+  try{ return await putIfChanged('productos.xml', OM_SEO.buildFeed(prods), 'Actualizar catálogo de productos (Google/Meta)'); }
+  catch(e){ console.error(e); return false; }
+}
 async function updateSitemap(prods, guides){
   try{
     return await putIfChanged('sitemap.xml', OM_SEO.buildSitemap(prods, guides), 'Actualizar mapa del sitio', /<lastmod>[^<]*<\/lastmod>/g);
@@ -1110,7 +1115,7 @@ document.getElementById('save').onclick=async()=>{
     const guiasOk=await updateGuias(guiasList);
     guias=guiasList; renderGuias();
     status('','Actualizando páginas de producto y mapa del sitio para Google…');
-    const mapaOk=guiasOk & (await updateProductPages(prods, cc.config)) & (await updateSitemap(prods, guiasList));
+    const mapaOk=guiasOk & (await updateProductPages(prods, cc.config)) & (await updateSitemap(prods, guiasList)) & (await updateFeed(prods));
     status('ok','¡Guardado! La tienda se actualiza en 1 o 2 minutos.'+(mapaOk?'':' (Algunas páginas de producto, guías o el mapa para Google no se pudieron actualizar del todo, se reintenta la próxima vez que guardes.)'));
   }catch(e){
     dirty=true;
