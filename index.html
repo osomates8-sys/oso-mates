@@ -605,6 +605,13 @@ fbq('track', 'PageView');
 </style>
 <style id="om-wa-css">.om-wa-btn{display:flex;align-items:center;justify-content:center;gap:.6rem;width:100%;margin:1.2rem 0 0;padding:1rem 1.2rem;background:#25D366;color:#fff!important;text-decoration:none;font-family:'Montserrat',sans-serif;font-size:.66rem;letter-spacing:.14em;text-transform:uppercase;font-weight:600;border:none;transition:background .2s}.om-wa-btn:hover{background:#1ebe5b}.om-wa-btn svg{width:18px;height:18px;fill:#fff;flex-shrink:0}.om-mail-warn{font-size:.72rem;color:#b3541e;margin-top:.8rem;line-height:1.6}</style>
 <style id="om-contraste">
+/* Stock */
+.stock-low{background:#b03a2e!important;}
+.stock-out{background:#555!important;}
+.btn-add:disabled,.p-add-btn:disabled,.bs-btn:disabled{opacity:.45;cursor:not-allowed;}
+.stock-note{font-size:.72rem;color:#b03a2e;margin:.5rem 0 0;font-weight:500;}
+[data-theme="dark"] .stock-note{color:#ff8a7a;}
+
 /* Elección de medio de pago en el checkout */
 .pay-choice{display:grid;grid-template-columns:1fr 1fr;gap:.6rem;margin:1.2rem 0 1rem;}
 .pay-opt{border:1.5px solid var(--light);background:var(--white);color:var(--black);padding:.85rem .8rem;text-align:left;cursor:pointer;font-family:'Montserrat',sans-serif;display:flex;flex-direction:column;gap:.25rem;transition:border-color .2s;}
@@ -1045,7 +1052,7 @@ function loadRecentlyViewed(){
         '<img src="'+getImg(p.imagen)+'" alt="'+p.nombre+'" class="bs-img" style="object-position:'+getImgPos(p.imagen)+'" loading="lazy"/>'+
         favBtnHtml(p.id)+
         '<div class="bs-info">'+
-          '<div class="bs-name">'+p.nombre+'</div>'+
+          '<div class="bs-name">'+p.nombre+'</div>'+stockBadgeHtml(p)+
           '<div class="bs-mat">'+p.material+'</div>'+
           '<div class="bs-footer">'+
             '<div class="bs-price">'+fmt(p.precio)+'</div>'+
@@ -1605,9 +1612,9 @@ function renderGrid(listOrFilter){
   else{list=listOrFilter==='todos'?allProds:allProds.filter(p=>p.categoria===listOrFilter);}
   if(!list.length){g.innerHTML='<div class="loading">No hay productos</div>';return;}
   g.innerHTML=list.map((p,i)=>{
-    const stockBadge=p.stock&&p.stock<=5?`<span class="stock-low">${t('ultimas')} ${p.stock}</span>`:'';
+    const stockBadge=stockBadgeHtml(p);
     const shipBadge=p.precio>=100000?`<span class="free-ship">${t('free_ship')}</span>`:'';
-    return `<div class="product-card"><div class="p-img-wrap" onclick="viewProduct('${p.id}')"><img src="${getImg(p.imagen)}" alt="${p.nombre}" class="p-img" style="object-position:${getImgPos(p.imagen)}" loading="lazy" onload="this.closest('.p-img-wrap').classList.add('loaded')" crossorigin="anonymous"/>${favBtnHtml(p.id)}</div><div class="p-body"><div class="p-num">N\u00b000${i+1}</div>${stockBadge}${shipBadge}${p.badge?`<div class="p-badge">${p.badge}</div>`:''}<a class="p-name" href="${OM_SEO.productHref(p.id)}" style="display:block;text-decoration:none">${p.nombre}</a>${starsHtml(p)}<div class="p-mat">${p.material}</div><div class="p-footer"><div>${hasDescuento(p)?`<div class="p-price-label">${t('transf_label')}</div><div class="p-price-orig">${fmt(p.precio)}</div>`:''}<div class="p-price"><strong>${fmt(getPrecioTransf(p))}</strong></div></div><div class="p-btns"><button class="p-view-btn" onclick="viewProduct('${p.id}')">${t('ver_btn')}</button><button class="p-add-btn" onclick="addToCart('${p.id}')">${t('add_btn')}</button></div></div></div></div>`;
+    return `<div class="product-card"><div class="p-img-wrap" onclick="viewProduct('${p.id}')"><img src="${getImg(p.imagen)}" alt="${p.nombre}" class="p-img" style="object-position:${getImgPos(p.imagen)}" loading="lazy" onload="this.closest('.p-img-wrap').classList.add('loaded')" crossorigin="anonymous"/>${favBtnHtml(p.id)}</div><div class="p-body"><div class="p-num">N\u00b000${i+1}</div>${stockBadge}${shipBadge}${p.badge?`<div class="p-badge">${p.badge}</div>`:''}<a class="p-name" href="${OM_SEO.productHref(p.id)}" style="display:block;text-decoration:none">${p.nombre}</a>${starsHtml(p)}<div class="p-mat">${p.material}</div><div class="p-footer"><div>${hasDescuento(p)?`<div class="p-price-label">${t('transf_label')}</div><div class="p-price-orig">${fmt(p.precio)}</div>`:''}<div class="p-price"><strong>${fmt(getPrecioTransf(p))}</strong></div></div><div class="p-btns"><button class="p-view-btn" onclick="viewProduct('${p.id}')">${t('ver_btn')}</button><button class="p-add-btn" onclick="addToCart('${p.id}')"${stockOf(p)===0?' disabled':''}>${stockOf(p)===0?'Sin stock':t('add_btn')}</button></div></div></div></div>`;
   }).join('');
 }
 
@@ -1622,15 +1629,29 @@ function starsHtml(p){
 }
 function viewProduct(id){window.location.href=OM_SEO.productHref(id);}
 
+/* Stock: vacío = sin límite (no se muestra nada). 1 = "Última pieza", 2-3 = "Quedan N", 0 = "Sin stock".
+   Se carga en editar.html → producto → Stock. */
+function stockOf(p){const s=p&&p.stock;return (s===null||s===undefined||s==='')?null:Math.max(0,parseInt(s,10)||0);}
+function stockLabel(p){const s=stockOf(p);if(s===null||s>3)return '';return s===0?'Sin stock':(s===1?'Última pieza':'Quedan '+s);}
+function stockBadgeHtml(p){const l=stockLabel(p);return l?'<span class="stock-low'+(stockOf(p)===0?' stock-out':'')+'">'+l+'</span>':'';}
+function qtyInCart(id){return cart.filter(x=>x.id===id).reduce((a,x)=>a+(x.qty||0),0);}
+/* ¿Se puede sumar una unidad más de este producto al carrito? */
+function canAddMore(p){
+  p=(window.FALLBACK_PRODUCTOS||[]).find(x=>x.id===p.id)||p;
+  const s=stockOf(p); if(s===null) return true;
+  if(qtyInCart(p.id)>=s){ showToast(s===0?'Este mate no tiene stock por ahora':(s===1?'Es la última pieza y ya está en tu carrito':'No hay más unidades de este mate')); return false; }
+  return true;
+}
 function addToCart(id){
   const p=allProds.find(x=>x.id===id);if(!p)return;
+  if(!canAddMore(p))return;
   const ex=cart.find(x=>lineKey(x)===id);
   if(ex){ex.qty++;}else{cart.push({...p,qty:1});}
   updateCartUI();showToast(p.nombre+' agregado \ud83d\uded2');
   trackAddToCart(p);
 }
 function removeFromCart(key){cart=cart.filter(x=>lineKey(x)!==key);updateCartUI();}
-function changeQty(key,d){const item=cart.find(x=>lineKey(x)===key);if(item){item.qty+=d;if(item.qty<=0)removeFromCart(key);}updateCartUI();}
+function changeQty(key,d){const item=cart.find(x=>lineKey(x)===key);if(item){if(d>0&&!canAddMore(item))return;item.qty+=d;if(item.qty<=0)removeFromCart(key);}updateCartUI();}
 const DEFAULT_COUPON={code:'',percent:0,active:false};
 let _coupon=DEFAULT_COUPON;
 let _couponApplied=false;
