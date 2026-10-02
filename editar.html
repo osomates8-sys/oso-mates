@@ -145,10 +145,17 @@
     <label>Bajada del hero (opcional)</label>
     <input type="text" id="cfg-hero_desc"/>
     <div class="row3">
-      <div><label>Cupón — código</label><input type="text" id="cup-code"/></div>
+      <div><label>Cupón visitantes nuevos — código</label><input type="text" id="cup-code"/></div>
       <div><label>Cupón — % descuento</label><input type="number" id="cup-percent" min="0" max="100"/></div>
       <div class="chk" style="align-self:end"><input type="checkbox" id="cup-active"/><label style="margin:0">Cupón activo</label></div>
     </div>
+    <p class="hint" style="margin:-.3rem 0 1rem">Aparece en el cartel "Antes de que te vayas" (en la computadora). Si lo desactivás, el cartel deja de aparecer.</p>
+    <div class="row3">
+      <div><label>Cupón newsletter — código</label><input type="text" id="cupn-code"/></div>
+      <div><label>Cupón — % descuento</label><input type="number" id="cupn-percent" min="0" max="100"/></div>
+      <div class="chk" style="align-self:end"><input type="checkbox" id="cupn-active"/><label style="margin:0">Cupón activo</label></div>
+    </div>
+    <p class="hint" style="margin:-.3rem 0 1rem">Se lo damos a quien se suscribe al newsletter. Los dos cupones son para la primera compra (uno por pedido) y se suman al 10% de transferencia.</p>
     <label>Fotos de la galería</label>
     <div id="galeria-imgs"></div>
   </div>
@@ -829,6 +836,11 @@ function loadConfigForm(){
   document.getElementById('cup-code').value = cup.code||'';
   document.getElementById('cup-percent').value = cup.percent||0;
   document.getElementById('cup-active').checked = !!cup.active;
+  let cupn={code:'',percent:0,active:false};
+  try{ cupn=JSON.parse(config.coupon_newsletter||'{}'); }catch(e){}
+  document.getElementById('cupn-code').value = cupn.code||'';
+  document.getElementById('cupn-percent').value = cupn.percent||0;
+  document.getElementById('cupn-active').checked = !!cupn.active;
   try{ galeria=JSON.parse(config.galeria_imgs||'[]'); }catch(e){ galeria=[]; }
   if(!Array.isArray(galeria)) galeria=[];
   renderGaleria();
@@ -853,6 +865,11 @@ function collectConfig(){
     percent: parseInt(document.getElementById('cup-percent').value,10)||0,
     active: document.getElementById('cup-active').checked
   });
+  c.coupon_newsletter = JSON.stringify({
+    code: document.getElementById('cupn-code').value.trim(),
+    percent: parseInt(document.getElementById('cupn-percent').value,10)||0,
+    active: document.getElementById('cupn-active').checked
+  });
   c.galeria_imgs = JSON.stringify(galeria.filter(Boolean));
   c.oso_config = collectOso();
   const gActivo=document.getElementById('grab-activo').checked;
@@ -876,7 +893,7 @@ function collectConfig(){
 }
 
 function buildFile(prods,cfg){
-  const order=['galeria_imgs','faq_items','hero_h1','hero_h2','hero_desc','banner','nosotros_content','testimonios','coupon'];
+  const order=['galeria_imgs','faq_items','hero_h1','hero_h2','hero_desc','banner','nosotros_content','testimonios','coupon','coupon_newsletter'];
   const ordered={};
   order.forEach(k=>{ if(cfg[k]!==undefined) ordered[k]=cfg[k]; });
   Object.keys(cfg).forEach(k=>{ if(ordered[k]===undefined) ordered[k]=cfg[k]; });
