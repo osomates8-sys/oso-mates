@@ -328,6 +328,13 @@ nav{position:fixed;top:0;left:0;right:0;z-index:500;display:flex;justify-content
 </style>
 <style id="om-extra-css">.om-wa-btn{display:flex;align-items:center;justify-content:center;gap:.6rem;width:100%;margin:1.2rem 0 0;padding:1rem 1.2rem;background:#25D366;color:#fff!important;text-decoration:none;font-family:'Montserrat',sans-serif;font-size:.66rem;letter-spacing:.14em;text-transform:uppercase;font-weight:600;border:none;transition:background .2s}.om-wa-btn:hover{background:#1ebe5b}.om-wa-btn svg{width:18px;height:18px;fill:#fff;flex-shrink:0}.om-mail-warn{font-size:.72rem;color:#b3541e;margin-top:.8rem;line-height:1.6}.engrave-note{font-size:.72rem;color:var(--gray);line-height:1.6;margin:0}</style>
 <style id="om-contraste">
+/* Stock */
+.stock-low{background:#b03a2e!important;}
+.stock-out{background:#555!important;}
+.btn-add:disabled,.p-add-btn:disabled,.bs-btn:disabled{opacity:.45;cursor:not-allowed;}
+.stock-note{font-size:.72rem;color:#b03a2e;margin:.5rem 0 0;font-weight:500;}
+[data-theme="dark"] .stock-note{color:#ff8a7a;}
+
 /* Elección de medio de pago en el checkout */
 .pay-choice{display:grid;grid-template-columns:1fr 1fr;gap:.6rem;margin:1.2rem 0 1rem;}
 .pay-opt{border:1.5px solid var(--light);background:var(--white);color:var(--black);padding:.85rem .8rem;text-align:left;cursor:pointer;font-family:'Montserrat',sans-serif;display:flex;flex-direction:column;gap:.25rem;transition:border-color .2s;}
@@ -793,7 +800,8 @@ function renderProduct(p, related){
   window._galleryImgs = imgs;
   window._galleryIdx = 0;
   saveRecentlyViewed(p.id);
-  const stockBadge = p.stock && p.stock<=5 ? `<span class="stock-low">Últimas ${p.stock}</span>` : '';
+  const stockBadge = stockBadgeHtml(p);
+  const sinStock = stockOf(p)===0;
   const shipBadge = p.precio>=100000 ? `<span class="free-ship">Envío gratis</span>` : '';
   const ex = extrasFor(p);
   const extrasBox = (ex.bombilla||ex.grabado) ? `<div class="extras-box">
@@ -825,8 +833,9 @@ function renderProduct(p, related){
         </div>
         ${extrasBox}
         <div class="product-actions">
-          <button class="btn-add" id="btn-add-main" onclick="addToCartAndOpen()">${t('btn_add')}<span class="add-total" id="add-total"></span></button>
+          <button class="btn-add" id="btn-add-main" onclick="addToCartAndOpen()"${sinStock?' disabled':''}>${sinStock?'Sin stock':t('btn_add')}<span class="add-total" id="add-total"></span></button>
         </div>
+        ${sinStock?`<p class="stock-note">Este mate no tiene stock por ahora. <a href="https://wa.me/542233061168?text=${encodeURIComponent('Hola! Me interesa el mate '+p.nombre+'. ¿Cuándo vuelve a haber?')}" target="_blank" rel="noopener" style="color:inherit">Consultanos por WhatsApp</a> y te avisamos cuando vuelva.</p>`:(stockOf(p)===1?`<p class="stock-note">Es la última pieza: cada mate es único y no se repite.</p>`:'')}
         <p class="product-desc">${p.descripcion} Cada pieza es tallada a mano y lista para usar desde el primer día.</p>
         <div class="ship-est" id="ship-est">
           <div class="ship-est-title">${t('ship_est_title')}</div>
@@ -882,7 +891,7 @@ function renderProduct(p, related){
   /* Barra fija con precio y botón (se ve en celular) */
   let bar=document.getElementById('buy-bar');
   if(!bar){ bar=document.createElement('div'); bar.id='buy-bar'; bar.className='buy-bar'; document.body.appendChild(bar); }
-  bar.innerHTML='<div class="buy-bar-info"><div class="buy-bar-price" id="buy-bar-price"></div><div class="buy-bar-sub" id="buy-bar-sub"></div></div><button class="btn-add" onclick="addToCartAndOpen()">'+t('btn_add_short')+'</button>';
+  bar.innerHTML='<div class="buy-bar-info"><div class="buy-bar-price" id="buy-bar-price"></div><div class="buy-bar-sub" id="buy-bar-sub"></div></div><button class="btn-add" onclick="addToCartAndOpen()"'+(sinStock?' disabled':'')+'>'+(sinStock?'Sin stock':t('btn_add_short'))+'</button>';
   document.body.classList.add('has-buy-bar');
   updateExtras();
   /* Las miniaturas se cargan después de la foto principal, para que esa aparezca primero */
@@ -932,8 +941,22 @@ function renderProduct(p, related){
     ldEl.textContent = JSON.stringify(ld);
   }
 }
+/* Stock: vacío = sin límite (no se muestra nada). 1 = "Última pieza", 2-3 = "Quedan N", 0 = "Sin stock".
+   Se carga en editar.html → producto → Stock. */
+function stockOf(p){const s=p&&p.stock;return (s===null||s===undefined||s==='')?null:Math.max(0,parseInt(s,10)||0);}
+function stockLabel(p){const s=stockOf(p);if(s===null||s>3)return '';return s===0?'Sin stock':(s===1?'Última pieza':'Quedan '+s);}
+function stockBadgeHtml(p){const l=stockLabel(p);return l?'<span class="stock-low'+(stockOf(p)===0?' stock-out':'')+'">'+l+'</span>':'';}
+function qtyInCart(id){return cart.filter(x=>x.id===id).reduce((a,x)=>a+(x.qty||0),0);}
+/* ¿Se puede sumar una unidad más de este producto al carrito? */
+function canAddMore(p){
+  p=(window.FALLBACK_PRODUCTOS||[]).find(x=>x.id===p.id)||p;
+  const s=stockOf(p); if(s===null) return true;
+  if(qtyInCart(p.id)>=s){ showToast(s===0?'Este mate no tiene stock por ahora':(s===1?'Es la última pieza y ya está en tu carrito':'No hay más unidades de este mate')); return false; }
+  return true;
+}
 function addToCartAndOpen(){
   if(!currentProd)return;
+  if(!canAddMore(currentProd))return;
   omTrack('add_to_cart', currentProd);
   const eng=getEngraveData(), bom=getBombillaData();
   /* Una línea del carrito por cada combinación de extras */
@@ -945,13 +968,14 @@ function addToCartAndOpen(){
 }
 function addToCart(id){
   const p=allProds.find(x=>x.id===id);if(!p)return;
+  if(!canAddMore(p))return;
   omTrack('add_to_cart', p);
   const ex=cart.find(x=>x.id===id&&!x.grabado&&!x.bombilla);
   if(ex){ex.qty++;}else{cart.push({...p,qty:1,grabado:'',grabadoPrecio:0,bombilla:'',bombillaPrecio:0});}
   updateCartUI();showToast(p.nombre+' agregado 🛒');
 }
 function removeFromCart(key){cart=cart.filter(x=>lineKey(x)!==key);updateCartUI();}
-function changeQty(key,d){const item=cart.find(x=>lineKey(x)===key);if(item){item.qty+=d;if(item.qty<=0)removeFromCart(key);}updateCartUI();}
+function changeQty(key,d){const item=cart.find(x=>lineKey(x)===key);if(item){if(d>0&&!canAddMore(item))return;item.qty+=d;if(item.qty<=0)removeFromCart(key);}updateCartUI();}
 const DEFAULT_GRABADO={active:false,price:0,maxChars:20};
 let _grabado=DEFAULT_GRABADO;
 const DEFAULT_BOMBILLA={active:false,price:0,nombre:'Bombilla'};

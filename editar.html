@@ -594,7 +594,7 @@ function renderProductos(){
 
     const f_precio=field('Precio (lista)',p.precio,{key:'precio',type:'number'});
     const f_transf=field('Precio transferencia',p.precio_transferencia,{key:'precio_transferencia',type:'number'});
-    const f_stock=field('Stock (vacío = sin límite)',p.stock,{key:'stock',type:'number'});
+    const f_stock=field('Stock (vacío = sin límite · 1 = "Última pieza" · 0 = sin stock)',p.stock,{key:'stock',type:'number'});
     const r2=el('div',{class:'row3'}); r2.append(f_precio.wrap,f_transf.wrap,f_stock.wrap); card.appendChild(r2);
 
     const f_cat=field('Categoría',p.categoria,{key:'categoria',type:'select',options:CATS});
