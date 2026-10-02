@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /* Genera las páginas de producto (mate-*.html, etc.), las guías (guias.html y guia-*.html)
-   y sitemap.xml desde la terminal.
+   sitemap.xml y productos.xml (catálogo para Google/Meta) desde la terminal.
    Hace lo mismo que editar.html al guardar. Uso: node scripts/build-product-pages.js */
 const fs = require('fs');
 const path = require('path');
@@ -52,3 +52,5 @@ for (const f of fs.readdirSync(root)) {
 }
 fs.writeFileSync(path.join(root, 'sitemap.xml'), SEO.buildSitemap(prods, guides));
 console.log('✓ sitemap.xml');
+fs.writeFileSync(path.join(root, 'productos.xml'), SEO.buildFeed(prods));
+console.log('✓ productos.xml');
