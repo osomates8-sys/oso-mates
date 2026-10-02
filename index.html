@@ -1689,7 +1689,7 @@ function cartTotal(){return cart.reduce((s,i)=>s+itemUnitPrice(i,false)*i.qty,0)
 function cartTransferTotal(){return cart.reduce((s,i)=>s+itemUnitPrice(i,true)*i.qty,0);}
 
 const DEFAULT_SHIPPING_ZONES=[
-  {label:'Mar del Plata',cost:null,days:'En el día',mismoDia:true},
+  {label:'Mar del Plata',cost:0,days:'En el día',mismoDia:true},
   {label:'CABA y GBA',cost:4500,days:'2-3 días hábiles'},
   {label:'Interior del país',cost:6500,days:'4-7 días hábiles'},
   {label:'Patagonia y zonas extremas',cost:8500,days:'7-10 días hábiles'}
@@ -1719,7 +1719,7 @@ function updateCartShipEstimate(){
   if(!z)return;
   if(z.mismoDia){
     const grab=cart.some(function(i){return i.grabado;});
-    res.innerHTML='Mar del Plata: '+(grab?'con grabado, te lo llevamos en 2 a 3 días hábiles':'<strong>entrega en el día</strong> pagando antes de las 14 h (día hábil)')+' · envío en mano o por moto, lo coordinamos por WhatsApp';
+    res.innerHTML='Mar del Plata: '+(grab?'con grabado, te lo llevamos en 2 a 3 días hábiles':'<strong>entrega en el día</strong> pagando antes de las 14 h (día hábil)')+' · <strong>envío gratis</strong>';
     return;
   }
   const dias=cart.some(function(i){return i.grabado;})?'grabado 2-3 días hábiles + envío '+z.days+' (estimado)':z.days;
