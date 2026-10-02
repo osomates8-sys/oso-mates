@@ -639,7 +639,7 @@ function galleryNext() {
 }
 
 const DEFAULT_SHIPPING_ZONES=[
-  {label:'Mar del Plata',cost:null,days:'En el día',mismoDia:true},
+  {label:'Mar del Plata',cost:0,days:'En el día',mismoDia:true},
   {label:'CABA y GBA',cost:4500,days:'2-3 días hábiles'},
   {label:'Interior del país',cost:6500,days:'4-7 días hábiles'},
   {label:'Patagonia y zonas extremas',cost:8500,days:'7-10 días hábiles'}
@@ -733,8 +733,8 @@ function updateShipEstimate(precio){
   const ent=entregaTexto(z);
   const dias=z.mismoDia?(conGrabado()?'con grabado, 2 a 3 días hábiles':'entrega en el día'):(conGrabado()?'grabado 2-3 días + envío '+z.days:z.days);
   if(z.cost===null||z.cost===undefined||z.cost===''){
-    res.innerHTML='Envío en mano o por moto: lo coordinamos por WhatsApp · '+dias+(ent?'<br>'+ent:'');
-  }else if(precio>=100000){
+    res.innerHTML='Envío a coordinar por WhatsApp · '+dias+(ent?'<br>'+ent:'');
+  }else if(precio>=100000||Number(z.cost)===0){
     res.innerHTML='<strong>Envío gratis</strong> a '+z.label+' · '+dias+(ent?'<br>'+ent:'');
   }else{
     res.innerHTML='Costo estimado: <strong>'+fmt(z.cost)+'</strong> · '+dias+(ent?'<br>'+ent:'');
