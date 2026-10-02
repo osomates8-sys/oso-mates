@@ -93,7 +93,7 @@
 
   function describe(p) {
     var d = String(p.descripcion || '').trim();
-    var extra = (p.material ? p.material + '. ' : '') + 'Hecho a mano en Mar del Plata. Envíos a todo el país.';
+    var extra = (p.material ? p.material + '. ' : '') + 'Desde Mar del Plata, envíos a todo el país.';
     return (d ? d + ' ' : '') + extra;
   }
 
@@ -257,7 +257,7 @@
     return '<?xml version="1.0" encoding="UTF-8"?>\n' +
       '<rss version="2.0" xmlns:g="http://base.google.com/ns/1.0">\n  <channel>\n' +
       '    <title>Oso Mates</title>\n    <link>' + SITE + '</link>\n' +
-      '    <description>Mates artesanales tallados a mano en Mar del Plata</description>\n' +
+      '    <description>Mates artesanales tallados a mano. Desde Mar del Plata, envíos a todo el país</description>\n' +
       items.join('') + '  </channel>\n</rss>\n';
   }
 
