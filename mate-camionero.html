@@ -473,7 +473,8 @@ nav{position:fixed;top:0;left:0;right:0;z-index:500;display:flex;justify-content
 <div class="toast" id="toast"></div>
 <script>
 
-function saveCart(){try{localStorage.setItem('om_cart',JSON.stringify(cart));}catch(e){}}
+/* Guarda el carrito y, si cambió, la hora del último cambio (para el aviso de carrito abandonado) */
+function saveCart(){try{const v=JSON.stringify(cart);if(localStorage.getItem('om_cart')!==v){localStorage.setItem('om_cart',v);localStorage.setItem('om_cart_ts',String(Date.now()));}}catch(e){}}
 function loadCart(){try{var d=localStorage.getItem('om_cart');if(d)cart=JSON.parse(d);}catch(e){}}
 /* Datos 100% locales (fallback-data.js). Sin base de datos externa.
    `sb` es un mini-cliente que imita la API que usa el resto del codigo. */
@@ -1394,5 +1395,6 @@ loadCart();loadGrabado().then(loadProduct);loadCoupon();updateCartUI();updateFav
   try{ render(); }catch(e){}
 })();
 </script>
+<script src="carrito-recuperar.js"></script>
 </body>
 </html>

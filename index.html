@@ -1121,7 +1121,8 @@ async function loadBombillas(){
     '</div>';
   }).join('');
 }
-function saveCart(){try{localStorage.setItem('om_cart',JSON.stringify(cart));}catch(e){}}
+/* Guarda el carrito y, si cambió, la hora del último cambio (para el aviso de carrito abandonado) */
+function saveCart(){try{const v=JSON.stringify(cart);if(localStorage.getItem('om_cart')!==v){localStorage.setItem('om_cart',v);localStorage.setItem('om_cart_ts',String(Date.now()));}}catch(e){}}
 function loadCart(){try{var d=localStorage.getItem('om_cart');if(d)cart=JSON.parse(d);}catch(e){}}
 function toggleMobileNav(){
   var h=document.getElementById('hamburger'),m=document.getElementById('mobile-nav');
@@ -2511,5 +2512,6 @@ document.addEventListener('mouseleave',function(e){
   try{ render(); }catch(e){}
 })();
 </script>
+<script src="carrito-recuperar.js"></script>
 </body>
 </html>
