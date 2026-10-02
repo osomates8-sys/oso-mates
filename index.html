@@ -1502,7 +1502,7 @@ const DEFAULT_FAQ=[
   {q:'¿Cuánto tarda en llegar el pedido?',a:'Despachamos en 48 horas hábiles desde que confirmamos el pago. El tiempo de entrega depende de tu ubicación: CABA y GBA 2-3 días, interior del país 3-7 días hábiles. Te enviamos el número de seguimiento por email.'},
   {q:'¿Los mates vienen curados?',a:'Los mates se entregan sin curar. Junto a cada mate enviamos una guía práctica con el paso a paso para curarlo fácilmente y empezar a disfrutarlo.'},
   {q:'¿Cómo funciona el descuento por transferencia?',a:'Al elegir el método de pago "Transferencia" en el checkout, el 10% de descuento se aplica automáticamente. Los datos bancarios (CBU del Banco Francés) aparecen en pantalla y te los enviamos por email.'},
-  {q:'¿Puedo pedir un mate personalizado?',a:'¡Sí! Podés agregar grabado personalizado (nombres, fechas o diseños) marcando la casilla en la página de cada mate; el precio se suma solo. Después de confirmar el pago coordinamos el diseño por WhatsApp. El tiempo de producción es de 1 a 3 días hábiles.'},
+  {q:'¿Puedo pedir un mate personalizado?',a:'¡Sí! Podés agregar grabado personalizado (nombres, fechas o diseños) marcando la casilla en la página de cada mate; el precio se suma solo. Después de confirmar el pago coordinamos el diseño por WhatsApp. El grabado demora 2 a 3 días hábiles; en Mar del Plata te lo llevamos al terminarlo y al resto del país se despacha y se suma el tiempo de envío.'},
   {q:'¿Qué hago si el producto llega dañado?',a:'Todos nuestros envíos tienen seguro. Si el producto llega dañado, escribinos por WhatsApp con una foto en las primeras 48hs y lo reponemos sin costo.'},
   {q:'¿Tienen local físico?',a:'Somos un emprendimiento online con taller en Mar del Plata. Por el momento no tenemos local físico, pero podés coordinar retiro en mano si estás en MDP escribiéndonos por WhatsApp.'}
 ];
@@ -1689,6 +1689,7 @@ function cartTotal(){return cart.reduce((s,i)=>s+itemUnitPrice(i,false)*i.qty,0)
 function cartTransferTotal(){return cart.reduce((s,i)=>s+itemUnitPrice(i,true)*i.qty,0);}
 
 const DEFAULT_SHIPPING_ZONES=[
+  {label:'Mar del Plata',cost:null,days:'En el día',mismoDia:true},
   {label:'CABA y GBA',cost:4500,days:'2-3 días hábiles'},
   {label:'Interior del país',cost:6500,days:'4-7 días hábiles'},
   {label:'Patagonia y zonas extremas',cost:8500,days:'7-10 días hábiles'}
@@ -1707,6 +1708,7 @@ async function loadShippingZones(){
   const sel=document.getElementById('cart-ship-zone-select');
   if(!sel)return;
   sel.innerHTML=items.map(function(z,i){return '<option value="'+i+'">'+z.label+'</option>';}).join('');
+  const def=items.findIndex(function(z){return !z.mismoDia;}); if(def>0) sel.value=String(def);
   updateCartShipEstimate();
 }
 function updateCartShipEstimate(){
@@ -1715,10 +1717,16 @@ function updateCartShipEstimate(){
   if(!sel||!res)return;
   const z=_shipZones[parseInt(sel.value)||0];
   if(!z)return;
+  if(z.mismoDia){
+    const grab=cart.some(function(i){return i.grabado;});
+    res.innerHTML='Mar del Plata: '+(grab?'con grabado, te lo llevamos en 2 a 3 días hábiles':'<strong>entrega en el día</strong> pagando antes de las 14 h (día hábil)')+' · envío en mano o por moto, lo coordinamos por WhatsApp';
+    return;
+  }
+  const dias=cart.some(function(i){return i.grabado;})?'grabado 2-3 días hábiles + envío '+z.days+' (estimado)':z.days;
   if(cartTotal()>=100000){
-    res.innerHTML='<strong>'+t('free_ship')+'</strong> a '+z.label+' · '+z.days;
+    res.innerHTML='<strong>'+t('free_ship')+'</strong> a '+z.label+' · '+dias;
   }else{
-    res.innerHTML='Costo estimado: <strong>'+fmt(z.cost)+'</strong> · '+z.days;
+    res.innerHTML='Costo estimado: <strong>'+fmt(z.cost)+'</strong> · '+dias;
   }
 }
 

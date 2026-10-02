@@ -335,6 +335,11 @@ nav{position:fixed;top:0;left:0;right:0;z-index:500;display:flex;justify-content
 </style>
 <style id="om-extra-css">.om-wa-btn{display:flex;align-items:center;justify-content:center;gap:.6rem;width:100%;margin:1.2rem 0 0;padding:1rem 1.2rem;background:#25D366;color:#fff!important;text-decoration:none;font-family:'Montserrat',sans-serif;font-size:.66rem;letter-spacing:.14em;text-transform:uppercase;font-weight:600;border:none;transition:background .2s}.om-wa-btn:hover{background:#1ebe5b}.om-wa-btn svg{width:18px;height:18px;fill:#fff;flex-shrink:0}.om-mail-warn{font-size:.72rem;color:#b3541e;margin-top:.8rem;line-height:1.6}.engrave-note{font-size:.72rem;color:var(--gray);line-height:1.6;margin:0}</style>
 <style id="om-contraste">
+/* Fecha estimada de entrega */
+.product-entrega{font-size:.76rem;color:var(--mid);line-height:1.6;margin:.9rem 0 0;}
+.product-entrega strong{color:var(--black);font-weight:600;}
+.product-entrega .entrega-nota{display:block;font-size:.66rem;color:var(--gray);}
+
 /* Stock */
 .stock-low{background:#b03a2e!important;}
 .stock-out{background:#555!important;}
@@ -634,6 +639,7 @@ function galleryNext() {
 }
 
 const DEFAULT_SHIPPING_ZONES=[
+  {label:'Mar del Plata',cost:null,days:'En el día',mismoDia:true},
   {label:'CABA y GBA',cost:4500,days:'2-3 días hábiles'},
   {label:'Interior del país',cost:6500,days:'4-7 días hábiles'},
   {label:'Patagonia y zonas extremas',cost:8500,days:'7-10 días hábiles'}
@@ -652,7 +658,70 @@ async function loadShippingZones(precio){
   const sel=document.getElementById('ship-zone-select');
   if(!sel)return;
   sel.innerHTML=items.map(function(z,i){return '<option value="'+i+'">'+z.label+'</option>';}).join('');
+  /* Por defecto se muestra la primera zona que no es Mar del Plata (la mayoría compra de afuera) */
+  const def=items.findIndex(function(z){return !z.mismoDia;}); if(def>0) sel.value=String(def);
   updateShipEstimate(precio);
+}
+/* ===== Fecha estimada de entrega =====
+   Despacho en 48 h hábiles desde el pago + días de envío de la zona ("2-3 días hábiles").
+   Cuenta solo días hábiles (lun-vie, sin feriados nacionales de fecha fija).
+   Si el pedido entra después de las 14 h o un día no hábil, se cuenta desde el siguiente. */
+const ENTREGA={horaCorte:14, despachoMin:1, despachoMax:2,
+  feriados:['01-01','03-24','04-02','05-01','05-25','06-20','07-09','12-08','12-25']};
+function esHabil(d){
+  const dow=d.getDay(); if(dow===0||dow===6) return false;
+  const k=String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+  return ENTREGA.feriados.indexOf(k)===-1;
+}
+function sumarHabiles(d,n){
+  const r=new Date(d.getFullYear(),d.getMonth(),d.getDate());
+  let k=0; while(k<n){ r.setDate(r.getDate()+1); if(esHabil(r)) k++; }
+  return r;
+}
+function rangoDias(txt){
+  const m=/(\d+)\s*(?:-|a)\s*(\d+)/.exec(String(txt||'')); if(m) return [parseInt(m[1],10),parseInt(m[2],10)];
+  const u=/(\d+)/.exec(String(txt||'')); return u?[parseInt(u[1],10),parseInt(u[1],10)]:null;
+}
+function fechaCorta(d,conMes){
+  const dias=['domingo','lunes','martes','miércoles','jueves','viernes','sábado'];
+  const meses=['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+  return dias[d.getDay()]+' '+d.getDate()+(conMes?' de '+meses[d.getMonth()]:'');
+}
+/* Mar del Plata: entrega en el día (pago confirmado antes de las 14 h en día hábil).
+   Con grabado hay que hacerlo primero: 2 a 3 días hábiles. En Mar del Plata se entrega
+   ese día; al resto del país se despacha al terminarlo y se suman los días del envío. */
+const GRABADO_DIAS=[2,3];
+function conGrabado(){ const c=document.getElementById('engrave-check'); return !!(c&&c.checked); }
+function baseEntrega(ahora){
+  let base=new Date(ahora.getFullYear(),ahora.getMonth(),ahora.getDate());
+  const tarde=!esHabil(base)||ahora.getHours()>=ENTREGA.horaCorte;
+  if(tarde){ base=sumarHabiles(base,1); }
+  return {base:base,tarde:tarde};
+}
+function entregaEstimada(z,ahora){
+  ahora=ahora||new Date();
+  const b=baseEntrega(ahora), base=b.base;
+  if(z&&z.mismoDia){
+    if(conGrabado()) return {desde:sumarHabiles(base,GRABADO_DIAS[0]),hasta:sumarHabiles(base,GRABADO_DIAS[1])};
+    return {desde:base,hasta:base,mismoDia:true};
+  }
+  const r=rangoDias(z&&z.days); if(!r) return null;
+  /* "base" es el día en que se empieza a preparar; el despacho tarda 1-2 días hábiles */
+  const g=conGrabado();
+  const desde=sumarHabiles(base,(g?GRABADO_DIAS[0]:ENTREGA.despachoMin)+r[0]);
+  const hasta=sumarHabiles(base,(g?GRABADO_DIAS[1]:ENTREGA.despachoMax)+r[1]);
+  return {desde:desde,hasta:hasta};
+}
+function entregaTexto(z,ahora){
+  ahora=ahora||new Date();
+  const e=entregaEstimada(z,ahora); if(!e) return '';
+  if(e.mismoDia){
+    const hoy=new Date(ahora.getFullYear(),ahora.getMonth(),ahora.getDate());
+    const dif=Math.round((e.desde-hoy)/864e5);
+    return dif===0?'Llega hoy mismo':dif===1?'Llega mañana, '+fechaCorta(e.desde,true):'Llega el '+fechaCorta(e.desde,true);
+  }
+  const mismoMes=e.desde.getMonth()===e.hasta.getMonth();
+  return 'Llega entre el '+fechaCorta(e.desde,!mismoMes)+' y el '+fechaCorta(e.hasta,true);
 }
 function updateShipEstimate(precio){
   const sel=document.getElementById('ship-zone-select');
@@ -660,11 +729,24 @@ function updateShipEstimate(precio){
   if(!sel||!res)return;
   const z=_shipZones[parseInt(sel.value)||0];
   if(!z)return;
-  if(precio>=100000){
-    res.innerHTML='<strong>Envío gratis</strong> a '+z.label+' · '+z.days;
+  if(precio===undefined&&currentProd) precio=currentProd.precio;
+  const ent=entregaTexto(z);
+  const dias=z.mismoDia?(conGrabado()?'con grabado, 2 a 3 días hábiles':'entrega en el día'):(conGrabado()?'grabado 2-3 días + envío '+z.days:z.days);
+  if(z.cost===null||z.cost===undefined||z.cost===''){
+    res.innerHTML='Envío en mano o por moto: lo coordinamos por WhatsApp · '+dias+(ent?'<br>'+ent:'');
+  }else if(precio>=100000){
+    res.innerHTML='<strong>Envío gratis</strong> a '+z.label+' · '+dias+(ent?'<br>'+ent:'');
   }else{
-    res.innerHTML='Costo estimado: <strong>'+fmt(z.cost)+'</strong> · '+z.days;
+    res.innerHTML='Costo estimado: <strong>'+fmt(z.cost)+'</strong> · '+dias+(ent?'<br>'+ent:'');
   }
+  const pe=document.getElementById('product-entrega');
+  if(!pe) return;
+  const ahora=new Date(), antes=ahora.getHours()<ENTREGA.horaCorte&&esHabil(ahora);
+  let nota='si se confirma el pago hoy'+(antes?' antes de las '+ENTREGA.horaCorte+' h':'');
+  if(z.mismoDia&&conGrabado()) nota='con grabado: lo grabamos en 2 a 3 días hábiles y te lo llevamos';
+  else if(conGrabado()) nota='con grabado: 2 a 3 días hábiles para grabarlo y después el envío (estimado, depende del transporte)';
+  else if(z.mismoDia) nota=antes?'pagando antes de las '+ENTREGA.horaCorte+' h':'pedidos después de las '+ENTREGA.horaCorte+' h o en fin de semana / feriado se entregan el siguiente día hábil';
+  pe.innerHTML=ent?'&#x1F4E6; <strong>'+ent+'</strong> '+(z.mismoDia?'en ':'a ')+escapeHtml(z.label)+' <span class="entrega-nota">'+nota+'</span>':'';
 }
 async function loadProduct(){
   if(!prodId){
@@ -844,6 +926,7 @@ function renderProduct(p, related){
         <div class="product-actions">
           <button class="btn-add" id="btn-add-main" onclick="addToCartAndOpen()"${sinStock?' disabled':''}>${sinStock?'Sin stock':t('btn_add')}<span class="add-total" id="add-total"></span></button>
         </div>
+        ${sinStock?'':'<p class="product-entrega" id="product-entrega"></p>'}
         ${sinStock?`<p class="stock-note">Este mate no tiene stock por ahora. <a href="https://wa.me/542233061168?text=${encodeURIComponent('Hola! Me interesa el mate '+p.nombre+'. ¿Cuándo vuelve a haber?')}" target="_blank" rel="noopener" style="color:inherit">Consultanos por WhatsApp</a> y te avisamos cuando vuelva.</p>`:(stockOf(p)===1?`<p class="stock-note">Es la última pieza: cada mate es único y no se repite.</p>`:'')}
         <p class="product-desc">${p.descripcion} Cada pieza es tallada a mano y lista para usar desde el primer día.</p>
         <div class="ship-est" id="ship-est">
@@ -1025,6 +1108,7 @@ function updateExtras(){
   const at=document.getElementById('add-total'); if(at) at.textContent=extra?'· '+fmt(total):'';
   const bp=document.getElementById('buy-bar-price'); if(bp) bp.textContent=fmt(total);
   const bs=document.getElementById('buy-bar-sub'); if(bs) bs.innerHTML=t('product_transfer_label')+' <strong>'+fmt(totalT)+'</strong>';
+  updateShipEstimate();
   const pc=document.getElementById('product-cuotas');
   if(pc) pc.innerHTML=(PAGO_TARJETA.active&&PAGO_TARJETA.cuotas>1)?'o hasta <strong>'+cuotasTxt(total)+'</strong> con tarjeta':'';
 }
