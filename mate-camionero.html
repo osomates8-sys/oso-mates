@@ -688,8 +688,9 @@ function fechaCorta(d,conMes){
   return dias[d.getDay()]+' '+d.getDate()+(conMes?' de '+meses[d.getMonth()]:'');
 }
 /* Mar del Plata: entrega en el día (pago confirmado antes de las 14 h en día hábil).
-   Con grabado hay que hacerlo primero: 1 a 3 días hábiles y se entrega ese día. */
-const GRABADO_DIAS=[1,3];
+   Con grabado hay que hacerlo primero: 2 a 3 días hábiles. En Mar del Plata se entrega
+   ese día; al resto del país se despacha al terminarlo y se suman los días del envío. */
+const GRABADO_DIAS=[2,3];
 function conGrabado(){ const c=document.getElementById('engrave-check'); return !!(c&&c.checked); }
 function baseEntrega(ahora){
   let base=new Date(ahora.getFullYear(),ahora.getMonth(),ahora.getDate());
@@ -706,8 +707,9 @@ function entregaEstimada(z,ahora){
   }
   const r=rangoDias(z&&z.days); if(!r) return null;
   /* "base" es el día en que se empieza a preparar; el despacho tarda 1-2 días hábiles */
-  const desde=sumarHabiles(base,ENTREGA.despachoMin+r[0]);
-  const hasta=sumarHabiles(base,ENTREGA.despachoMax+r[1]);
+  const g=conGrabado();
+  const desde=sumarHabiles(base,(g?GRABADO_DIAS[0]:ENTREGA.despachoMin)+r[0]);
+  const hasta=sumarHabiles(base,(g?GRABADO_DIAS[1]:ENTREGA.despachoMax)+r[1]);
   return {desde:desde,hasta:hasta};
 }
 function entregaTexto(z,ahora){
@@ -729,7 +731,7 @@ function updateShipEstimate(precio){
   if(!z)return;
   if(precio===undefined&&currentProd) precio=currentProd.precio;
   const ent=entregaTexto(z);
-  const dias=z.mismoDia?(conGrabado()?'con grabado, 1 a 3 días hábiles':'entrega en el día'):z.days;
+  const dias=z.mismoDia?(conGrabado()?'con grabado, 2 a 3 días hábiles':'entrega en el día'):(conGrabado()?'grabado 2-3 días + envío '+z.days:z.days);
   if(z.cost===null||z.cost===undefined||z.cost===''){
     res.innerHTML='Envío en mano o por moto: lo coordinamos por WhatsApp · '+dias+(ent?'<br>'+ent:'');
   }else if(precio>=100000){
@@ -741,7 +743,8 @@ function updateShipEstimate(precio){
   if(!pe) return;
   const ahora=new Date(), antes=ahora.getHours()<ENTREGA.horaCorte&&esHabil(ahora);
   let nota='si se confirma el pago hoy'+(antes?' antes de las '+ENTREGA.horaCorte+' h':'');
-  if(z.mismoDia&&conGrabado()) nota='con grabado: primero lo grabamos y te lo llevamos ese mismo día';
+  if(z.mismoDia&&conGrabado()) nota='con grabado: lo grabamos en 2 a 3 días hábiles y te lo llevamos';
+  else if(conGrabado()) nota='con grabado: 2 a 3 días hábiles para grabarlo y después el envío (estimado, depende del transporte)';
   else if(z.mismoDia) nota=antes?'pagando antes de las '+ENTREGA.horaCorte+' h':'pedidos después de las '+ENTREGA.horaCorte+' h o en fin de semana / feriado se entregan el siguiente día hábil';
   pe.innerHTML=ent?'&#x1F4E6; <strong>'+ent+'</strong> '+(z.mismoDia?'en ':'a ')+escapeHtml(z.label)+' <span class="entrega-nota">'+nota+'</span>':'';
 }
