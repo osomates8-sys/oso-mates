@@ -179,6 +179,22 @@
   <div id="guias"></div>
   <button class="btn-ghost" id="add-guia">+ Agregar guía</button>
 
+  <h2>Campaña Día de la Madre</h2>
+  <div class="card">
+    <label class="chk" style="margin-top:0"><input type="checkbox" id="camp-activo"/> Mostrar la campaña (cartel de arriba, sección en el inicio y aviso "llega antes" en cada mate)</label>
+    <div class="row">
+      <div><label for="camp-fecha">Fecha del Día de la Madre (después se apaga sola)</label><input type="date" id="camp-fecha"/></div>
+      <div><label for="camp-premio">Premio del sorteo (vacío = sin sorteo)</label><input type="text" id="camp-premio" placeholder="un combo mate + bombilla + yerba"/></div>
+    </div>
+    <div class="row">
+      <div><label for="camp-shasta">Se participa hasta</label><input type="date" id="camp-shasta"/></div>
+      <div><label for="camp-sdia">Día del sorteo</label><input type="date" id="camp-sdia"/></div>
+    </div>
+    <label for="camp-link">Link al posteo del sorteo en Instagram</label>
+    <input type="url" id="camp-link" placeholder="https://www.instagram.com/p/..."/>
+    <p class="hint">Si dejás el link vacío, el botón "Participar" lleva a tu perfil @oso_mates. Las bases están en sorteo-dia-de-la-madre.html.</p>
+  </div>
+
   <h2>Pago con tarjeta</h2>
   <div class="card">
     <label class="chk" style="margin-top:0"><input type="checkbox" id="tarj-activo"/> Ofrecer "Tarjeta" en el checkout (además de transferencia)</label>
@@ -800,6 +816,26 @@ function parseResenas(id,txt){
 }
 
 /* ===== Grabado ===== */
+function loadCampanaForm(){
+  let c={}; try{ c=JSON.parse(config.campana_madre||'{}')||{}; }catch(e){}
+  document.getElementById('camp-activo').checked=!!c.active;
+  document.getElementById('camp-fecha').value=c.fecha||'';
+  document.getElementById('camp-premio').value=c.sorteo_premio||'';
+  document.getElementById('camp-shasta').value=c.sorteo_hasta||'';
+  document.getElementById('camp-sdia').value=c.sorteo_dia||'';
+  document.getElementById('camp-link').value=c.sorteo_link||'';
+}
+function collectCampana(){
+  let c={}; try{ c=JSON.parse(config.campana_madre||'{}')||{}; }catch(e){}
+  c.active=document.getElementById('camp-activo').checked;
+  c.titulo=c.titulo||'Día de la Madre';
+  c.fecha=document.getElementById('camp-fecha').value;
+  c.sorteo_premio=document.getElementById('camp-premio').value.trim();
+  c.sorteo_hasta=document.getElementById('camp-shasta').value;
+  c.sorteo_dia=document.getElementById('camp-sdia').value;
+  c.sorteo_link=document.getElementById('camp-link').value.trim();
+  return JSON.stringify(c);
+}
 function loadTarjetaForm(){
   let t={active:false,cuotas:0,proveedor:''};
   try{ if(config.pago_tarjeta) Object.assign(t,JSON.parse(config.pago_tarjeta)); }catch(e){}
@@ -825,6 +861,7 @@ function loadConfigForm(){
   loadGrabadoForm();
   loadBombillaForm();
   loadTarjetaForm();
+  loadCampanaForm();
   loadOsoForm();
   document.getElementById('cfg-banner').value = config.banner||'';
   document.getElementById('cfg-ga_id').value = config.ga_id||'';
@@ -874,6 +911,7 @@ function collectConfig(){
   c.oso_config = collectOso();
   const gActivo=document.getElementById('grab-activo').checked;
   const gPrecio=parseInt(document.getElementById('grab-precio').value,10)||0;
+  c.campana_madre = collectCampana();
   c.pago_tarjeta = JSON.stringify({active:document.getElementById('tarj-activo').checked, cuotas:Math.max(0,parseInt(document.getElementById('tarj-cuotas').value,10)||0), proveedor:document.getElementById('tarj-prov').value.trim()});
   c.bombilla_extra = JSON.stringify({active:document.getElementById('bomb-activo').checked, nombre:document.getElementById('bomb-nombre').value.trim()||'Bombilla', price:parseInt(document.getElementById('bomb-precio').value,10)||0});
   c.grabado = JSON.stringify({active:gActivo, price:gPrecio, maxChars:(function(){ try{ return JSON.parse(config.grabado||'{}').maxChars||20; }catch(e){ return 20; } })()});

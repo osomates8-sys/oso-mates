@@ -128,6 +128,7 @@
     "coupon": "{\"code\":\"OSO10\",\"percent\":10,\"active\":true}",
     "coupon_newsletter": "{\"code\":\"BIENVENIDA5\",\"percent\":5,\"active\":true}",
     "ga_id": "G-74Q6C5ZQMS",
+    "campana_madre": "{\"active\":true,\"titulo\":\"Día de la Madre\",\"fecha\":\"2026-10-18\",\"sorteo_premio\":\"un mate Ranchero + bombilla pico de loro + yerba LIBRE\",\"sorteo_hasta\":\"2026-10-16\",\"sorteo_dia\":\"2026-10-17\",\"sorteo_link\":\"\"}",
     "oso_config": "{\"activo\":true,\"lado\":\"der\",\"tamano\":\"mediano\",\"celular\":true,\"zonas\":{\"inicio\":{\"accion\":\"saluda\",\"frase\":\"¡Hola! Encontrá tu próximo mate\"},\"productos\":{\"accion\":\"mate\",\"frase\":\"Un mate y seguimos!\"},\"galeria\":{\"accion\":\"mira\",\"frase\":\"Elegi el tuyo\"},\"info\":{\"accion\":\"quieto\",\"frase\":\"Este es para vos\"},\"contacto\":{\"accion\":\"asiente\",\"frase\":\"¿Te cebo uno? Escribinos.\"}},\"tocar\":[\"¡Cebame uno!\",\"Desde Mar del Plata a todo el país.\",\"¿Ya viste los bombillones?\",\"El ranchero es mi favorito.\"]}",
     "grabado": "{\"active\":true,\"price\":9000,\"maxChars\":20}"
   };
