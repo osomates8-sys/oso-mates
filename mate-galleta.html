@@ -380,6 +380,34 @@ nav{position:fixed;top:0;left:0;right:0;z-index:500;display:flex;justify-content
 .hero-left,.marquee-strip,.wa-block,footer,#instagram-section,.promo-banner,.cookie-banner{--warm:#c8956c;--gray:#9a9a9a;}
 [data-theme="dark"] .hero-left,[data-theme="dark"] .marquee-strip,[data-theme="dark"] .wa-block,[data-theme="dark"] footer,[data-theme="dark"] #instagram-section,[data-theme="dark"] .promo-banner,[data-theme="dark"] .cookie-banner{--black:#0a0a0a;--white:#f8f8f6;--light:#2a2a30;--mid:#bbb;}
 </style>
+<style id="om-visual-producto">
+/* ===== Mejoras visuales de la página de cada mate (oct 2026) ===== */
+/* Foto principal entera (formato vertical), sin recortar el mate */
+@media(min-width:901px){
+  .product-img-section{height:auto!important;background:transparent!important;padding:2.5rem 1rem 1rem 4rem;}
+  .product-img-section .gallery-main{flex:none;aspect-ratio:4/5;width:min(100%,calc((100vh - 230px)*.8));margin:0 auto;background:var(--light);}
+  .product-img-section .gallery-thumbs{justify-content:center;background:transparent!important;padding:1rem 0;}
+}
+@media(max-width:900px){
+  .product-img-section .gallery-main{height:auto!important;aspect-ratio:4/5;}
+  .newsletter-form button{padding:1rem;}
+}
+/* "También te puede gustar": fotos enteras; en el celular se deslizan de costado */
+.related-img{height:auto!important;aspect-ratio:4/5;}
+@media(max-width:900px){
+  .related-grid{display:flex!important;overflow-x:auto;gap:.8rem;scroll-snap-type:x mandatory;padding-bottom:.5rem;-webkit-overflow-scrolling:touch;}
+  .related-card{flex:0 0 44%;scroll-snap-align:start;}
+}
+/* Opiniones más compactas: lista y formulario lado a lado en la compu */
+.reviews-header{margin-bottom:.6rem!important;}.reviews-header .related-title{margin-bottom:0!important;}
+.reviews-list .loading{padding:.8rem 0!important;text-align:left!important;text-transform:none!important;letter-spacing:0!important;font-size:.82rem!important;color:var(--mid)!important;}
+@media(min-width:901px){
+  .reviews-section{display:grid;grid-template-columns:1fr minmax(320px,440px);column-gap:4rem;align-items:start;padding:4.5rem 4rem!important;}
+  .reviews-section .reviews-header,.reviews-section .reviews-list{grid-column:1;}
+  .reviews-section .review-form{grid-column:2;grid-row:1 / span 2;margin-top:0!important;}
+}
+@media(max-width:900px){.reviews-section{padding:2.5rem 1.25rem!important;}.review-form{margin-top:1.5rem!important;padding:1.4rem!important;}}
+</style>
 </head>
 <body>
 <nav>
