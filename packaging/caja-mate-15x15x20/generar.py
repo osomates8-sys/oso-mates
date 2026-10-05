@@ -305,7 +305,7 @@ def diamond_rule(c, cx, y, half, color=None):
 def panel_front(c):
     x0, cx = XA, XA + L / 2
     if MINIMAL:
-        logo(c, cx, 122, 36, parts=("oso",))
+        logo(c, cx, 130, 58, parts=("oso",))
         tracked(c, "OSO MATES", cx, 84, "MSM", pt(24), track=3.6)
         diamond_rule(c, cx, 76, 0)
         tracked(c, "MATES Y BOMBILLAS", cx, 67, "MSR", pt(7), track=2.2)
