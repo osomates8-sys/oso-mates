@@ -1,11 +1,11 @@
-"""Genera el archivo de imprenta de la caja Oso Mates (150 x 150 x 200 mm).
+"""Genera el archivo de imprenta de la caja Oso Mates (medidas en L, W, H).
 
 Modelo: caja de tapas invertidas (reverse tuck end), una sola pieza de cartulina.
 
 Salidas (en esta misma carpeta):
-  caja-oso-mates-15x15x20_IMPRENTA.pdf  -> pág. 1: arte + troquel (tintas planas CutContour / Crease)
+  caja-oso-mates-<medida>_<COLOR>_IMPRENTA.pdf -> pág. 1: arte + troquel (tintas planas CutContour / Crease)
                                           pág. 2: solo troquel con cotas
-  caja-oso-mates-15x15x20_PREVIEW.pdf   -> arte recortado al troquel (para mirar, no para imprimir)
+  caja-oso-mates-<medida>_<COLOR>_PREVIEW.pdf  -> arte recortado al troquel (para mirar, no para imprimir)
 
 Uso: python3 generar.py   (requiere reportlab y qrcode)
 Todas las medidas están en milímetros.
@@ -29,12 +29,12 @@ from reportlab.platypus import Paragraph
 HERE = os.path.dirname(os.path.abspath(__file__))
 
 # ---------------------------------------------------------------- medidas
-L = 150.0   # frente / dorso
-W = 150.0   # laterales (profundidad)
-H = 200.0   # alto
+L = 130.0   # frente / dorso
+W = 130.0   # laterales (profundidad)
+H = 160.0   # alto
 GLUE = 15.0  # solapa de pegado
 TUCK = 15.0  # lengüeta de cierre
-DUST = 56.0  # alto de las aletas guardapolvo
+DUST = round(W * 0.37)  # alto de las aletas guardapolvo
 BLEED = 3.0
 MARGIN = 22.0  # margen de hoja para marcas y leyenda
 
@@ -46,6 +46,14 @@ Y_MIN, Y_MAX = -(W + TUCK), H + W + TUCK
 
 PAGE_W = (X_MAX - X_MIN) + 2 * MARGIN
 PAGE_H = (Y_MAX - Y_MIN) + 2 * MARGIN
+
+SIZE = f"{L / 10:g}x{W / 10:g}x{H / 10:g}"   # para los nombres de archivo
+
+
+def Y(v):
+    """Posición vertical diseñada para un panel de 200 mm, llevada al alto real."""
+    return v * H / 200.0
+
 
 # ---------------------------------------------------------------- colores (CMYK)
 THEMES = {
@@ -143,7 +151,7 @@ def contour():
 
 
 # Ventana: rectángulo que envuelve la esquina frente/lateral derecho, abajo (donde apoya el mate)
-WIN_W, WIN_Y0, WIN_Y1, WIN_R = 40.0, 15.0, 75.0, 3.5   # mm de cada cara, alto desde la base
+WIN_W, WIN_Y0, WIN_Y1, WIN_R = 35.0, 12.0, 60.0, 3.5   # mm de cada cara, alto desde la base
 
 
 CREASES = [
@@ -315,45 +323,46 @@ def diamond_rule(c, cx, y, half, color=None):
 def panel_front(c):
     x0, cx = XA, XA + L / 2
     if MINIMAL:
-        logo(c, cx, 140, 58, parts=("oso",))
-        tracked(c, "OSO MATES", cx, 96, "MSM", pt(24), track=3.6)
-        diamond_rule(c, cx, 89, 0)
-        tracked(c, "MATES Y BOMBILLAS", cx, 81, "MSR", pt(7), track=2.2)
-        tracked(c, "MAR DEL PLATA", cx, 18, "MSR", pt(6.5), track=2.2)
+        logo(c, cx, Y(142), 48, parts=("oso",))
+        tracked(c, "OSO MATES", cx, Y(97), "MSM", pt(22), track=3.2)
+        diamond_rule(c, cx, Y(97) - 6, 0)
+        tracked(c, "MATES Y BOMBILLAS", cx, Y(97) - 12.5, "MSR", pt(7), track=2.0)
+        tracked(c, "MAR DEL PLATA", cx, 14, "MSR", pt(6.5), track=2.2, align="center")
         return
     frame(c, x0, 0, L, H)
-    logo(c, cx, 124, 96)
-    tracked(c, "MATES Y BOMBILLAS", cx, 58, "MSM", pt(8.5), track=1.2)
-    diamond_rule(c, cx, 47, 18)
-    tracked(c, "TALLADO A MANO · MAR DEL PLATA", cx, 22, "MSR", pt(5.8), track=0.5, color=BROWN)
+    logo(c, cx, Y(132), 80)
+    tracked(c, "MATES Y BOMBILLAS", cx, Y(132) - 47, "MSM", pt(8), track=1.0)
+    diamond_rule(c, cx, Y(132) - 55, 14)
+    tracked(c, "TALLADO A MANO · MAR DEL PLATA", cx - 6, 17, "MSR", pt(5.8), track=0.3, color=BROWN)
 
 
 def panel_curado(c, x0, material, steps, note_title, note, window=False):
     """Lateral con el curado paso a paso de un tipo de mate.
     window=True: el lateral tiene la ventana abajo a la izquierda; la nota y el pie van a su derecha."""
     cx = x0 + W / 2
-    nx0 = x0 + WIN_W + 6 if window else x0 + 15   # zona libre para la nota
-    ncx = (nx0 + x0 + W - 15) / 2
+    nx0 = x0 + WIN_W + 5 if window else x0 + 12   # zona libre para la nota
+    ncx = (nx0 + x0 + W - 12) / 2
     frame(c, x0, 0, W, H)
-    tracked(c, "CURADO  ·  ANTES DEL PRIMER USO", cx, 178, "MSM", pt(6), track=1.3, color=BROWN)
-    tracked(c, "Cómo curar tu mate", cx, 165, "CGLI", pt(24), track=0.3)
-    tracked(c, f"de {material}", cx, 156, "CGLI", pt(24), track=0.3)
-    diamond_rule(c, cx, 149, 14)
-    y = 142
+    top = H - 20
+    tracked(c, "CURADO  ·  ANTES DEL PRIMER USO", cx, top, "MSM", pt(6), track=1.0, color=BROWN)
+    tracked(c, "Cómo curar tu mate", cx, top - 11.5, "CGLI", pt(21), track=0.3)
+    tracked(c, f"de {material}", cx, top - 19.5, "CGLI", pt(21), track=0.3)
+    diamond_rule(c, cx, top - 25.5, 12)
+    y = top - 31
     for i, (bold, rest) in enumerate(steps, 1):
-        tracked(c, f"{i:02d}", x0 + 16, y - pt(8.4), "CGM", pt(15), color=BROWN, align="left")
-        h = para(c, f"<b>{bold}</b> {rest}", x0 + 28, y, W - 28 - 16, size=8, leading=11.2)
-        y -= max(h, 5) + 5
+        tracked(c, f"{i:02d}", x0 + 13, y - pt(7.6), "CGM", pt(13), color=BROWN, align="left")
+        h = para(c, f"<b>{bold}</b> {rest}", x0 + 23, y, W - 23 - 12, size=7, leading=9.4)
+        y -= max(h, 4.5) + 3.2
     y -= 2
     c.saveState()
     c.setStrokeColor(BROWN)
     c.setLineWidth(0.3)
     if not MINIMAL:
-        c.roundRect(nx0, y - 27, x0 + W - 15 - nx0, 27, 2, stroke=1, fill=0)
+        c.roundRect(nx0, y - 27, x0 + W - 12 - nx0, 27, 2, stroke=1, fill=0)
     c.restoreState()
-    tracked(c, note_title, ncx, y - 7, "MSSB", pt(6.5), track=1.2, color=BROWN)
-    para(c, note, nx0 + 4, y - 10.5, x0 + W - 15 - nx0 - 8, size=7.5, leading=10.4, align=TA_CENTER)
-    tracked(c, "Guía completa en osomates.com/guias", ncx if window else cx, 18.5, "MSR", pt(5.6), track=0.2)
+    tracked(c, note_title, ncx, y - 6, "MSSB", pt(6.5), track=1.0, color=BROWN)
+    para(c, note, nx0 + 3, y - 9, x0 + W - 12 - nx0 - 6, size=7, leading=9.4, align=TA_CENTER)
+    tracked(c, "Guía completa en osomates.com/guias", ncx if window else cx, 14, "MSR", pt(5.6), track=0.1)
 
 
 def panel_cure(c):
@@ -382,17 +391,17 @@ def panel_cure_algarrobo(c):
 def panel_back(c):
     x0, cx = XC, XC + L / 2
     frame(c, x0, 0, L, H)
-    logo(c, cx, 168, 16 if MINIMAL else 22, parts=("oso",))
-    tracked(c, "Cada mate es único", cx, 143, "CGLI", pt(22), track=0.3, color=INK)
-    diamond_rule(c, cx, 136, 16)
+    logo(c, cx, H - 26, 14 if MINIMAL else 18, parts=("oso",))
+    tracked(c, "Cada mate es único", cx, H - 47, "CGLI", pt(20), track=0.3, color=INK)
+    diamond_rule(c, cx, H - 53, 14)
     para(c, "Cada mate de <b>Oso Mates</b> se hace y se talla a mano, uno por uno, en Mar del Plata. "
             "Por eso no hay dos iguales: las vetas, el color y las pequeñas marcas del tallado "
             "son parte de su historia.",
-         x0 + 20, 129, L - 40, size=7, leading=10.6, align=TA_CENTER)
+         x0 + 15, H - 58, L - 30, size=7, leading=10, align=TA_CENTER)
 
     # QR a la web
-    qs = 27.0
-    qx, qy = cx - qs / 2, 50
+    qs = 22.0
+    qx, qy = cx - qs / 2, 38
     c.saveState()
     if THEME == "negra":  # el QR necesita fondo claro
         c.setFillColor(CMYKColor(0, 0, 0, 0))
@@ -410,9 +419,9 @@ def panel_back(c):
                 c.rect(qx + k * cell, qy + qs - (r + 1) * cell, cell + 0.01, cell + 0.01, stroke=0, fill=1)
     c.restoreState()
     tracked(c, "CONOCÉ LA COLECCIÓN", cx, qy + qs + 6, "MSM", pt(5.8), track=1.4, color=BROWN)
-    tracked(c, "osomates.com", cx, 39, "CGM", pt(15), track=0.4, color=INK)
-    tracked(c, "@oso_mates", cx, 32, "MSR", pt(6.5), track=0.8, color=BROWN)
-    tracked(c, "HECHO A MANO EN ARGENTINA", cx, 18.5, "MSR", pt(5.6), track=1.1, color=INK)
+    tracked(c, "osomates.com", cx, 29, "CGM", pt(14), track=0.4, color=INK)
+    tracked(c, "@oso_mates", cx, 23, "MSR", pt(6.5), track=0.8, color=BROWN)
+    tracked(c, "HECHO A MANO EN ARGENTINA", cx, 14, "MSR", pt(5.6), track=0.8, color=INK)
 
 
 def lid_top(c):
@@ -531,8 +540,8 @@ def legend(c, title):
     c.drawString(X_MIN, Y_MAX + 10, title)
     c.setFont("MSR", pt(6))
     c.drawString(X_MIN, Y_MAX + 6,
-                 "Caja Oso Mates · interior 150 × 150 × 200 mm · tapas invertidas · "
-                 "Desplegado 615 × 530 mm · Sangrado 3 mm · CMYK · Escala 1:1")
+                 f"Caja Oso Mates · interior {L:g} × {W:g} × {H:g} mm · tapas invertidas · "
+                 f"Desplegado {X_MAX - X_MIN:g} × {Y_MAX - Y_MIN:g} mm · Sangrado 3 mm · CMYK · Escala 1:1")
     c.setFillColor(CUT)
     c.rect(X_MAX - 120, Y_MAX + 9.2, 6, 1.4, stroke=0, fill=1)
     c.setFillColor(CREASE)
@@ -617,14 +626,15 @@ def build_print(path):
     panel_labels(c)
     legend(c, "PÁG. 2 — TROQUEL CON COTAS (no imprimir, referencia)")
     yb = Y_MIN - 8
-    dim(c, X_MIN, X_MAX, yb, "615 mm")
-    for a, b, t in [(0, XA, "15"), (XA, XB, "150"), (XB, XC, "150"), (XC, XD, "150"), (XD, XE, "150")]:
+    dim(c, X_MIN, X_MAX, yb, f"{X_MAX - X_MIN:g} mm")
+    for a, b, t in [(0, XA, f"{GLUE:g}"), (XA, XB, f"{L:g}"), (XB, XC, f"{W:g}"), (XC, XD, f"{L:g}"),
+                    (XD, XE, f"{W:g}")]:
         dim(c, a, b, Y_MIN - 3, t)
-    dim(c, Y_MIN, Y_MAX, X_MAX + 14, "530 mm", horizontal=False)
-    for a, b, t in [(Y_MIN, Y_BOT_LID, "15"), (Y_BOT_LID, 0, "150"), (0, H, "200"),
-                    (H, Y_TOP_LID, "150"), (Y_TOP_LID, Y_MAX, "15")]:
+    dim(c, Y_MIN, Y_MAX, X_MAX + 14, f"{Y_MAX - Y_MIN:g} mm", horizontal=False)
+    for a, b, t in [(Y_MIN, Y_BOT_LID, f"{TUCK:g}"), (Y_BOT_LID, 0, f"{W:g}"), (0, H, f"{H:g}"),
+                    (H, Y_TOP_LID, f"{W:g}"), (Y_TOP_LID, Y_MAX, f"{TUCK:g}")]:
         dim(c, a, b, X_MAX + 7, t, horizontal=False)
-    dim(c, H, H + DUST, XB - 4, "56", horizontal=False)
+    dim(c, H, H + DUST, XB - 4, f"{DUST:g}", horizontal=False)
     dim(c, XB - WIN_W, XB + WIN_W, WIN_Y1 + 4, f"ventana {2 * WIN_W:g} ({WIN_W:g} + {WIN_W:g})")
     dim(c, WIN_Y0, WIN_Y1, XB + WIN_W + 4, f"{WIN_Y1 - WIN_Y0:g}", horizontal=False)
     dim(c, 0, WIN_Y0, XB + WIN_W + 4, f"{WIN_Y0:g}", horizontal=False)
@@ -666,6 +676,6 @@ def build_preview(path):
 if __name__ == "__main__":
     for theme in THEMES:
         set_theme(theme)
-        build_print(os.path.join(HERE, f"caja-oso-mates-15x15x20_{theme.upper()}_IMPRENTA.pdf"))
-        build_preview(os.path.join(HERE, f"caja-oso-mates-15x15x20_{theme.upper()}_PREVIEW.pdf"))
+        build_print(os.path.join(HERE, f"caja-oso-mates-{SIZE}_{theme.upper()}_IMPRENTA.pdf"))
+        build_preview(os.path.join(HERE, f"caja-oso-mates-{SIZE}_{theme.upper()}_PREVIEW.pdf"))
     print("ok")

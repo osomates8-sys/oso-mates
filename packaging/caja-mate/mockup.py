@@ -31,7 +31,7 @@ def paste(canvas, img, quad, shade=1.0):
 def render(theme):
     tmp = tempfile.mkdtemp()
     subprocess.run(["pdftoppm", "-r", str(DPI), "-png", "-singlefile",
-                    os.path.join(HERE, f"caja-oso-mates-15x15x20_{theme}_PREVIEW.pdf"), os.path.join(tmp, "p")],
+                    os.path.join(HERE, f"caja-oso-mates-{g.SIZE}_{theme}_PREVIEW.pdf"), os.path.join(tmp, "p")],
                    check=True)
     src = Image.open(os.path.join(tmp, "p.png")).convert("RGB")
     front = crop(src, g.XA, 0, g.XB, g.H)
@@ -41,7 +41,7 @@ def render(theme):
     lid = ImageEnhance.Brightness(top.crop((5, 5, 15, 15)).resize((1, 1))).enhance(0.8).getpixel((0, 0))
     r = 11 * k
     ImageDraw.Draw(front).ellipse((front.width / 2 - r, -r, front.width / 2 + r, r), fill=lid)
-    S = 4.2
+    S = 4.2 * 150 / g.L  # la caja ocupa lo mismo en la imagen sea cual sea la medida
     ex, ez, ey = np.array([0.92, 0.26]) * S, np.array([0.62, -0.36]) * S, np.array([0, -1.0]) * S
     O = np.array([260, 1180.0])
     P = lambda x, y, z: tuple(O + x * ex + y * ey + z * ez)
@@ -54,7 +54,7 @@ def render(theme):
     paste(out, side, [P(L, H, 0), P(L, H, W), P(L, 0, W), P(L, 0, 0)], 0.86)
     paste(out, top, [P(0, H, W), P(L, H, W), P(L, H, 0), P(0, H, 0)], 1.06)
     out = out.resize((1050, 980), Image.LANCZOS)
-    out.save(os.path.join(HERE, f"caja-oso-mates-15x15x20_{theme}_MOCKUP.png"))
+    out.save(os.path.join(HERE, f"caja-oso-mates-{g.SIZE}_{theme}_MOCKUP.png"))
 
 
 for t in ("NEGRA", "BLANCA", "MADERA", "KRAFT"):
