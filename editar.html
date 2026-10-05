@@ -195,6 +195,12 @@
     <p class="hint">Si dejás el link vacío, el botón "Participar" lleva a tu perfil @oso_mates. Las bases están en sorteo-dia-de-la-madre.html.</p>
   </div>
 
+  <h2>Promos por fecha</h2>
+  <div class="card">
+    <p class="hint" style="margin-top:0">Durante las fechas, todos los precios bajan solos con el descuento, el cartel de arriba muestra una cuenta regresiva y los cupones no se suman. 7 días antes aparece el aviso "Se viene…". Al guardar, el catálogo de Google también recibe el precio de oferta con sus fechas.</p>
+    <div id="promos-list"></div>
+  </div>
+
   <h2>Pago con tarjeta</h2>
   <div class="card">
     <label class="chk" style="margin-top:0"><input type="checkbox" id="tarj-activo"/> Ofrecer "Tarjeta" en el checkout (además de transferencia)</label>
@@ -422,8 +428,8 @@ async function putIfChanged(path, text, message, ignore){
   return r.ok;
 }
 /* Catálogo para Google Shopping e Instagram/Facebook (osomates.com/productos.xml) */
-async function updateFeed(prods){
-  try{ return await putIfChanged('productos.xml', OM_SEO.buildFeed(prods), 'Actualizar catálogo de productos (Google/Meta)'); }
+async function updateFeed(prods, cfg){
+  try{ return await putIfChanged('productos.xml', OM_SEO.buildFeed(prods, (cfg||{}).promos), 'Actualizar catálogo de productos (Google/Meta)'); }
   catch(e){ console.error(e); return false; }
 }
 async function updateSitemap(prods, guides){
@@ -816,6 +822,26 @@ function parseResenas(id,txt){
 }
 
 /* ===== Grabado ===== */
+function loadPromosForm(){
+  let ps=[]; try{ ps=JSON.parse(config.promos||'[]')||[]; }catch(e){}
+  while(ps.length<2) ps.push({active:false,nombre:'',desde:'',hasta:'',descuento:15});
+  document.getElementById('promos-list').innerHTML=ps.map((p,i)=>`
+    <div class="row" style="align-items:end">
+      <div><label>Nombre</label><input type="text" class="pr-nombre" value="${(p.nombre||'').replace(/"/g,'&quot;')}" placeholder="Cyber Oso"/></div>
+      <div><label>% de descuento</label><input type="number" class="pr-desc" min="1" max="90" value="${p.descuento||15}"/></div>
+    </div>
+    <div class="row" style="align-items:end;margin-bottom:1rem">
+      <div><label>Desde</label><input type="date" class="pr-desde" value="${p.desde||''}"/></div>
+      <div><label>Hasta (inclusive)</label><input type="date" class="pr-hasta" value="${p.hasta||''}"/></div>
+    </div>
+    <label class="chk" style="margin:-.4rem 0 1.4rem"><input type="checkbox" class="pr-activo"${p.active?' checked':''}/> Promo activa</label>`).join('');
+}
+function collectPromos(){
+  const q=c=>[...document.querySelectorAll('#promos-list .'+c)];
+  const n=q('pr-nombre'), d=q('pr-desc'), de=q('pr-desde'), h=q('pr-hasta'), a=q('pr-activo');
+  return JSON.stringify(n.map((x,i)=>({active:a[i].checked, nombre:x.value.trim(), desde:de[i].value, hasta:h[i].value, descuento:Math.max(0,Math.min(90,parseInt(d[i].value,10)||0))}))
+    .filter(p=>p.nombre||p.desde));
+}
 function loadCampanaForm(){
   let c={}; try{ c=JSON.parse(config.campana_madre||'{}')||{}; }catch(e){}
   document.getElementById('camp-activo').checked=!!c.active;
@@ -862,6 +888,7 @@ function loadConfigForm(){
   loadBombillaForm();
   loadTarjetaForm();
   loadCampanaForm();
+  loadPromosForm();
   loadOsoForm();
   document.getElementById('cfg-banner').value = config.banner||'';
   document.getElementById('cfg-ga_id').value = config.ga_id||'';
@@ -912,6 +939,7 @@ function collectConfig(){
   const gActivo=document.getElementById('grab-activo').checked;
   const gPrecio=parseInt(document.getElementById('grab-precio').value,10)||0;
   c.campana_madre = collectCampana();
+  c.promos = collectPromos();
   c.pago_tarjeta = JSON.stringify({active:document.getElementById('tarj-activo').checked, cuotas:Math.max(0,parseInt(document.getElementById('tarj-cuotas').value,10)||0), proveedor:document.getElementById('tarj-prov').value.trim()});
   c.bombilla_extra = JSON.stringify({active:document.getElementById('bomb-activo').checked, nombre:document.getElementById('bomb-nombre').value.trim()||'Bombilla', price:parseInt(document.getElementById('bomb-precio').value,10)||0});
   c.grabado = JSON.stringify({active:gActivo, price:gPrecio, maxChars:(function(){ try{ return JSON.parse(config.grabado||'{}').maxChars||20; }catch(e){ return 20; } })()});
@@ -1170,7 +1198,7 @@ document.getElementById('save').onclick=async()=>{
     const guiasOk=await updateGuias(guiasList);
     guias=guiasList; renderGuias();
     status('','Actualizando páginas de producto y mapa del sitio para Google…');
-    const mapaOk=guiasOk & (await updateProductPages(prods, cc.config)) & (await updateSitemap(prods, guiasList)) & (await updateFeed(prods));
+    const mapaOk=guiasOk & (await updateProductPages(prods, cc.config)) & (await updateSitemap(prods, guiasList)) & (await updateFeed(prods, cc.config));
     status('ok','¡Guardado! La tienda se actualiza en 1 o 2 minutos.'+(mapaOk?'':' (Algunas páginas de producto, guías o el mapa para Google no se pudieron actualizar del todo, se reintenta la próxima vez que guardes.)'));
   }catch(e){
     dirty=true;

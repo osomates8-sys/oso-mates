@@ -54,5 +54,5 @@ for (const f of fs.readdirSync(root)) {
 }
 fs.writeFileSync(path.join(root, 'sitemap.xml'), SEO.buildSitemap(prods, guides));
 console.log('✓ sitemap.xml');
-fs.writeFileSync(path.join(root, 'productos.xml'), SEO.buildFeed(prods));
+fs.writeFileSync(path.join(root, 'productos.xml'), SEO.buildFeed(prods, (sandbox.window.FALLBACK_CONFIG || {}).promos));
 console.log('✓ productos.xml');
