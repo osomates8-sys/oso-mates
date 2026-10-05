@@ -38,6 +38,7 @@
 - **Tipografías:** Cormorant Garamond y Montserrat, incrustadas (las de la web).
 - **Solapa de pegado:** sin tinta, para que el adhesivo agarre bien.
 - **Muesca para el pulgar** en la boca del frente, para abrir la tapa fácil.
+- **Ventana** rectangular que envuelve la esquina frente/lateral derecho (30 mm de cada cara × 44 mm de alto, a 18 mm de la base), para ver el mate. Va en el troquel como corte (CutContour); el hendido de esa esquina se interrumpe en la ventana.
 - **QR:** lleva a https://osomates.com.
 
 ## Qué pedirle a la imprenta

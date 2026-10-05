@@ -142,9 +142,13 @@ def contour():
     return p
 
 
+# Ventana: rectángulo que envuelve la esquina frente/lateral derecho, abajo (donde apoya el mate)
+WIN_W, WIN_Y0, WIN_Y1, WIN_R = 30.0, 18.0, 62.0, 3.0   # mm de cada cara, alto desde la base
+
+
 CREASES = [
     # verticales entre paneles
-    ((XA, 0), (XA, H)), ((XB, 0), (XB, H)), ((XC, 0), (XC, H)), ((XD, 0), (XD, H)),
+    ((XA, 0), (XA, H)), ((XB, 0), (XB, WIN_Y0)), ((XB, WIN_Y1), (XB, H)), ((XC, 0), (XC, H)), ((XD, 0), (XD, H)),
     # arriba
     ((XB, H), (XC - 2, H)), ((XC, H), (XD, H)), ((XD + 2, H), (XE, H)),
     ((XC + 1.5, Y_TOP_LID), (XD - 1.5, Y_TOP_LID)),
@@ -152,6 +156,12 @@ CREASES = [
     ((XA, 0), (XB, 0)), ((XB, 0), (XC - 2, 0)), ((XD + 2, 0), (XE, 0)),
     ((XA + 1.5, Y_BOT_LID), (XB - 1.5, Y_BOT_LID)),
 ]
+
+
+def window_path(c):
+    p = c.beginPath()
+    p.roundRect(XB - WIN_W, WIN_Y0, 2 * WIN_W, WIN_Y1 - WIN_Y0, WIN_R)
+    return p
 
 
 def contour_path(c):
@@ -491,6 +501,7 @@ def dieline(c, overprint=True):
     c.setLineWidth(0.25)
     c.setStrokeColor(CUT)
     c.drawPath(contour_path(c), stroke=1, fill=0)
+    c.drawPath(window_path(c), stroke=1, fill=0)
     c.setStrokeColor(CREASE)
     c.setDash(3, 1.5)
     for a, b in CREASES:
@@ -611,6 +622,9 @@ def build_print(path):
                     (H, Y_TOP_LID, "150"), (Y_TOP_LID, Y_MAX, "15")]:
         dim(c, a, b, X_MAX + 7, t, horizontal=False)
     dim(c, H, H + DUST, XB - 4, "56", horizontal=False)
+    dim(c, XB - WIN_W, XB + WIN_W, WIN_Y1 + 4, "ventana 60 (30 + 30)")
+    dim(c, WIN_Y0, WIN_Y1, XB + WIN_W + 4, "44", horizontal=False)
+    dim(c, 0, WIN_Y0, XB + WIN_W + 4, "18", horizontal=False)
     c.restoreState()
     c.showPage()
     c.save()
@@ -628,10 +642,15 @@ def build_preview(path):
     c.clipPath(contour_path(c), stroke=0, fill=0)
     artwork(c, preview=True)
     c.restoreState()
+    c.saveState()  # por la ventana se ve el interior de la caja, en sombra
+    c.setFillColor(CMYKColor(0.45, 0.60, 0.70, 0.65))
+    c.drawPath(window_path(c), stroke=0, fill=1)
+    c.restoreState()
     c.saveState()
     c.setLineWidth(0.25)
     c.setStrokeColor(CMYKColor(0, 0, 0, 0.45))
     c.drawPath(contour_path(c), stroke=1, fill=0)
+    c.drawPath(window_path(c), stroke=1, fill=0)
     c.setStrokeColor(CMYKColor(0, 0, 0, 0.25))
     c.setDash(3, 1.5)
     for a, b in CREASES:
