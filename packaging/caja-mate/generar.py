@@ -150,13 +150,14 @@ def contour():
     return p
 
 
-# Ventana: rectángulo que envuelve la esquina frente/lateral derecho, abajo (donde apoya el mate)
-WIN_W, WIN_Y0, WIN_Y1, WIN_R = 35.0, 12.0, 60.0, 3.5   # mm de cada cara, alto desde la base
+# Ventana: rectángulo centrado en la parte baja del frente (donde apoya el mate)
+WIN_W, WIN_Y0, WIN_Y1, WIN_R = 52.0, 10.0, 66.0, 2.0   # ancho total, desde/hasta (mm desde la base)
+WIN_X0 = XA + L / 2 - WIN_W / 2
 
 
 CREASES = [
     # verticales entre paneles
-    ((XA, 0), (XA, H)), ((XB, 0), (XB, WIN_Y0)), ((XB, WIN_Y1), (XB, H)), ((XC, 0), (XC, H)), ((XD, 0), (XD, H)),
+    ((XA, 0), (XA, H)), ((XB, 0), (XB, H)), ((XC, 0), (XC, H)), ((XD, 0), (XD, H)),
     # arriba
     ((XB, H), (XC - 2, H)), ((XC, H), (XD, H)), ((XD + 2, H), (XE, H)),
     ((XC + 1.5, Y_TOP_LID), (XD - 1.5, Y_TOP_LID)),
@@ -168,7 +169,7 @@ CREASES = [
 
 def window_path(c):
     p = c.beginPath()
-    p.roundRect(XB - WIN_W, WIN_Y0, 2 * WIN_W, WIN_Y1 - WIN_Y0, WIN_R)
+    p.roundRect(WIN_X0, WIN_Y0, WIN_W, WIN_Y1 - WIN_Y0, WIN_R)
     return p
 
 
@@ -323,17 +324,18 @@ def diamond_rule(c, cx, y, half, color=None):
 def panel_front(c):
     x0, cx = XA, XA + L / 2
     if MINIMAL:
-        logo(c, cx, Y(142), 48, parts=("oso",))
-        tracked(c, "OSO MATES", cx, Y(97), "MSM", pt(22), track=3.2)
-        diamond_rule(c, cx, Y(97) - 6, 0)
-        tracked(c, "MATES Y BOMBILLAS", cx, Y(97) - 12.5, "MSR", pt(7), track=2.0)
-        tracked(c, "MAR DEL PLATA", cx, 14, "MSR", pt(6.5), track=2.2, align="center")
+        top = WIN_Y1 + 12   # el bloque de marca va arriba de la ventana
+        tracked(c, "MATES Y BOMBILLAS", cx, top, "MSR", pt(7), track=2.0)
+        diamond_rule(c, cx, top + 6.5, 0)
+        tracked(c, "OSO MATES", cx, top + 12.5, "MSM", pt(22), track=3.2)
+        bear_h = min(48, H - 16 - (top + 24))
+        logo(c, cx, top + 24 + bear_h / 2, bear_h, parts=("oso",))
         return
     frame(c, x0, 0, L, H)
-    logo(c, cx, Y(132), 80)
-    tracked(c, "MATES Y BOMBILLAS", cx, Y(132) - 47, "MSM", pt(8), track=1.0)
-    diamond_rule(c, cx, Y(132) - 55, 14)
-    tracked(c, "TALLADO A MANO · MAR DEL PLATA", cx - 6, 17, "MSR", pt(5.8), track=0.3, color=BROWN)
+    top = WIN_Y1 + 8
+    tracked(c, "MATES Y BOMBILLAS", cx, top, "MSM", pt(8), track=1.6)
+    logo_h = H - 16 - (top + 7)
+    logo(c, cx, top + 7 + logo_h / 2, logo_h)
 
 
 def panel_curado(c, x0, material, steps, note_title, note, window=False):
@@ -373,7 +375,7 @@ def panel_cure(c):
         ("Enjuagalo con agua", "(sin detergente) y repetí durante 2 o 3 días."),
         ("Dejalo secar", "en un lugar ventilado, sin tapar, antes de estrenarlo."),
     ], "OJO CON EL AGUA", "Usala caliente, nunca hirviendo: entre 70 y 80 °C. "
-                         "El agua hirviendo puede rajar la calabaza.", window=True)
+                         "El agua hirviendo puede rajar la calabaza.")
 
 
 def panel_cure_algarrobo(c):
@@ -635,9 +637,9 @@ def build_print(path):
                     (H, Y_TOP_LID, f"{W:g}"), (Y_TOP_LID, Y_MAX, f"{TUCK:g}")]:
         dim(c, a, b, X_MAX + 7, t, horizontal=False)
     dim(c, H, H + DUST, XB - 4, f"{DUST:g}", horizontal=False)
-    dim(c, XB - WIN_W, XB + WIN_W, WIN_Y1 + 4, f"ventana {2 * WIN_W:g} ({WIN_W:g} + {WIN_W:g})")
-    dim(c, WIN_Y0, WIN_Y1, XB + WIN_W + 4, f"{WIN_Y1 - WIN_Y0:g}", horizontal=False)
-    dim(c, 0, WIN_Y0, XB + WIN_W + 4, f"{WIN_Y0:g}", horizontal=False)
+    dim(c, WIN_X0, WIN_X0 + WIN_W, WIN_Y1 + 4, f"ventana {WIN_W:g}")
+    dim(c, WIN_Y0, WIN_Y1, WIN_X0 + WIN_W + 4, f"{WIN_Y1 - WIN_Y0:g}", horizontal=False)
+    dim(c, 0, WIN_Y0, WIN_X0 + WIN_W + 4, f"{WIN_Y0:g}", horizontal=False)
     c.restoreState()
     c.showPage()
     c.save()
