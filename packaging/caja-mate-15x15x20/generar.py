@@ -156,9 +156,7 @@ def contour_path(c):
 
 # ---------------------------------------------------------------- helpers de texto
 def legible(font, size_mm):
-    """En la caja negra el texto va calado: mínimo 7 pt y un peso más, para que el negro no lo coma."""
-    if THEME != "negra":
-        return font, size_mm
+    """Texto chico: mínimo 7 pt y un peso más, para que se lea bien impreso."""
     return {"MSL": "MSR", "MSR": "MSM"}.get(font, font), max(size_mm, pt(7))
 
 
@@ -350,7 +348,7 @@ def frame(c, x0, y0, w, h, inset=7.0):
     c.setStrokeColor(BROWN)
     c.setLineWidth(0.35)
     c.rect(x0 + inset, y0 + inset, w - 2 * inset, h - 2 * inset, stroke=1, fill=0)
-    c.setLineWidth(0.25 if THEME == "negra" else 0.12)
+    c.setLineWidth(0.25)
     c.rect(x0 + inset + 1.2, y0 + inset + 1.2, w - 2 * inset - 2.4, h - 2 * inset - 2.4, stroke=1, fill=0)
     c.restoreState()
 
@@ -360,7 +358,7 @@ def diamond_rule(c, cx, y, half, color=None):
     c.saveState()
     c.setStrokeColor(color)
     c.setFillColor(color)
-    c.setLineWidth(0.28 if THEME == "negra" else 0.18)
+    c.setLineWidth(0.28)
     c.line(cx - half, y, cx - 2.2, y)
     c.line(cx + 2.2, y, cx + half, y)
     d = c.beginPath()
@@ -404,13 +402,9 @@ def panel_cure(c):
         y -= max(h, 9) + 3.6
     y -= 2
     c.saveState()
-    if THEME == "negra":
-        c.setStrokeColor(BROWN)
-        c.setLineWidth(0.3)
-        c.roundRect(x0 + 15, y - 22, W - 30, 22, 2, stroke=1, fill=0)
-    else:
-        c.setFillColor(BROWN_SOFT)
-        c.roundRect(x0 + 15, y - 22, W - 30, 22, 2, stroke=0, fill=1)
+    c.setStrokeColor(BROWN)
+    c.setLineWidth(0.3)
+    c.roundRect(x0 + 15, y - 22, W - 30, 22, 2, stroke=1, fill=0)
     c.restoreState()
     tracked(c, "¿ES DE ALGARROBO?", cx, y - 7, "MSSB", pt(6), track=1.2, color=BROWN)
     para(c, "Untalo con manteca o aceite y dejalo reposar 8 horas antes de empezar. "
