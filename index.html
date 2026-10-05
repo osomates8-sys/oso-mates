@@ -4,7 +4,7 @@
 <script>(function(){try{var t=localStorage.getItem('om_theme');if(t==='dark')document.documentElement.setAttribute('data-theme','dark');}catch(e){}})();</script>
 <meta charset="UTF-8"/>
 <!-- SEO -->
-<meta name="description" content="Mates artesanales tallados a mano: algarrobo, calabaza y cuero. Cada pieza es única e incluye guía de curado. Desde Mar del Plata, envíos a todo el país y 10% OFF por transferencia."/>
+<meta name="description" content="Mates artesanales tallados a mano en algarrobo, calabaza y cuero. Piezas únicas con guía de curado. Envíos a todo el país y 10% OFF por transferencia."/>
 <meta name="keywords" content="mates artesanales, mates Mar del Plata, mates de madera, mates algarrobo, mates calabaza, mates tallados, bombillas artesanales"/>
 <meta name="author" content="Oso Mates"/>
 <meta property="og:title" content="Oso Mates — Mates artesanales tallados a mano | Mar del Plata"/>
@@ -638,7 +638,7 @@ fbq('track', 'PageView');
 <body>
 <!-- BANNER PROMO -->
 <div class="promo-banner" id="promo-banner">
-  <span id="promo-banner-text">Envio gratis en compras mayores a <strong>$60.000</strong> &nbsp;|&nbsp; 10% OFF pagando por transferencia</span>
+  <span id="promo-banner-text">Envío gratis en compras mayores a $100.000 | 10% OFF pagando por transferencia</span>
   <button class="promo-close" onclick="document.getElementById('promo-banner').style.display='none'">&#x2715;</button>
 </div>
 <div class="cursor" id="cur"></div>
@@ -927,7 +927,7 @@ fbq('track', 'PageView');
       <div class="wa-block">
         <span class="wa-label" data-i18n="wa_label">WhatsApp directo</span>
         <span class="wa-num">+54 9 223 306-1168</span>
-        <a href="https://wa.me/542233061168?text=Hola!%20Vi%20sus%20mates%20y%20me%20gustar%C3%ADa%20consultar." target="_blank" class="wa-btn" data-i18n="wa_btn">Escribir ahora &#x2192;</a>
+        <a href="https://wa.me/5492233061168?text=Hola!%20Vi%20sus%20mates%20y%20me%20gustar%C3%ADa%20consultar." target="_blank" class="wa-btn" data-i18n="wa_btn">Escribir ahora &#x2192;</a>
       </div>
       <a href="https://www.instagram.com/oso_mates" target="_blank" class="ig-block">
         <span class="ig-handle">@oso_mates</span><span class="ig-arrow">&#x2197;</span>
@@ -950,7 +950,7 @@ fbq('track', 'PageView');
   <div class="footer-copy" data-i18n="footer_copy1">&#169; 2026 &#8212; Hecho en Argentina</div>
   <div class="footer-copy" data-i18n="footer_copy2">Todos los derechos reservados</div>
   <div class="footer-copy" style="margin-top:.6rem"><a href="guias.html" style="color:inherit;text-decoration:underline">Guías del mate</a></div>
-  <div class="footer-copy" style="margin-top:.6rem"><a href="legales.html" style="color:inherit;text-decoration:underline" data-i18n="footer_legal">Politica de privacidad y terminos</a></div>
+  <div class="footer-copy" style="margin-top:.6rem"><a href="legales.html" style="color:inherit;text-decoration:underline" data-i18n="footer_legal">Política de privacidad y términos</a></div>
   <div class="footer-copy" style="margin-top:.6rem"><a href="legales.html#arrepentimiento" style="color:inherit;text-decoration:underline">Botón de arrepentimiento</a> · <a href="legales.html#devoluciones" style="color:inherit;text-decoration:underline">Cambios y devoluciones</a></div>
 </footer>
 <div class="cart-overlay" id="cart-overlay" onclick="toggleCart()"></div>
@@ -1542,6 +1542,17 @@ function getImg(img){
   if(IMG_MAP[file]) return GHBASE+IMG_MAP[file];
   return GHBASE+file;
 }
+/* Miniatura liviana (thumbs/, la genera scripts/make-thumbs.py). Si no existe, se usa la foto original. */
+function getThumb(img){
+  const full=getImg(img);
+  if(!full||full.indexOf(GHBASE)!==0) return full;
+  const rel=full.slice(GHBASE.length);
+  return rel.indexOf('/')===-1?GHBASE+'thumbs/'+rel.replace(/\.[^.]+$/,'')+'.webp':full;
+}
+function thumbAttrs(img){
+  const t=getThumb(img), f=getImg(img);
+  return 'src="'+t+'"'+(t!==f?' onerror="this.onerror=null;this.src=\''+f+'\'"':'');
+}
 function getImgPos(img){
   return parseImgVal(img).pos;
 }
@@ -1762,7 +1773,7 @@ function updateCartUI(){saveCart();
   document.getElementById('cart-count').textContent=count;
   const el=document.getElementById('cart-items');
   if(!cart.length){el.innerHTML='<div class="cart-empty">'+t('cart_empty')+'</div>';}
-  else{el.innerHTML=cart.map(item=>`<div class="cart-item"><img src="${getImg(item.imagen)}" alt="${item.nombre}" class="cart-item-img" style="object-position:${getImgPos(item.imagen)}" crossorigin="anonymous"/><div><div class="cart-item-name">${item.nombre}</div><div class="cart-item-mat">${item.material}</div>${item.bombilla?`<div class="cart-item-mat">+ ${escapeHtml(item.bombilla)}</div>`:''}${item.grabado?`<div class="cart-item-mat">${t('cart_item_grabado')}: "${escapeHtml(item.grabado)}"</div>`:''}<div class="cart-item-qty"><button class="qty-btn" onclick="changeQty('${lineKey(item)}',-1)">\u2212</button><span class="qty-num">${item.qty}</span><button class="qty-btn" onclick="changeQty('${lineKey(item)}',1)">+</button></div></div><div><div class="cart-item-price">${fmt(itemUnitPrice(item,false)*item.qty)}</div><div class="cart-item-remove" onclick="removeFromCart('${lineKey(item)}')">${t('cart_item_remove')}</div></div></div>`).join('');}
+  else{el.innerHTML=cart.map(item=>`<div class="cart-item"><img ${thumbAttrs(item.imagen)} alt="${item.nombre}" class="cart-item-img" style="object-position:${getImgPos(item.imagen)}" crossorigin="anonymous"/><div><div class="cart-item-name">${item.nombre}</div><div class="cart-item-mat">${item.material}</div>${item.bombilla?`<div class="cart-item-mat">+ ${escapeHtml(item.bombilla)}</div>`:''}${item.grabado?`<div class="cart-item-mat">${t('cart_item_grabado')}: "${escapeHtml(item.grabado)}"</div>`:''}<div class="cart-item-qty"><button class="qty-btn" onclick="changeQty('${lineKey(item)}',-1)">\u2212</button><span class="qty-num">${item.qty}</span><button class="qty-btn" onclick="changeQty('${lineKey(item)}',1)">+</button></div></div><div><div class="cart-item-price">${fmt(itemUnitPrice(item,false)*item.qty)}</div><div class="cart-item-remove" onclick="removeFromCart('${lineKey(item)}')">${t('cart_item_remove')}</div></div></div>`).join('');}
   document.getElementById('cart-total').textContent=fmt(cartTotal());
   updateCartShipEstimate();
 }
@@ -1882,7 +1893,7 @@ async function confirmOrder(){
     '<div class="confirm-step"><span class="confirm-step-num">3</span><span>Despachamos en 48hs h\u00e1biles desde que se acredita el pago</span></div>';
   document.getElementById('confirm-title').textContent=confirmTitle;
   document.getElementById('confirm-text').textContent=confirmText;
-  const waBtn='<a class="om-wa-btn" target="_blank" rel="noopener" href="'+'https://wa.me/542233061168?text='+encodeURIComponent('¡Hola! Hice un pedido en la web.\n'+'Nombre: '+name+'\nEmail: '+email+'\nPedido: '+detalle+'\nTotal: '+fmt(total)+'\n'+(isT?'Te mando el comprobante de la transferencia'+(cart.some(function(i){return i.grabado;})?' y el diseño del grabado.':'.'):'Quiero pagar con tarjeta'+(PAGO_TARJETA.cuotas>1?' en hasta '+PAGO_TARJETA.cuotas+' cuotas sin inter\u00e9s':'')+'. \u00bfMe mand\u00e1s el link de pago?'))+'"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2a8.2 8.2 0 0 1-4.2-1.1l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1l-.8 1c-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.2-.4.7-1.3.1-.2 0-.3 0-.4l-.8-1.9c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.8 12 12 0 0 0 4.6 4c1.7.7 2.4.8 3.2.7.5-.1 1.5-.6 1.8-1.2.2-.6.2-1.1.1-1.2l-.4-.2z"/></svg>'+(isT?'Enviar pedido y comprobante por WhatsApp':'Pedir link de pago por WhatsApp')+'</a>';
+  const waBtn='<a class="om-wa-btn" target="_blank" rel="noopener" href="'+'https://wa.me/5492233061168?text='+encodeURIComponent('¡Hola! Hice un pedido en la web.\n'+'Nombre: '+name+'\nEmail: '+email+'\nPedido: '+detalle+'\nTotal: '+fmt(total)+'\n'+(isT?'Te mando el comprobante de la transferencia'+(cart.some(function(i){return i.grabado;})?' y el diseño del grabado.':'.'):'Quiero pagar con tarjeta'+(PAGO_TARJETA.cuotas>1?' en hasta '+PAGO_TARJETA.cuotas+' cuotas sin inter\u00e9s':'')+'. \u00bfMe mand\u00e1s el link de pago?'))+'"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2a8.2 8.2 0 0 1-4.2-1.1l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1l-.8 1c-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.2-.4.7-1.3.1-.2 0-.3 0-.4l-.8-1.9c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.8 12 12 0 0 0 4.6 4c1.7.7 2.4.8 3.2.7.5-.1 1.5-.6 1.8-1.2.2-.6.2-1.1.1-1.2l-.4-.2z"/></svg>'+(isT?'Enviar pedido y comprobante por WhatsApp':'Pedir link de pago por WhatsApp')+'</a>';
   const grabStep=cart.some(function(i){return i.grabado;})?'<div class="confirm-step"><span class="confirm-step-num">✎</span><span>Por WhatsApp coordinamos el dise\u00f1o del grabado</span></div>':'';
   document.getElementById('confirm-steps').innerHTML=(isT?cbuBox+steps:cardBox+cardSteps)+grabStep+waBtn;
   document.getElementById('confirm-page').classList.add('show');
@@ -2092,7 +2103,7 @@ function showSuggestions(val){
   const matches=allProds.filter(p=>(p.nombre||'').toLowerCase().includes(q)).slice(0,6);
   if(!matches.length){box.innerHTML='';box.classList.remove('show');return;}
   const re=new RegExp('('+q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+')','gi');
-  box.innerHTML=matches.map(p=>`<div class="sug-item" tabindex="0" onclick="selectSuggestion('${p.id}','${(p.nombre||'').replace(/'/g,"\\'")}')"><img src="${getImg(p.imagen)}" class="sug-img" onerror="this.style.display='none'"/><span>${(p.nombre||'').replace(re,'<mark>$1</mark>')}</span></div>`).join('');
+  box.innerHTML=matches.map(p=>`<div class="sug-item" tabindex="0" onclick="selectSuggestion('${p.id}','${(p.nombre||'').replace(/'/g,"\\'")}')"><img ${thumbAttrs(p.imagen)} class="sug-img" onerror="this.style.display='none'"/><span>${(p.nombre||'').replace(re,'<mark>$1</mark>')}</span></div>`).join('');
   box.classList.add('show');
 }
 function selectSuggestion(id,name){
@@ -2207,12 +2218,12 @@ async function loadInstagramGrid(){
     if(data&&data[0]&&data[0].valor){galImgs=JSON.parse(data[0].valor)||[];}
   }catch(e){}
   if(galImgs.length){
-    grid.innerHTML=galImgs.slice(0,6).map(name=>`<img src="${getImg(name)}" style="object-position:${getImgPos(name)}" alt="Oso Mates" loading="lazy"/>`).join('');
+    grid.innerHTML=galImgs.slice(0,6).map(name=>`<img ${thumbAttrs(name)} style="object-position:${getImgPos(name)}" alt="Oso Mates" loading="lazy"/>`).join('');
     return;
   }
   if(!allProds.length)return;
   const items=allProds.filter(p=>p.imagen).slice(0,6);
-  grid.innerHTML=items.map(p=>`<img src="${getImg(p.imagen)}" alt="${p.nombre}" loading="lazy" onclick="viewProduct('${p.id}')"/>`).join('');
+  grid.innerHTML=items.map(p=>`<img ${thumbAttrs(p.imagen)} alt="${p.nombre}" loading="lazy" onclick="viewProduct('${p.id}')"/>`).join('');
 }
 
 // ── EXIT INTENT ───────────────────────────────────────────────────────────────
@@ -2239,7 +2250,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape')closeExitPop
 </script>
 
 <!-- WHATSAPP FLOTANTE -->
-<a href="https://wa.me/542233061168?text=Hola!%20Vi%20su%20tienda%20y%20quiero%20consultar." target="_blank" class="wa-float" title="Escribinos por WhatsApp">
+<a href="https://wa.me/5492233061168?text=Hola!%20Vi%20su%20tienda%20y%20quiero%20consultar." target="_blank" class="wa-float" title="Escribinos por WhatsApp">
   <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
 </a>
 
@@ -2254,7 +2265,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape')closeExitPop
   </div>
 </div>
 <script type="application/ld+json">
-{"@context":"https://schema.org","@type":"Store","name":"Oso Mates","description":"Mates artesanales tallados a mano: algarrobo, calabaza y cuero. Desde Mar del Plata, envíos a todo el país.","url":"https://osomates.com/","telephone":"+542233061168","email":"osomates8@gmail.com","address":{"@type":"PostalAddress","addressLocality":"Mar del Plata","addressRegion":"Buenos Aires","addressCountry":"AR"},"sameAs":["https://www.instagram.com/oso_mates"],"priceRange":"$$","image":"https://osomates.com/og-image.jpg","currenciesAccepted":"ARS","paymentAccepted":"Bank Transfer"}
+{"@context":"https://schema.org","@type":"Store","name":"Oso Mates","description":"Mates artesanales tallados a mano: algarrobo, calabaza y cuero. Desde Mar del Plata, envíos a todo el país.","url":"https://osomates.com/","telephone":"+5492233061168","email":"osomates8@gmail.com","address":{"@type":"PostalAddress","addressLocality":"Mar del Plata","addressRegion":"Buenos Aires","addressCountry":"AR"},"sameAs":["https://www.instagram.com/oso_mates"],"priceRange":"$$","image":"https://osomates.com/og-image.jpg","currenciesAccepted":"ARS","paymentAccepted":"Bank Transfer"}
 </script>
 <!-- POPUP SALIDA -->
 <div class="exit-overlay" id="exit-overlay">

@@ -13,7 +13,7 @@
    Un renglón vacío separa párrafos. El primer párrafo sale más grande (bajada). */
 (function (root) {
   var SITE = 'https://osomates.com/';
-  var WA = 'https://wa.me/542233061168?text=Hola!%20Le%C3%AD%20la%20gu%C3%ADa%20y%20quer%C3%ADa%20consultar.';
+  var WA = 'https://wa.me/5492233061168?text=Hola!%20Le%C3%AD%20la%20gu%C3%ADa%20y%20quer%C3%ADa%20consultar.';
   var CATS = {
     '*': 'Todos los mates', 'calabaza,madera': 'Mates de calabaza y madera',
     'calabaza': 'Solo calabaza', 'madera': 'Solo madera', 'bombillas': 'Bombillas', 'combos': 'Combos'
