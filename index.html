@@ -20,6 +20,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧉</text></svg>"/>
 <title>Oso Mates — Mates artesanales tallados a mano | Mar del Plata</title>
+<link rel="preload" as="image" href="IMG_5272.webp" fetchpriority="high"/>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
 <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Montserrat:wght@300;400;500;600&display=swap"/>
@@ -635,6 +636,53 @@ fbq('track', 'PageView');
 .hero-left,.marquee-strip,.wa-block,footer,#instagram-section,.promo-banner,.cookie-banner{--warm:#c8956c;--gray:#9a9a9a;}
 [data-theme="dark"] .hero-left,[data-theme="dark"] .marquee-strip,[data-theme="dark"] .wa-block,[data-theme="dark"] footer,[data-theme="dark"] #instagram-section,[data-theme="dark"] .promo-banner,[data-theme="dark"] .cookie-banner{--black:#0a0a0a;--white:#f8f8f6;--light:#2a2a30;--mid:#bbb;}
 </style>
+<style id="om-visual">
+/* ===== Mejoras visuales (oct 2026) ===== */
+/* Portada con foto */
+.hero-right{background:#1b1714;display:block;}
+.hero-photo{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 62%;display:block;}
+.hero-desc{color:rgba(248,248,246,.78);}
+@media(max-width:900px){
+  #hero{position:relative;padding:64px 0 0!important;}
+  .hero-right{display:block!important;position:absolute;inset:0;}
+  .hero-left{position:relative;z-index:1;min-height:78vh;background:linear-gradient(180deg,rgba(10,10,10,.05) 0%,rgba(10,10,10,.35) 35%,rgba(10,10,10,.88) 72%)!important;padding:6rem 1.6rem 3rem!important;}
+  .hero-title{text-shadow:0 2px 18px rgba(0,0,0,.35);}
+}
+/* Sin la sección repetida "Los más vendidos" (los populares ya se marcan en la colección) */
+#bestsellers{display:none!important;}
+/* Fotos del catálogo enteras, en formato vertical */
+.p-img-wrap{height:auto!important;aspect-ratio:4/5;}
+/* Celular: catálogo de a 2 */
+@media(max-width:600px){
+  .catalog-grid{grid-template-columns:1fr 1fr!important;gap:.7rem;}
+  .catalog-grid .p-body{padding:.85rem .7rem 1rem;}
+  .catalog-grid .p-num{display:none;}
+  .catalog-grid .p-name{font-size:1.12rem;}
+  .catalog-grid .p-mat{font-size:.5rem;letter-spacing:.1em;}
+  .catalog-grid .p-footer{flex-direction:column;align-items:stretch;gap:.55rem;}
+  .catalog-grid .p-price{font-size:1.25rem;}
+  .catalog-grid .p-btns{margin-top:0;}
+  .catalog-grid .p-view-btn{display:none;}
+  .catalog-grid .p-add-btn{flex:1;padding:.7rem .4rem!important;font-size:.56rem!important;}
+  .catalog-grid .p-badge,.catalog-grid .free-ship{font-size:.48rem;}
+}
+/* Galería: sin huecos cuando hay pocas fotos */
+.gallery-grid:has(> .gallery-item:nth-child(3):last-child){grid-template-columns:2fr 1fr;grid-template-rows:1fr 1fr;}
+.gallery-grid:has(> .gallery-item:nth-child(3):last-child) .gallery-item{aspect-ratio:auto;min-height:0;}
+.gallery-grid:has(> .gallery-item:nth-child(3):last-child) .gallery-item img{position:absolute;inset:0;}
+.gallery-grid:has(> .gallery-item:nth-child(3):last-child) .gallery-item:first-child{grid-column:1;grid-row:1 / span 2;aspect-ratio:4/3;}
+.gallery-grid:has(> .gallery-item:nth-child(2):last-child){grid-template-columns:1fr 1fr;}
+.gallery-grid:has(> .gallery-item:nth-child(2):last-child) .gallery-item:first-child{grid-column:auto;grid-row:auto;}
+/* Instagram: fotos centradas, del tamaño justo */
+.ig-grid{display:flex!important;flex-wrap:wrap;justify-content:center;gap:.6rem;}
+.ig-grid img{flex:0 1 200px;width:200px;max-width:calc(33.333% - .4rem);}
+/* Cuidado del mate: números en lugar de emojis y link a la guía */
+.care-icon{font-family:'Cormorant Garamond',serif;font-size:1.8rem!important;color:var(--warm);line-height:1;}
+.care-more{margin-top:2rem;font-size:.75rem;color:var(--mid);}
+.care-more a{color:var(--black);text-underline-offset:4px;}
+/* Textos grises más legibles */
+.review-author,.care-desc,.como-step-desc{color:var(--mid)!important;}
+</style>
 </head>
 <body>
 <!-- BANNER PROMO -->
@@ -680,8 +728,7 @@ fbq('track', 'PageView');
     </div>
   </div>
   <div class="hero-right">
-    <div class="hero-bg-text">OSO</div>
-    <div class="hero-name">Oso<em>Mates</em><small>Mates y Bombillas</small></div>
+    <img class="hero-photo" src="IMG_5272.webp" alt="Mate artesanal de algarrobo con virola de alpaca y bombilla" fetchpriority="high" decoding="async" width="933" height="1400"/>
   </div>
 </section>
 <div class="marquee-strip"><div class="marquee-inner"><span>Tallado a mano</span><span class="dot">—</span><span>Madera noble</span><span class="dot">—</span><span>Guía de curado incluida</span><span class="dot">—</span><span>Envíos a todo el país</span><span class="dot">—</span><span>Piezas únicas</span><span class="dot">—</span><span>@oso_mates</span><span class="dot">—</span><span>Bombillas</span><span class="dot">—</span><span>Tallado a mano</span><span class="dot">—</span><span>Madera noble</span><span class="dot">—</span><span>Guía de curado incluida</span><span class="dot">—</span><span>Envíos a todo el país</span><span class="dot">—</span><span>Piezas únicas</span><span class="dot">—</span><span>@oso_mates</span><span class="dot">—</span></div></div>
@@ -817,32 +864,33 @@ fbq('track', 'PageView');
 <section id="cuidado">
   <div class="section-header reveal">
     <div>
-      <div class="section-num" data-i18n="sec_cuidado_num">04 — Guía</div>
+      <div class="section-num" data-i18n="sec_cuidado_num">04 — Cuidado</div>
       <h2 class="section-title" data-i18n="sec_cuidado_title">Cuidá tu <em>mate</em></h2>
     </div>
   </div>
   <div class="care-grid">
     <div class="care-item">
-      <span class="care-icon">&#x1F392;</span>
+      <span class="care-icon">01</span>
       <div class="care-title" data-i18n="care1_title">Curado inicial</div>
       <div class="care-desc" data-i18n="care1_desc">Antes de usarlo por primera vez, llená el mate de calabaza con yerba usada y agua hasta el borde. Dejalo reposar 24 horas y repetí el proceso 2 o 3 veces para sellar los poros y eliminar el sabor a madera.</div>
     </div>
     <div class="care-item">
-      <span class="care-icon">&#x1F4A7;</span>
+      <span class="care-icon">02</span>
       <div class="care-title" data-i18n="care2_title">Uso diario</div>
       <div class="care-desc" data-i18n="care2_desc">Después de cada uso, vaciá la yerba húmeda y enjuagá con agua tibia, sin jabón. Dejalo secar boca abajo en un lugar ventilado y lejos del sol directo para que no se agriete.</div>
     </div>
     <div class="care-item">
-      <span class="care-icon">&#x2728;</span>
+      <span class="care-icon">03</span>
       <div class="care-title" data-i18n="care3_title">Limpieza</div>
       <div class="care-desc" data-i18n="care3_desc">Nunca uses detergente ni lavavajillas en mates de calabaza: arruina el curado. La bombilla de metal podés lavarla con agua tibia y un poco de bicarbonato cada tanto.</div>
     </div>
     <div class="care-item">
-      <span class="care-icon">&#x267B;</span>
+      <span class="care-icon">04</span>
       <div class="care-title" data-i18n="care4_title">Mantenimiento</div>
       <div class="care-desc" data-i18n="care4_desc">Si notás olor a humedad o moho, repetí el curado con yerba y agua caliente. Guardá el mate destapado entre usos para que respire y se conserve por años.</div>
     </div>
   </div>
+  <div class="care-more reveal"><a href="guia-como-curar-un-mate.html">Guía completa: cómo curar tu mate paso a paso &#8594;</a> &nbsp;·&nbsp; <a href="guias.html">Todas las guías</a></div>
 </section>
 <section class="como-section reveal" id="como-comprar">
   <div class="section-header" style="margin-bottom:0"><div>
@@ -867,53 +915,13 @@ fbq('track', 'PageView');
     </div>
   </div>
 </section>
-<section class="curado-section" id="curado">
-  <div class="section-num" data-i18n="sec_curado_num">★ Primer paso</div>
-  <h2 class="section-title" data-i18n="sec_curado_title">Cómo <em>curar</em> tu mate</h2>
-  <p class="section-desc" data-i18n="sec_curado_desc">Un mate nuevo necesita ser curado antes del primer uso. Este proceso protege la madera, le da sabor y alarga su vida útil.</p>
-  <div class="curado-steps">
-    <div class="curado-step reveal">
-      <span class="curado-step-num" data-i18n="curado_step1_num">Paso 01</span>
-      <span class="curado-step-icon">🧂</span>
-      <div class="curado-step-title" data-i18n="curado_step1_title">Llenar con yerba y sal</div>
-      <div class="curado-step-desc" data-i18n="curado_step1_desc">Completá el mate con yerba usada hasta las ¾ partes. Agregá sal gruesa y humedecé con agua tibia hasta formar una pasta.</div>
-    </div>
-    <div class="curado-step reveal">
-      <span class="curado-step-num" data-i18n="curado_step2_num">Paso 02</span>
-      <span class="curado-step-icon">⏰</span>
-      <div class="curado-step-title" data-i18n="curado_step2_title">Dejar reposar 24 horas</div>
-      <div class="curado-step-desc" data-i18n="curado_step2_desc">Dejá la mezcla adentro del mate durante 24 horas. La madera absorbe los aceites naturales de la yerba, sellando los poros y dándole el sabor característico.</div>
-    </div>
-    <div class="curado-step reveal">
-      <span class="curado-step-num" data-i18n="curado_step3_num">Paso 03</span>
-      <span class="curado-step-icon">🚿</span>
-      <div class="curado-step-title" data-i18n="curado_step3_title">Vaciar y enjuagar</div>
-      <div class="curado-step-desc" data-i18n="curado_step3_desc">Retirá la yerba con cuchara, enjuagá con agua tibia sin jabón. Nunca uses detergente ni lavavajillas.</div>
-    </div>
-    <div class="curado-step reveal">
-      <span class="curado-step-num" data-i18n="curado_step4_num">Paso 04</span>
-      <span class="curado-step-icon">🌬️</span>
-      <div class="curado-step-title" data-i18n="curado_step4_title">Secar boca abajo</div>
-      <div class="curado-step-desc" data-i18n="curado_step4_desc">Dejá el mate boca abajo sobre una superficie ventilada hasta que seque completamente. Evitá lugares húmedos para prevenir hongos.</div>
-    </div>
-    <div class="curado-step reveal">
-      <span class="curado-step-num" data-i18n="curado_step5_num">Paso 05</span>
-      <span class="curado-step-icon">🧉</span>
-      <div class="curado-step-title" data-i18n="curado_step5_title">¡Listo para usar!</div>
-      <div class="curado-step-desc" data-i18n="curado_step5_desc">Los primeros mates pueden tener sabor más intenso, es normal. En unos días el sabor se estabiliza.</div>
-    </div>
-  </div>
-  <div class="curado-tip reveal">
-    <strong data-i18n="curado_tip_label">Consejo:</strong> <span data-i18n="curado_tip_text">Si tu mate es de calabaza, repetí el proceso 2-3 veces. Para mates de madera, con una vez alcanza.</span>
-  </div>
-</section>
 <section id="nosotros" style="padding:0">
   <div class="nos-right reveal" id="nosotros-content">
     <div class="loading">Cargando...</div>
   </div>
 </section>
 <section id="contacto">
-  <div class="section-header reveal"><div><div class="section-num" data-i18n="sec_contacto_num">05 — Contacto</div><h2 class="section-title" data-i18n="sec_contacto_title">Habla<em>mos</em></h2></div></div>
+  <div class="section-header reveal"><div><div class="section-num" data-i18n="sec_contacto_num">06 — Contacto</div><h2 class="section-title" data-i18n="sec_contacto_title">Habla<em>mos</em></h2></div></div>
   <div class="contact-layout">
     <div class="reveal">
       <p class="contact-sub" data-i18n="contact_sub">Estamos para ayudarte a elegir el mate perfecto. Respondemos todos los mensajes en el día.</p>
@@ -1196,12 +1204,12 @@ const I18N = {
     sec_galeria_num:'02 — Galería', sec_galeria_title:'Cada mate, <em>una historia</em>',
     sec_instagram_title:'Seguinos en <em>Instagram</em>', ig_sub:'Mirá nuestras últimas creaciones, novedades y el detrás de escena.',
     sec_faq_num:'03 — Preguntas frecuentes', sec_faq_title:'Todo lo que <em>necesitas saber</em>',
-    sec_cuidado_num:'04 — Guía', sec_cuidado_title:'Cuidá tu <em>mate</em>',
+    sec_cuidado_num:'04 — Cuidado', sec_cuidado_title:'Cuidá tu <em>mate</em>',
     care1_title:'Curado inicial', care1_desc:'Antes de usarlo por primera vez, llená el mate de calabaza con yerba usada y agua hasta el borde. Dejalo reposar 24 horas y repetí el proceso 2 o 3 veces para sellar los poros y eliminar el sabor a madera.',
     care2_title:'Uso diario', care2_desc:'Después de cada uso, vaciá la yerba húmeda y enjuagá con agua tibia, sin jabón. Dejalo secar boca abajo en un lugar ventilado y lejos del sol directo para que no se agriete.',
     care3_title:'Limpieza', care3_desc:'Nunca uses detergente ni lavavajillas en mates de calabaza: arruina el curado. La bombilla de metal podés lavarla con agua tibia y un poco de bicarbonato cada tanto.',
     care4_title:'Mantenimiento', care4_desc:'Si notás olor a humedad o moho, repetí el curado con yerba y agua caliente. Guardá el mate destapado entre usos para que respire y se conserve por años.',
-    sec_contacto_num:'05 — Contacto', sec_contacto_title:'Habla<em>mos</em>',
+    sec_contacto_num:'06 — Contacto', sec_contacto_title:'Habla<em>mos</em>',
     contact_sub:'Estamos para ayudarte a elegir el mate perfecto. Respondemos todos los mensajes en el día.',
     ci_whatsapp:'WhatsApp', ci_instagram:'Instagram', ci_email:'Email', ci_envios:'Envíos', ci_envios_val:'Todo Argentina',
     wa_label:'WhatsApp directo', wa_btn:'Escribir ahora →',
@@ -1250,12 +1258,12 @@ const I18N = {
     sec_galeria_num:'02 — Gallery', sec_galeria_title:'Every mate, <em>a story</em>',
     sec_instagram_title:'Follow us on <em>Instagram</em>', ig_sub:'Check out our latest creations, news and behind-the-scenes.',
     sec_faq_num:'03 — FAQ', sec_faq_title:'Everything you <em>need to know</em>',
-    sec_cuidado_num:'04 — Guide', sec_cuidado_title:'Care for your <em>mate</em>',
+    sec_cuidado_num:'04 — Care', sec_cuidado_title:'Care for your <em>mate</em>',
     care1_title:'Initial curing', care1_desc:'Before using it for the first time, fill the gourd mate with used yerba and water to the brim. Let it sit for 24 hours and repeat the process 2 or 3 times to seal the pores and remove the wood taste.',
     care2_title:'Daily use', care2_desc:'After each use, empty the wet yerba and rinse with warm water, no soap. Let it dry upside down in a ventilated spot away from direct sun so it doesn\'t crack.',
     care3_title:'Cleaning', care3_desc:'Never use dish soap or detergent on gourd mates: it ruins the curing. The metal straw can be washed with warm water and a bit of baking soda every now and then.',
     care4_title:'Maintenance', care4_desc:'If you notice a damp or musty smell, repeat the curing with yerba and hot water. Store the mate uncovered between uses so it can breathe and last for years.',
-    sec_contacto_num:'05 — Contact', sec_contacto_title:'Let\'s <em>talk</em>',
+    sec_contacto_num:'06 — Contact', sec_contacto_title:'Let\'s <em>talk</em>',
     contact_sub:'We\'re here to help you choose the perfect mate. We reply to every message the same day.',
     ci_whatsapp:'WhatsApp', ci_instagram:'Instagram', ci_email:'Email', ci_envios:'Shipping', ci_envios_val:'All of Argentina',
     wa_label:'Direct WhatsApp', wa_btn:'Message us →',
@@ -1464,7 +1472,7 @@ async function loadNosotros(){
     }
   }catch(e){}
   cont.innerHTML=
-    '<div class="nos-tag">04 — Nosotros</div>'+
+    '<div class="nos-tag">05 — Nosotros</div>'+
     '<h2 class="nos-title">'+d.title1+'<br/><em>'+d.title2+'</em></h2>'+
     '<p class="nos-body">'+d.body+'</p>'+
     '<div class="values-list">'+
