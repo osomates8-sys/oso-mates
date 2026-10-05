@@ -10,6 +10,7 @@ Salidas (en esta misma carpeta):
 Uso: python3 generar.py   (requiere reportlab y qrcode)
 Todas las medidas están en milímetros.
 """
+import json
 import math
 import os
 
@@ -21,6 +22,7 @@ from reportlab.lib.units import mm
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.pdfgen import canvas
+from reportlab.pdfgen.canvas import FILL_EVEN_ODD
 from reportlab.platypus import Paragraph
 
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -45,10 +47,28 @@ PAGE_W = (X_MAX - X_MIN) + 2 * MARGIN
 PAGE_H = (Y_MAX - Y_MIN) + 2 * MARGIN
 
 # ---------------------------------------------------------------- colores (CMYK)
-CREAM = CMYKColor(0, 0.04, 0.12, 0.03)
-BROWN = CMYKColor(0.20, 0.55, 0.85, 0.30)     # ~ #946437 de la web
-BROWN_SOFT = CMYKColor(0.06, 0.18, 0.32, 0.06)
-INK = CMYKColor(0, 0, 0, 0.88)                # texto chico: solo negro, sin registro
+THEMES = {
+    # caja negra: negro enriquecido de fondo, textos calados (blanco = papel) y acento caramelo
+    "negra": dict(BG=CMYKColor(0.60, 0.40, 0.40, 1.0), INK=CMYKColor(0, 0, 0, 0),
+                  BROWN=CMYKColor(0.15, 0.42, 0.62, 0.04), BROWN_SOFT=CMYKColor(0.55, 0.55, 0.60, 0.70),
+                  LOGO=CMYKColor(0, 0, 0, 0)),
+    # caja blanca: papel blanco sin fondo, texto negro (solo K) y acento marrón
+    "blanca": dict(BG=CMYKColor(0, 0, 0, 0), INK=CMYKColor(0, 0, 0, 0.9),
+                   BROWN=CMYKColor(0.20, 0.55, 0.85, 0.30), BROWN_SOFT=CMYKColor(0.04, 0.12, 0.22, 0.02),
+                   LOGO=CMYKColor(0, 0, 0, 1)),
+}
+THEME = "negra"
+BG = INK = BROWN = BROWN_SOFT = LOGO = None
+
+
+def set_theme(name):
+    global THEME
+    THEME = name
+    globals().update(THEMES[name])
+
+
+set_theme(THEME)
+QR_DARK = CMYKColor(0, 0, 0, 1)
 CUT = CMYKColorSep(0, 1, 0, 0, spotName="CutContour")
 CREASE = CMYKColorSep(1, 0, 0, 0, spotName="Crease")
 
@@ -134,7 +154,8 @@ def contour_path(c):
 
 
 # ---------------------------------------------------------------- helpers de texto
-def tracked(c, text, x, y, font, size, track=0.0, color=INK, align="center"):
+def tracked(c, text, x, y, font, size, track=0.0, color=None, align="center"):
+    color = INK if color is None else color
     w = pdfmetrics.stringWidth(text, font, size) + track * (len(text) - 1)
     if align == "center":
         x -= w / 2
@@ -150,7 +171,8 @@ def tracked(c, text, x, y, font, size, track=0.0, color=INK, align="center"):
     return w
 
 
-def para(c, html, x, y_top, width, font="MSR", size=7, leading=None, color=INK, align=TA_LEFT):
+def para(c, html, x, y_top, width, font="MSR", size=7, leading=None, color=None, align=TA_LEFT):
+    color = INK if color is None else color
     st = ParagraphStyle("p", fontName=font, fontSize=pt(size), leading=pt(leading or size * 1.45),
                         textColor=color, alignment=align, bulletFontName=font)
     p = Paragraph(html, st)
@@ -159,9 +181,10 @@ def para(c, html, x, y_top, width, font="MSR", size=7, leading=None, color=INK, 
     return h
 
 
-def circle_text(c, text, cx, cy, r, font, size, track=None, start_deg=90, color=INK):
+def circle_text(c, text, cx, cy, r, font, size, track=None, start_deg=90, color=None):
     """Texto alrededor de un círculo, sentido horario, con la base hacia el centro.
     Sin track, reparte el texto en la vuelta completa."""
+    color = INK if color is None else color
     if track is None:
         track = (2 * math.pi * r - sum(pdfmetrics.stringWidth(ch, font, size) for ch in text)) / len(text)
     total = sum(pdfmetrics.stringWidth(ch, font, size) + track for ch in text) - track
@@ -180,8 +203,9 @@ def circle_text(c, text, cx, cy, r, font, size, track=None, start_deg=90, color=
 
 
 # ---------------------------------------------------------------- ilustraciones
-def mate_icon(c, cx, cy, s, lw=0.35, color=BROWN, carved=True):
+def mate_icon(c, cx, cy, s, lw=0.35, color=None, carved=True):
     """Mate de calabaza con virola y bombilla, en línea. s = escala (1 -> ~92 mm de alto)."""
+    color = BROWN if color is None else color
     c.saveState()
     c.translate(cx, cy)
     c.scale(s, s)
@@ -209,7 +233,7 @@ def mate_icon(c, cx, cy, s, lw=0.35, color=BROWN, carved=True):
     c.setLineWidth(lw / s)
     c.circle(15.2, 59.5, 1.6, stroke=1, fill=0)
 
-    c.setFillColor(CREAM)
+    c.setFillColor(BG)
     c.drawPath(body, stroke=1, fill=1)
 
     if carved:  # guarda tallada, recortada a la silueta
@@ -258,7 +282,7 @@ def mate_icon(c, cx, cy, s, lw=0.35, color=BROWN, carved=True):
     c.setLineWidth(lw / s)
 
     # pie
-    c.setFillColor(CREAM)
+    c.setFillColor(BG)
     pie = c.beginPath()
     pie.moveTo(-12, -40)
     pie.lineTo(-15, -47)
@@ -268,31 +292,46 @@ def mate_icon(c, cx, cy, s, lw=0.35, color=BROWN, carved=True):
     c.restoreState()
 
 
-def bear_icon(c, cx, cy, r, lw=0.3, color=BROWN):
-    """Cabeza de oso minimalista en línea."""
+LOGO_DATA = json.load(open(os.path.join(HERE, "logo_paths.json")))
+
+
+def _logo_part(cv):
+    x0, y0, x1, y1 = cv["bbox"]
+    if x1 - x0 > 700:
+        return None  # borde de la imagen
+    if y0 >= 600:
+        return "tagline"
+    if y0 >= 230:
+        return "oso"
+    return "arco"
+
+
+def logo(c, cx, cy, height, parts=("arco", "oso"), color=None):
+    """Logo vectorizado (logo-original.png -> potrace), centrado en (cx, cy) con alto dado en mm."""
+    color = LOGO if color is None else color
+    curves = [cv for cv in LOGO_DATA["curves"] if _logo_part(cv) in parts]
+    x0 = min(cv["bbox"][0] for cv in curves)
+    y0 = min(cv["bbox"][1] for cv in curves)
+    x1 = max(cv["bbox"][2] for cv in curves)
+    y1 = max(cv["bbox"][3] for cv in curves)
+    k = height / (y1 - y0)
+    tx = lambda x: cx + (x - (x0 + x1) / 2) * k
+    ty = lambda y: cy - (y - (y0 + y1) / 2) * k
+    p = c.beginPath()
+    for cv in curves:
+        p.moveTo(tx(cv["start"][0]), ty(cv["start"][1]))
+        for sg in cv["segs"]:
+            if sg[0] == "L":
+                p.lineTo(tx(sg[1]), ty(sg[2]))
+                p.lineTo(tx(sg[3]), ty(sg[4]))
+            else:
+                p.curveTo(tx(sg[1]), ty(sg[2]), tx(sg[3]), ty(sg[4]), tx(sg[5]), ty(sg[6]))
+        p.close()
     c.saveState()
-    c.setStrokeColor(color)
-    c.setLineWidth(lw)
-    c.setFillColor(CREAM)
-    for sx in (-1, 1):
-        ex, ey = cx + sx * 0.68 * r, cy + 0.68 * r
-        c.circle(ex, ey, 0.34 * r, stroke=1, fill=1)
-        c.circle(ex, ey, 0.17 * r, stroke=1, fill=0)
-    c.circle(cx, cy, r, stroke=1, fill=1)
     c.setFillColor(color)
-    for sx in (-1, 1):
-        c.circle(cx + sx * 0.36 * r, cy + 0.12 * r, 0.065 * r, stroke=0, fill=1)
-    c.setFillColor(CREAM)
-    c.ellipse(cx - 0.36 * r, cy - 0.62 * r, cx + 0.36 * r, cy - 0.06 * r, stroke=1, fill=1)
-    c.setFillColor(color)
-    c.ellipse(cx - 0.12 * r, cy - 0.26 * r, cx + 0.12 * r, cy - 0.12 * r, stroke=0, fill=1)
-    c.line(cx, cy - 0.26 * r, cx, cy - 0.40 * r)
-    m = c.beginPath()
-    m.moveTo(cx - 0.14 * r, cy - 0.44 * r)
-    m.curveTo(cx - 0.07 * r, cy - 0.50 * r, cx, cy - 0.44 * r, cx, cy - 0.40 * r)
-    m.curveTo(cx, cy - 0.44 * r, cx + 0.07 * r, cy - 0.50 * r, cx + 0.14 * r, cy - 0.44 * r)
-    c.drawPath(m, stroke=1, fill=0)
+    c.drawPath(p, stroke=0, fill=1, fillMode=FILL_EVEN_ODD)
     c.restoreState()
+    return (x1 - x0) * k
 
 
 def frame(c, x0, y0, w, h, inset=7.0):
@@ -305,7 +344,8 @@ def frame(c, x0, y0, w, h, inset=7.0):
     c.restoreState()
 
 
-def diamond_rule(c, cx, y, half, color=BROWN):
+def diamond_rule(c, cx, y, half, color=None):
+    color = BROWN if color is None else color
     c.saveState()
     c.setStrokeColor(color)
     c.setFillColor(color)
@@ -326,18 +366,16 @@ def diamond_rule(c, cx, y, half, color=BROWN):
 def panel_front(c):
     x0, cx = XA, XA + L / 2
     frame(c, x0, 0, L, H)
-    tracked(c, "MATES ARTESANALES", cx, 176, "MSM", pt(6), track=1.6, color=BROWN)
-    mate_icon(c, cx, 118, 0.62, lw=0.38)
-    tracked(c, "OSO", cx, 54, "CGL", pt(66), track=5.5, color=INK)
-    tracked(c, "Mates", cx, 40, "CGLI", pt(30), track=0.6, color=BROWN)
-    diamond_rule(c, cx, 31, 18)
-    tracked(c, "TALLADO A MANO  ·  MAR DEL PLATA", cx, 21.5, "MSR", pt(5.6), track=1.1, color=INK)
+    logo(c, cx, 108, 112)
+    tracked(c, "MATES Y BOMBILLAS", cx, 44, "MSM", pt(8.5), track=2.2)
+    diamond_rule(c, cx, 33, 18)
+    tracked(c, "TALLADO A MANO  ·  MAR DEL PLATA", cx, 22, "MSR", pt(5.8), track=1.1, color=BROWN)
 
 
 def panel_cure(c):
     x0, cx = XB, XB + W / 2
     frame(c, x0, 0, W, H)
-    tracked(c, "ANTES DEL PRIMER USO", cx, 178, "MSM", pt(6), track=1.5, color=BROWN)
+    tracked(c, "CURADO  ·  ANTES DEL PRIMER USO", cx, 178, "MSM", pt(6), track=1.3, color=BROWN)
     tracked(c, "Cómo curar", cx, 165, "CGLI", pt(24), track=0.3, color=INK)
     tracked(c, "tu mate", cx, 156, "CGLI", pt(24), track=0.3, color=INK)
     diamond_rule(c, cx, 149, 14)
@@ -368,7 +406,7 @@ def panel_cure(c):
 def panel_back(c):
     x0, cx = XC, XC + L / 2
     frame(c, x0, 0, L, H)
-    bear_icon(c, cx, 168, 9, lw=0.32)
+    logo(c, cx, 166, 22, parts=("oso",))
     tracked(c, "Cada mate es único", cx, 143, "CGLI", pt(22), track=0.3, color=INK)
     diamond_rule(c, cx, 136, 16)
     para(c, "Cada mate de <b>Oso Mates</b> se hace y se talla a mano, uno por uno, en Mar del Plata. "
@@ -388,7 +426,7 @@ def panel_back(c):
     m = qr.get_matrix()
     cell = qs / len(m)
     c.saveState()
-    c.setFillColor(INK)
+    c.setFillColor(QR_DARK)
     for r, row in enumerate(m):
         for k, on in enumerate(row):
             if on:
@@ -439,16 +477,11 @@ def lid_top(c):
     c.saveState()
     c.translate(cx, cy)
     c.rotate(180)
-    c.setStrokeColor(BROWN)
-    c.setLineWidth(0.4)
-    c.circle(0, 0, 52, stroke=1, fill=0)
-    c.setLineWidth(0.15)
-    c.circle(0, 0, 50.5, stroke=1, fill=0)
-    c.circle(0, 0, 34, stroke=1, fill=0)
-    circle_text(c, "OSO MATES · TALLADO A MANO · MAR DEL PLATA · ", 0, 0, 39.5, "MSM", pt(8.6),
-                color=BROWN)
-    bear_icon(c, 0, 4, 14, lw=0.38)
-    tracked(c, "OSO", 0, -21, "CGL", pt(18), track=2.2, color=INK)
+    logo(c, 0, 30, 46, parts=("oso",))
+    tracked(c, "Llegó lo", 0, -8, "CGLI", pt(34), track=0.3)
+    tracked(c, "más esperado", 0, -21, "CGLI", pt(34), track=0.3)
+    diamond_rule(c, 0, -31, 20)
+    tracked(c, "OSO MATES", 0, -41, "MSM", pt(7), track=2.4, color=BROWN)
     c.restoreState()
 
 
@@ -465,7 +498,7 @@ def lid_bottom(c):
 
 def artwork(c):
     c.saveState()
-    c.setFillColor(CREAM)
+    c.setFillColor(BG)
     # fondo con 3 mm de sangrado; la solapa de pegado queda sin tinta para que pegue bien
     c.rect(XA - BLEED, Y_MIN - BLEED, (X_MAX - XA) + 2 * BLEED, (Y_MAX - Y_MIN) + 2 * BLEED, stroke=0, fill=1)
     c.restoreState()
@@ -637,6 +670,8 @@ def build_preview(path):
 
 
 if __name__ == "__main__":
-    build_print(os.path.join(HERE, "caja-oso-mates-15x15x20_IMPRENTA.pdf"))
-    build_preview(os.path.join(HERE, "caja-oso-mates-15x15x20_PREVIEW.pdf"))
+    for theme in THEMES:
+        set_theme(theme)
+        build_print(os.path.join(HERE, f"caja-oso-mates-15x15x20_{theme.upper()}_IMPRENTA.pdf"))
+        build_preview(os.path.join(HERE, f"caja-oso-mates-15x15x20_{theme.upper()}_PREVIEW.pdf"))
     print("ok")
