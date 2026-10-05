@@ -17,9 +17,9 @@
 
 - **Frente:** logo Oso Mates (oso + texto en arco), "Mates y bombillas", "Tallado a mano · Mar del Plata".
 - **Tapa:** el oso + **"Llegó lo más esperado"**.
-- **Lateral derecho:** **curado** paso a paso (calabaza) + nota para algarrobo.
+- **Lateral derecho:** **curado del mate de calabaza** paso a paso.
 - **Dorso:** "Cada mate es único", QR a osomates.com, @oso_mates.
-- **Lateral izquierdo:** cuidados (qué hacer y qué nunca).
+- **Lateral izquierdo:** **curado del mate de algarrobo** paso a paso.
 - **Base:** "Producto artesanal".
 
 ## Ficha técnica

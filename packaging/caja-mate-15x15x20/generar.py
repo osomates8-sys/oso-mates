@@ -212,95 +212,6 @@ def circle_text(c, text, cx, cy, r, font, size, track=None, start_deg=90, color=
 
 
 # ---------------------------------------------------------------- ilustraciones
-def mate_icon(c, cx, cy, s, lw=0.35, color=None, carved=True):
-    """Mate de calabaza con virola y bombilla, en línea. s = escala (1 -> ~92 mm de alto)."""
-    color = BROWN if color is None else color
-    c.saveState()
-    c.translate(cx, cy)
-    c.scale(s, s)
-    c.setLineJoin(1)
-    c.setLineCap(1)
-    c.setStrokeColor(color)
-    c.setLineWidth(lw / s)
-
-    body = c.beginPath()
-    body.moveTo(17, 28)
-    body.curveTo(21, 18, 35, 12, 35, -6)
-    body.curveTo(35, -26, 25, -38, 12, -40)
-    body.lineTo(-12, -40)
-    body.curveTo(-25, -38, -35, -26, -35, -6)
-    body.curveTo(-35, 12, -21, 18, -17, 28)
-    body.close()
-
-    # bombilla (va detrás de la virola)
-    c.setLineWidth(1.6 * lw / s)
-    c.line(3, 33, 21, 74)
-    bp = c.beginPath()
-    bp.moveTo(21, 74)
-    bp.curveTo(22.5, 77.5, 22, 80, 18.5, 82.5)
-    c.drawPath(bp, stroke=1, fill=0)
-    c.setLineWidth(lw / s)
-    c.circle(15.2, 59.5, 1.6, stroke=1, fill=0)
-
-    c.setFillColor(BG)
-    c.drawPath(body, stroke=1, fill=1)
-
-    if carved:  # guarda tallada, recortada a la silueta
-        c.saveState()
-        c.clipPath(body, stroke=0, fill=0)
-        c.setLineWidth(0.8 * lw / s)
-        for yy in (6, -8):
-            pth = c.beginPath()
-            pth.moveTo(-40, yy + 3)
-            pth.curveTo(-15, yy - 2, 15, yy - 2, 40, yy + 3)
-            c.drawPath(pth, stroke=1, fill=0)
-        zig = c.beginPath()
-        n = 14
-        for i in range(n + 1):
-            x = -38 + 76 * i / n
-            t = (x / 40.0) ** 2
-            ybase = (-8 + 3 * t - 2 * (1 - t)) if i % 2 == 0 else (6 + 3 * t - 2 * (1 - t))
-            ybase += 0 if i % 2 == 0 else 0
-            (zig.moveTo if i == 0 else zig.lineTo)(x, ybase + (1.2 if i % 2 == 0 else -1.2))
-        c.drawPath(zig, stroke=1, fill=0)
-        # hojas de yerba talladas
-        for sx in (-1, 1):
-            leaf = c.beginPath()
-            leaf.moveTo(0, -30)
-            leaf.curveTo(sx * 6, -26, sx * 14, -22, sx * 18, -14)
-            leaf.curveTo(sx * 10, -16, sx * 4, -22, 0, -30)
-            c.drawPath(leaf, stroke=1, fill=0)
-        c.line(0, -34, 0, -16)
-        c.restoreState()
-
-    # virola
-    vir = c.beginPath()
-    vir.moveTo(-17, 28)
-    vir.lineTo(-19, 35)
-    vir.lineTo(19, 35)
-    vir.lineTo(17, 28)
-    vir.close()
-    c.drawPath(vir, stroke=1, fill=1)
-    c.line(-18, 31.5, 18, 31.5)
-    c.ellipse(-19, 32.5, 19, 37.5, stroke=1, fill=1)
-    c.setFillColor(BROWN_SOFT)
-    c.ellipse(-16, 33.4, 16, 36.6, stroke=0, fill=1)
-    # la bombilla asoma por la boca
-    c.setLineWidth(1.6 * lw / s)
-    c.line(4.2, 35.6, 6.5, 41)
-    c.setLineWidth(lw / s)
-
-    # pie
-    c.setFillColor(BG)
-    pie = c.beginPath()
-    pie.moveTo(-12, -40)
-    pie.lineTo(-15, -47)
-    pie.lineTo(15, -47)
-    pie.lineTo(12, -40)
-    c.drawPath(pie, stroke=1, fill=1)
-    c.restoreState()
-
-
 LOGO_DATA = json.load(open(os.path.join(HERE, "logo_paths.json")))
 
 
@@ -381,36 +292,51 @@ def panel_front(c):
     tracked(c, "TALLADO A MANO  ·  MAR DEL PLATA", cx, 22, "MSR", pt(5.8), track=1.1, color=BROWN)
 
 
-def panel_cure(c):
-    x0, cx = XB, XB + W / 2
+def panel_curado(c, x0, material, steps, note_title, note):
+    """Lateral con el curado paso a paso de un tipo de mate."""
+    cx = x0 + W / 2
     frame(c, x0, 0, W, H)
     tracked(c, "CURADO  ·  ANTES DEL PRIMER USO", cx, 178, "MSM", pt(6), track=1.3, color=BROWN)
-    tracked(c, "Cómo curar", cx, 165, "CGLI", pt(24), track=0.3, color=INK)
-    tracked(c, "tu mate", cx, 156, "CGLI", pt(24), track=0.3, color=INK)
+    tracked(c, "Cómo curar tu mate", cx, 165, "CGLI", pt(24), track=0.3)
+    tracked(c, f"de {material}", cx, 156, "CGLI", pt(24), track=0.3)
     diamond_rule(c, cx, 149, 14)
-    steps = [
+    y = 142
+    for i, (bold, rest) in enumerate(steps, 1):
+        tracked(c, f"{i:02d}", x0 + 16, y - pt(8.4), "CGM", pt(15), color=BROWN, align="left")
+        h = para(c, f"<b>{bold}</b> {rest}", x0 + 28, y, W - 28 - 16, size=8, leading=11.2)
+        y -= max(h, 5) + 5
+    y -= 2
+    c.saveState()
+    c.setStrokeColor(BROWN)
+    c.setLineWidth(0.3)
+    c.roundRect(x0 + 15, y - 25, W - 30, 25, 2, stroke=1, fill=0)
+    c.restoreState()
+    tracked(c, note_title, cx, y - 7, "MSSB", pt(6.5), track=1.2, color=BROWN)
+    para(c, note, x0 + 20, y - 10.5, W - 40, size=7.5, leading=10.4, align=TA_CENTER)
+    tracked(c, "Guía completa en osomates.com/guias", cx, 18.5, "MSR", pt(5.6), track=0.4)
+
+
+def panel_cure(c):
+    panel_curado(c, XB, "calabaza", [
         ("Llenalo con yerba", "hasta el borde y agregá agua caliente, sin hervir, hasta cubrirla."),
         ("Dejalo reposar 24 horas.", "Si baja el nivel del agua, completalo."),
         ("Vacialo y raspá suavemente", "el interior con una cuchara, solo lo que sale fácil."),
         ("Enjuagalo con agua", "(sin detergente) y repetí durante 2 o 3 días."),
         ("Dejalo secar", "en un lugar ventilado, sin tapar, antes de estrenarlo."),
-    ]
-    y = 142
-    for i, (b, rest) in enumerate(steps, 1):
-        tracked(c, f"{i:02d}", x0 + 16, y - pt(7.2), "CGM", pt(13), color=BROWN, align="left")
-        h = para(c, f"<b>{b}</b> {rest}", x0 + 27, y, W - 27 - 16, size=6.8, leading=9.6)
-        y -= max(h, 9) + 3.6
-    y -= 2
-    c.saveState()
-    c.setStrokeColor(BROWN)
-    c.setLineWidth(0.3)
-    c.roundRect(x0 + 15, y - 22, W - 30, 22, 2, stroke=1, fill=0)
-    c.restoreState()
-    tracked(c, "¿ES DE ALGARROBO?", cx, y - 7, "MSSB", pt(6), track=1.2, color=BROWN)
-    para(c, "Untalo con manteca o aceite y dejalo reposar 8 horas antes de empezar. "
-            "En la madera no hace falta raspar.", x0 + 20, y - 10, W - 40, size=6.4, leading=9,
-         align=TA_CENTER)
-    tracked(c, "Guía completa en osomates.com/guias", cx, 18.5, "MSR", pt(5.6), track=0.4, color=INK)
+    ], "OJO CON EL AGUA", "Usala caliente, nunca hirviendo: entre 70 y 80 °C. "
+                         "El agua hirviendo puede rajar la calabaza.")
+
+
+def panel_cure_algarrobo(c):
+    panel_curado(c, XD, "algarrobo", [
+        ("Untalo con manteca o aceite", "por dentro y dejalo reposar 8 horas."),
+        ("Llenalo con yerba húmeda", "y agregá agua caliente hasta el borde."),
+        ("Dejalo reposar 24 horas", "y completá con agua si baja el nivel."),
+        ("Vacialo y enjuagalo", "solo con agua. En la madera no hace falta raspar."),
+        ("Repetí el proceso", "1 o 2 veces más."),
+        ("Dejalo secar al aire", "en un lugar ventilado, lejos del sol y del calor."),
+    ], "ES NORMAL", "Que largue un poco de color oscuro las primeras veces: son los taninos "
+                   "naturales de la madera. Con el uso desaparece.")
 
 
 def panel_back(c):
@@ -448,39 +374,6 @@ def panel_back(c):
     tracked(c, "HECHO A MANO EN ARGENTINA", cx, 18.5, "MSR", pt(5.6), track=1.1, color=INK)
 
 
-def panel_care(c):
-    x0, cx = XD, XD + W / 2
-    frame(c, x0, 0, W, H)
-    tracked(c, "PARA QUE TE DURE TODA LA VIDA", cx, 178, "MSM", pt(6), track=1.3, color=BROWN)
-    tracked(c, "Cuidados", cx, 162, "CGLI", pt(24), track=0.3, color=INK)
-    diamond_rule(c, cx, 154, 14)
-    tracked(c, "DESPUÉS DE CADA USO", x0 + 16, 145, "MSSB", pt(6), track=1.1, color=BROWN, align="left")
-    y = 140
-    for b, rest in [("Sacá toda la yerba", "apenas terminás."),
-                    ("Enjuagalo con agua,", "sin detergente."),
-                    ("Dejalo secar al aire", "en un lugar ventilado, sin taparlo."),
-                    ("Usalo seguido:", "es el mejor mantenimiento.")]:
-        c.setFillColor(BROWN)
-        c.circle(x0 + 17.2, y - 2.2, 0.75, stroke=0, fill=1)
-        h = para(c, f"<b>{b}</b> {rest}", x0 + 21, y, W - 21 - 16, size=6.8, leading=9.6)
-        y -= h + 2.6
-    y -= 4
-    tracked(c, "NUNCA", x0 + 16, y, "MSSB", pt(6), track=1.1, color=BROWN, align="left")
-    y -= 5
-    for b in ["Detergente ni lavandina.", "Agua hirviendo: puede rajarlo.", "Lavavajillas ni microondas.",
-              "Secarlo al sol fuerte o junto a la estufa.", "Dejarlo en remojo por horas."]:
-        c.saveState()
-        c.setStrokeColor(BROWN)
-        c.setLineWidth(0.3)
-        c.line(x0 + 16.4, y - 3.0, x0 + 18.0, y - 1.4)
-        c.line(x0 + 16.4, y - 1.4, x0 + 18.0, y - 3.0)
-        c.restoreState()
-        h = para(c, b, x0 + 21, y, W - 21 - 16, size=6.8, leading=9.6)
-        y -= h + 1.4
-    mate_icon(c, cx, 52, 0.34, lw=0.3, carved=False)
-    tracked(c, "¿Dudas? Escribinos por Instagram @oso_mates", cx, 18.5, "MSR", pt(5.6), track=0.3, color=INK)
-
-
 def lid_top(c):
     """Tapa superior (cuelga del dorso). Rotada 180° para leerse de frente con la caja cerrada."""
     cx, cy = XC + L / 2, H + W / 2
@@ -515,7 +408,7 @@ def artwork(c):
     panel_front(c)
     panel_cure(c)
     panel_back(c)
-    panel_care(c)
+    panel_cure_algarrobo(c)
     lid_top(c)
     lid_bottom(c)
 
@@ -596,8 +489,8 @@ def panel_labels(c):
     c.saveState()
     c.setFillColor(CMYKColor(0, 0, 0, 0.55))
     c.setFont("MSM", pt(9))
-    for x, y, t in [(XA + L / 2, H / 2, "FRENTE"), (XB + W / 2, H / 2, "LATERAL · CURADO"),
-                    (XC + L / 2, H / 2, "DORSO"), (XD + W / 2, H / 2, "LATERAL · CUIDADOS"),
+    for x, y, t in [(XA + L / 2, H / 2, "FRENTE"), (XB + W / 2, H / 2, "LATERAL · CURADO CALABAZA"),
+                    (XC + L / 2, H / 2, "DORSO"), (XD + W / 2, H / 2, "LATERAL · CURADO ALGARROBO"),
                     (XC + L / 2, H + W / 2, "TAPA SUPERIOR"), (XA + L / 2, -W / 2, "TAPA INFERIOR"),
                     (GLUE / 2, H / 2 + 30, "")]:
         c.drawCentredString(x, y, t)
