@@ -13,6 +13,7 @@ Todas las medidas están en milímetros.
 import json
 import math
 import os
+import random
 
 import qrcode
 from reportlab.lib.colors import CMYKColor, CMYKColorSep
@@ -56,15 +57,20 @@ THEMES = {
     "blanca": dict(BG=CMYKColor(0, 0, 0, 0), INK=CMYKColor(0, 0, 0, 0.9),
                    BROWN=CMYKColor(0.20, 0.55, 0.85, 0.30), BROWN_SOFT=CMYKColor(0.04, 0.12, 0.22, 0.02),
                    LOGO=CMYKColor(0, 0, 0, 1)),
+    # caja madera: fondo madera clara con veta suave, todos los detalles en negro
+    "madera": dict(BG=CMYKColor(0.07, 0.27, 0.48, 0.03), INK=CMYKColor(0, 0, 0, 1),
+                   BROWN=CMYKColor(0, 0, 0, 1), BROWN_SOFT=CMYKColor(0.12, 0.38, 0.62, 0.10),
+                   LOGO=CMYKColor(0, 0, 0, 1), GRAIN=CMYKColor(0.10, 0.34, 0.57, 0.07),
+                   GRAIN_DARK=CMYKColor(0.14, 0.42, 0.66, 0.14)),
 }
 THEME = "negra"
-BG = INK = BROWN = BROWN_SOFT = LOGO = None
+BG = INK = BROWN = BROWN_SOFT = LOGO = GRAIN = GRAIN_DARK = None
 
 
 def set_theme(name):
     global THEME
     THEME = name
-    globals().update(THEMES[name])
+    globals().update({"GRAIN": None, "GRAIN_DARK": None, **THEMES[name]})
 
 
 set_theme(THEME)
@@ -354,8 +360,8 @@ def panel_back(c):
     qs = 27.0
     qx, qy = cx - qs / 2, 50
     c.saveState()
-    c.setFillColor(CMYKColor(0, 0, 0, 0))
-    c.rect(qx - 2, qy - 2, qs + 4, qs + 4, stroke=0, fill=1)
+    c.setFillColor(CMYKColor(0, 0, 0, 0) if GRAIN is None else BG)
+    c.rect(qx - 2, qy - 2, qs + 4, qs + 4, stroke=0, fill=1)  # en madera tapa la veta detrás del QR
     c.restoreState()
     qr = qrcode.QRCode(error_correction=qrcode.constants.ERROR_CORRECT_M, border=0)
     qr.add_data("https://osomates.com")
@@ -399,12 +405,43 @@ def lid_bottom(c):
     diamond_rule(c, cx, cy - 26, 22)
 
 
+def wood_grain(c, x0, y0, x1, y1):
+    """Veta de madera vectorial, sutil (mismo tono un poco más oscuro). Semilla fija: siempre igual."""
+    rnd = random.Random(7)
+    c.saveState()
+    clip = c.beginPath()
+    clip.rect(x0, y0, x1 - x0, y1 - y0)
+    c.clipPath(clip, stroke=0, fill=0)
+    c.setLineCap(1)
+    # ondulación compartida por toda la tabla: las vetas vecinas se mueven juntas
+    waves = [(rnd.uniform(2, 6), rnd.uniform(0.0015, 0.004), rnd.uniform(0, 6.3)) for _ in range(3)]
+    shared = lambda y, x: sum(a * math.sin(f * 6.283 * y + p + x * 0.01) for a, f, p in waves)
+    x = x0 - 8
+    while x < x1 + 8:
+        local = (rnd.uniform(0.2, 1.0), rnd.uniform(0.01, 0.03), rnd.uniform(0, 6.3))
+        dark = rnd.random() < 0.15
+        c.setStrokeColor(GRAIN_DARK if dark else GRAIN)
+        c.setLineWidth(rnd.uniform(0.25, 0.5) if dark else rnd.uniform(0.06, 0.2))
+        p = c.beginPath()
+        y = y0 - 5
+        f = lambda yy: x + shared(yy, x) + local[0] * math.sin(local[1] * 6.283 * yy + local[2])
+        p.moveTo(f(y), y)
+        while y < y1 + 5:
+            y += 3
+            p.lineTo(f(y), y)
+        c.drawPath(p, stroke=1, fill=0)
+        x += rnd.choice([0.5, 0.7, 0.9, 1.2, 1.6, 2.4, 3.5])
+    c.restoreState()
+
+
 def artwork(c):
     c.saveState()
     c.setFillColor(BG)
     # fondo con 3 mm de sangrado; la solapa de pegado queda sin tinta para que pegue bien
     c.rect(XA - BLEED, Y_MIN - BLEED, (X_MAX - XA) + 2 * BLEED, (Y_MAX - Y_MIN) + 2 * BLEED, stroke=0, fill=1)
     c.restoreState()
+    if GRAIN is not None:
+        wood_grain(c, XA - BLEED, Y_MIN - BLEED, X_MAX + BLEED, Y_MAX + BLEED)
     panel_front(c)
     panel_cure(c)
     panel_back(c)

@@ -2,12 +2,13 @@
 
 ![Versión negra](caja-oso-mates-15x15x20_NEGRA_MOCKUP.png)
 ![Versión blanca](caja-oso-mates-15x15x20_BLANCA_MOCKUP.png)
+![Versión madera](caja-oso-mates-15x15x20_MADERA_MOCKUP.png)
 
 ## Archivos
 
 | Archivo | Para qué |
 |---|---|
-| `caja-oso-mates-15x15x20_NEGRA_IMPRENTA.pdf` / `_BLANCA_IMPRENTA.pdf` | **El que se manda a la imprenta** (uno por versión). Pág. 1: arte + troquel. Pág. 2: troquel con cotas. |
+| `caja-oso-mates-15x15x20_NEGRA_IMPRENTA.pdf` / `_BLANCA_` / `_MADERA_` | **El que se manda a la imprenta** (uno por versión). Pág. 1: arte + troquel. Pág. 2: troquel con cotas. |
 | `*_PREVIEW.pdf` / `*_DESPLEGADO.png` | Vista del desplegado recortado (solo para mirar). |
 | `*_MOCKUP.png` | Cómo queda la caja armada. |
 | `logo-original.png`, `vectorizar_logo.py`, `logo_paths.json` | Logo del oso y su versión vectorizada (potrace). Si tenés el logo en vector original (.ai/.svg/.pdf), conviene reemplazarlo. |
@@ -30,6 +31,7 @@
 - **Color:** CMYK, sangrado 3 mm.
   - *Negra:* fondo negro enriquecido C60 M40 Y40 K100, textos calados en blanco, acento caramelo.
   - *Blanca:* papel blanco sin fondo, texto solo en negro (K) y acento marrón.
+  - *Madera:* fondo madera clara con veta vectorial sutil, todos los detalles en negro (K100).
 - **Troquel:** tintas planas `CutContour` (corte, magenta continuo) y `Crease` (hendido, cian punteado), en sobreimpresión. No se imprimen.
 - **Tipografías:** Cormorant Garamond y Montserrat, incrustadas (las de la web).
 - **Solapa de pegado:** sin tinta, para que el adhesivo agarre bien.

@@ -57,6 +57,6 @@ def render(theme):
     out.save(os.path.join(HERE, f"caja-oso-mates-15x15x20_{theme}_MOCKUP.png"))
 
 
-for t in ("NEGRA", "BLANCA"):
+for t in ("NEGRA", "BLANCA", "MADERA"):
     render(t)
 print("ok")
