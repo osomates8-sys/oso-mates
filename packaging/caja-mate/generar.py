@@ -150,9 +150,9 @@ def contour():
     return p
 
 
-# Ventana: rectángulo centrado en la parte baja del frente (donde apoya el mate)
-WIN_W, WIN_Y0, WIN_Y1, WIN_R = 52.0, 10.0, 66.0, 2.0   # ancho total, desde/hasta (mm desde la base)
-WIN_X0 = XA + L / 2 - WIN_W / 2
+# Ventana: rectángulo en la mitad derecha del frente, abajo (donde apoya el mate)
+WIN_W, WIN_Y0, WIN_Y1, WIN_R = round(0.37 * L), 12.0, 12.0 + round(0.36 * H), 2.0   # ancho, desde/hasta (mm desde la base)
+WIN_X0 = XA + L - 10 - WIN_W
 
 
 CREASES = [
@@ -322,20 +322,40 @@ def diamond_rule(c, cx, y, half, color=None):
 
 # ---------------------------------------------------------------- paneles
 def panel_front(c):
-    x0, cx = XA, XA + L / 2
-    if MINIMAL:
-        top = WIN_Y1 + 12   # el bloque de marca va arriba de la ventana
-        tracked(c, "MATES Y BOMBILLAS", cx, top, "MSR", pt(7), track=2.0)
-        diamond_rule(c, cx, top + 6.5, 0)
-        tracked(c, "OSO MATES", cx, top + 12.5, "MSM", pt(22), track=3.2)
-        bear_h = min(48, H - 16 - (top + 24))
-        logo(c, cx, top + 24 + bear_h / 2, bear_h, parts=("oso",))
-        return
+    """Frente: "OSO" grande en vertical (se lee de abajo hacia arriba), "MATES" al lado y el oso al pie."""
+    x0 = XA
     frame(c, x0, 0, L, H)
-    top = WIN_Y1 + 8
-    tracked(c, "MATES Y BOMBILLAS", cx, top, "MSM", pt(8), track=1.6)
-    logo_h = H - 16 - (top + 7)
-    logo(c, cx, top + 7 + logo_h / 2, logo_h)
+    y_start, y_end = 16.0, H - 18.0              # recorrido vertical del bloque
+    bear_len = 0.17 * H                          # largo del oso a lo largo del texto
+    word_len = y_end - (y_start + bear_len + 4)  # largo disponible para "OSO"
+    fs = word_len / (pdfmetrics.stringWidth("OSO", "MSSB", 1) + 2 * 0.02)
+    track = 0.02 * fs
+    cap = 0.70 * fs                              # alto de mayúscula de Montserrat
+    base_x = x0 + 12 + cap                       # línea de base (las letras crecen hacia la izquierda)
+    c.saveState()
+    c.translate(base_x, 0)
+    c.rotate(90)                                 # x local = arriba, y local = izquierda
+    u0 = y_start + bear_len + 4
+    t = c.beginText(u0, 0)
+    t.setFont("MSSB", fs)
+    t.setCharSpace(track)
+    t.setFillColor(INK)
+    t.textOut("OSO")
+    t.setCharSpace(0)
+    c.drawText(t)
+    # "MATES" del otro lado de la base, terminando donde termina "OSO"
+    ms = 0.30 * fs
+    mw = pdfmetrics.stringWidth("MATES", "MSR", ms) + 4 * 0.08 * ms
+    t = c.beginText(y_end - mw, -(0.70 * ms + 3))
+    t.setFont("MSR", ms)
+    t.setCharSpace(0.08 * ms)
+    t.setFillColor(INK)
+    t.textOut("MATES")
+    t.setCharSpace(0)
+    c.drawText(t)
+    c.restoreState()
+    # el oso, derecho, al pie de la palabra
+    logo(c, base_x - cap / 2, y_start + bear_len / 2, bear_len, parts=("oso",), color=INK)
 
 
 def panel_curado(c, x0, material, steps, note_title, note, window=False):

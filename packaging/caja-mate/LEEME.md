@@ -17,7 +17,7 @@
 
 ## Contenido de la caja
 
-- **Frente:** logo Oso Mates (oso + texto en arco), "Mates y bombillas", "Tallado a mano · Mar del Plata".
+- **Frente:** "OSO" grande en vertical con "MATES" al lado y el oso al pie; ventana a la derecha.
 - **Tapa:** el oso + **"Llegó lo más esperado"**.
 - **Lateral derecho:** **curado del mate de calabaza** paso a paso.
 - **Dorso:** "Cada mate es único", QR a osomates.com, @oso_mates.
@@ -38,7 +38,7 @@
 - **Tipografías:** Cormorant Garamond y Montserrat, incrustadas (las de la web).
 - **Solapa de pegado:** sin tinta, para que el adhesivo agarre bien.
 - **Muesca para el pulgar** en la boca del frente, para abrir la tapa fácil.
-- **Ventana** rectangular centrada en la parte baja del frente (52 mm de ancho × 56 mm de alto, a 10 mm de la base), para ver el mate. Va en el troquel como corte (CutContour).
+- **Ventana** rectangular en la mitad derecha del frente, abajo (48 mm de ancho × 58 mm de alto, a 12 mm de la base y 10 mm del borde), para ver el mate. Va en el troquel como corte (CutContour).
 - **QR:** lleva a https://osomates.com.
 
 ## Qué pedirle a la imprenta
