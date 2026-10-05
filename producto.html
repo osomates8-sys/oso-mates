@@ -184,6 +184,8 @@ nav{position:fixed;top:0;left:0;right:0;z-index:500;display:flex;justify-content
 .cart-subtotal-label{font-size:.65rem;letter-spacing:.15em;text-transform:uppercase;color:var(--gray);}
 .cart-subtotal-amount{font-family:'Cormorant Garamond',serif;font-size:1.8rem;font-weight:300;}
 .checkout-btn{display:block;width:100%;padding:1.1rem;background:var(--black);color:var(--white);border:none;font-family:'Montserrat',sans-serif;font-size:.65rem;letter-spacing:.2em;text-transform:uppercase;cursor:pointer;transition:background .2s;margin-bottom:.8rem;}
+.checkout-btn-alt{background:none!important;color:var(--black)!important;border:1px solid var(--black)!important;margin-top:.6rem;}
+.checkout-btn-alt:hover{background:var(--black)!important;color:var(--white)!important;}
 .checkout-btn:hover{background:#333}
 .checkout-btn.mp{background:var(--blue);}
 /* CHECKOUT */
@@ -438,7 +440,8 @@ nav{position:fixed;top:0;left:0;right:0;z-index:500;display:flex;justify-content
   <div class="cart-items" id="cart-items"></div>
   <div class="cart-footer">
     <div class="cart-subtotal"><span class="cart-subtotal-label" data-i18n="cart_total">Total</span><span class="cart-subtotal-amount" id="cart-total">$0</span></div>
-    <button class="checkout-btn" onclick="openCheckout('transfer')" data-i18n="cart_pay_transfer">Pagar por transferencia (&#x2212;10%)</button>
+    <button class="checkout-btn" onclick="openCheckout('transfer')" data-i18n="cart_pay_transfer">Pagar con transferencia (&#x2212;10%)</button>
+    <button class="checkout-btn checkout-btn-alt" id="cart-pay-card" onclick="openCheckout('card')" style="display:none">Pagar con tarjeta</button>
   </div>
 </div>
 <div class="co-overlay" id="co-overlay">
@@ -542,7 +545,7 @@ const sb = (function(){
 const I18N = {
   es: {
     back_btn:'← Volver', cart_btn:'Carrito',
-    cart_title:'Tu carrito', cart_close:'✕ Cerrar', cart_total:'Total', cart_pay_mp:'Pagar con Mercado Pago', cart_pay_transfer:'Transferencia (−10%)', cart_empty:'Tu carrito está vacío', cart_item_remove:'Quitar', cart_item_grabado:'Grabado',
+    cart_title:'Tu carrito', cart_close:'✕ Cerrar', cart_total:'Total', cart_pay_mp:'Pagar con Mercado Pago', cart_pay_transfer:'Pagar con transferencia (−10%)', cart_empty:'Tu carrito está vacío', cart_item_remove:'Quitar', cart_item_grabado:'Grabado',
     co_title:'Resumen de compra', co_close:'✕ Volver', co_productos:'Productos', co_total:'Total', coupon_ph:'Código de cupón', coupon_btn:'Aplicar',
     pay_mp_label:'Mercado Pago', pay_mp_desc:'Tarjeta, débito o saldo', pay_tr_label:'Transferencia', pay_tr_desc:'10% de descuento',
     transfer_title:'✓ Datos para transferir', transfer_banco:'Banco', transfer_banco_val:'Francés (BBVA)', transfer_cbu:'CBU', copy_btn:'Copiar', dcto_banner:'10% DE DESCUENTO APLICADO',
@@ -562,7 +565,7 @@ const I18N = {
   },
   en: {
     back_btn:'← Back', cart_btn:'Cart',
-    cart_title:'Your cart', cart_close:'✕ Close', cart_total:'Total', cart_pay_mp:'Pay with Mercado Pago', cart_pay_transfer:'Bank transfer (−10%)', cart_empty:'Your cart is empty', cart_item_remove:'Remove', cart_item_grabado:'Engraving',
+    cart_title:'Your cart', cart_close:'✕ Close', cart_total:'Total', cart_pay_mp:'Pay with Mercado Pago', cart_pay_transfer:'Pay by bank transfer (−10%)', cart_empty:'Your cart is empty', cart_item_remove:'Remove', cart_item_grabado:'Engraving',
     co_title:'Order summary', co_close:'✕ Back', co_productos:'Products', co_total:'Total', coupon_ph:'Coupon code', coupon_btn:'Apply',
     pay_mp_label:'Mercado Pago', pay_mp_desc:'Card, debit or balance', pay_tr_label:'Bank transfer', pay_tr_desc:'10% discount',
     transfer_title:'✓ Transfer details', transfer_banco:'Bank', transfer_banco_val:'Francés (BBVA)', transfer_cbu:'CBU', copy_btn:'Copy', dcto_banner:'10% DISCOUNT APPLIED',
@@ -1253,7 +1256,7 @@ function goToStep2(){
     if(e&&!e.value&&saved.email)e.value=saved.email;
   }catch(err){}
 }
-function openCheckout(m){if(!cart.length){showToast('Agregá productos primero 👆');return;}toggleCart();payMethod='transfer';buildCheckout();goToStep1();document.getElementById('co-overlay').classList.add('open');}
+function openCheckout(m){if(!cart.length){showToast('Agregá productos primero 👆');return;}toggleCart();payMethod=(m==='card'&&PAGO_TARJETA.active)?'card':'transfer';buildCheckout();goToStep1();document.getElementById('co-overlay').classList.add('open');}
 function closeCheckout(){document.getElementById('co-overlay').classList.remove('open');}
 /* Pago con tarjeta: el cliente confirma el pedido y le mandás por WhatsApp un link de pago
    (Naranja X u otro). Se configura en editar.html → "Pago con tarjeta". Con tarjeta se cobra el precio de lista. */
@@ -1262,6 +1265,12 @@ const PAGO_TARJETA=(function(){
     const o=typeof v==='string'?JSON.parse(v):v;
     return {active:o.active!==false, cuotas:parseInt(o.cuotas,10)||0, proveedor:String(o.proveedor||'').trim()};
   }catch(e){return {active:false,cuotas:0,proveedor:''};}
+})();
+/* Carrito: botón "Pagar con tarjeta" (solo si el pago con tarjeta está activo en editar.html) */
+(function(){
+  const b=document.getElementById('cart-pay-card'); if(!b||!PAGO_TARJETA.active) return;
+  b.textContent='Pagar con tarjeta'+(PAGO_TARJETA.cuotas>1?' ('+PAGO_TARJETA.cuotas+' cuotas sin interés)':'');
+  b.style.display='';
 })();
 function cuotasTxt(total){
   const c=PAGO_TARJETA.cuotas;
