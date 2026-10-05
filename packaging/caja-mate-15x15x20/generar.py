@@ -60,17 +60,18 @@ THEMES = {
     # caja madera: fondo madera clara con veta suave, todos los detalles en negro
     "madera": dict(BG=CMYKColor(0.07, 0.27, 0.48, 0.03), INK=CMYKColor(0, 0, 0, 1),
                    BROWN=CMYKColor(0, 0, 0, 1), BROWN_SOFT=CMYKColor(0.12, 0.38, 0.62, 0.10),
-                   LOGO=CMYKColor(0, 0, 0, 1), GRAIN=CMYKColor(0.10, 0.34, 0.57, 0.07),
-                   GRAIN_DARK=CMYKColor(0.14, 0.42, 0.66, 0.14)),
+                   LOGO=CMYKColor(0, 0, 0, 1), GRAIN=CMYKColor(0.09, 0.31, 0.53, 0.05),
+                   GRAIN_DARK=CMYKColor(0.12, 0.38, 0.62, 0.10), MINIMAL=True),
 }
 THEME = "negra"
 BG = INK = BROWN = BROWN_SOFT = LOGO = GRAIN = GRAIN_DARK = None
+MINIMAL = False
 
 
 def set_theme(name):
     global THEME
     THEME = name
-    globals().update({"GRAIN": None, "GRAIN_DARK": None, **THEMES[name]})
+    globals().update({"GRAIN": None, "GRAIN_DARK": None, "MINIMAL": False, **THEMES[name]})
 
 
 set_theme(THEME)
@@ -261,6 +262,8 @@ def logo(c, cx, cy, height, parts=("arco", "oso"), color=None):
 
 
 def frame(c, x0, y0, w, h, inset=7.0):
+    if MINIMAL:
+        return
     c.saveState()
     c.setStrokeColor(BROWN)
     c.setLineWidth(0.35)
@@ -272,6 +275,13 @@ def frame(c, x0, y0, w, h, inset=7.0):
 
 def diamond_rule(c, cx, y, half, color=None):
     color = BROWN if color is None else color
+    if MINIMAL:
+        c.saveState()
+        c.setStrokeColor(color)
+        c.setLineWidth(0.3)
+        c.line(cx - 6, y, cx + 6, y)
+        c.restoreState()
+        return
     c.saveState()
     c.setStrokeColor(color)
     c.setFillColor(color)
@@ -291,6 +301,13 @@ def diamond_rule(c, cx, y, half, color=None):
 # ---------------------------------------------------------------- paneles
 def panel_front(c):
     x0, cx = XA, XA + L / 2
+    if MINIMAL:
+        logo(c, cx, 122, 36, parts=("oso",))
+        tracked(c, "OSO MATES", cx, 84, "MSM", pt(24), track=3.6)
+        diamond_rule(c, cx, 76, 0)
+        tracked(c, "MATES Y BOMBILLAS", cx, 67, "MSR", pt(7), track=2.2)
+        tracked(c, "MAR DEL PLATA", cx, 18, "MSR", pt(6.5), track=2.2)
+        return
     frame(c, x0, 0, L, H)
     logo(c, cx, 108, 112)
     tracked(c, "MATES Y BOMBILLAS", cx, 44, "MSM", pt(8.5), track=2.2)
@@ -315,7 +332,8 @@ def panel_curado(c, x0, material, steps, note_title, note):
     c.saveState()
     c.setStrokeColor(BROWN)
     c.setLineWidth(0.3)
-    c.roundRect(x0 + 15, y - 25, W - 30, 25, 2, stroke=1, fill=0)
+    if not MINIMAL:
+        c.roundRect(x0 + 15, y - 25, W - 30, 25, 2, stroke=1, fill=0)
     c.restoreState()
     tracked(c, note_title, cx, y - 7, "MSSB", pt(6.5), track=1.2, color=BROWN)
     para(c, note, x0 + 20, y - 10.5, W - 40, size=7.5, leading=10.4, align=TA_CENTER)
@@ -348,7 +366,7 @@ def panel_cure_algarrobo(c):
 def panel_back(c):
     x0, cx = XC, XC + L / 2
     frame(c, x0, 0, L, H)
-    logo(c, cx, 166, 22, parts=("oso",))
+    logo(c, cx, 168, 16 if MINIMAL else 22, parts=("oso",))
     tracked(c, "Cada mate es único", cx, 143, "CGLI", pt(22), track=0.3, color=INK)
     diamond_rule(c, cx, 136, 16)
     para(c, "Cada mate de <b>Oso Mates</b> se hace y se talla a mano, uno por uno, en Mar del Plata. "
@@ -386,6 +404,13 @@ def lid_top(c):
     c.saveState()
     c.translate(cx, cy)
     c.rotate(180)
+    if MINIMAL:
+        logo(c, 0, 28, 24, parts=("oso",))
+        tracked(c, "Llegó lo más esperado", 0, -2, "CGLI", pt(24), track=0.3)
+        diamond_rule(c, 0, -12, 0)
+        tracked(c, "OSO MATES", 0, -22, "MSM", pt(8), track=2.8)
+        c.restoreState()
+        return
     logo(c, 0, 30, 46, parts=("oso",))
     tracked(c, "Llegó lo", 0, -8, "CGLI", pt(34), track=0.3)
     tracked(c, "más esperado", 0, -21, "CGLI", pt(34), track=0.3)

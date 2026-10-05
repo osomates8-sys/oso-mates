@@ -31,7 +31,7 @@
 - **Color:** CMYK, sangrado 3 mm.
   - *Negra:* fondo negro enriquecido C60 M40 Y40 K100, textos calados en blanco, acento caramelo.
   - *Blanca:* papel blanco sin fondo, texto solo en negro (K) y acento marrón.
-  - *Madera:* fondo madera clara con veta vectorial sutil, todos los detalles en negro (K100).
+  - *Madera (minimalista):* fondo madera clara con veta sutil, sin marcos; frente con el oso chico + "OSO MATES". Detalles en negro (K100).
 - **Troquel:** tintas planas `CutContour` (corte, magenta continuo) y `Crease` (hendido, cian punteado), en sobreimpresión. No se imprimen.
 - **Tipografías:** Cormorant Garamond y Montserrat, incrustadas (las de la web).
 - **Solapa de pegado:** sin tinta, para que el adhesivo agarre bien.
