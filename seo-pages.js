@@ -231,8 +231,22 @@
       : (p.categoria === 'bombillas' ? 'Bombilla ' : p.categoria === 'combos' ? 'Combo ' : 'Mate ') + n;
     return (base + (p.material ? ' — ' + p.material : '') + ' | Tallado a mano').slice(0, 150);
   }
-  function buildFeed(prods) {
+  /* Próxima promo por fecha (o la que está corriendo) para el precio de oferta del catálogo.
+     promos: lo que está en config.promos (texto JSON o lista). */
+  function promoFeed(promos) {
+    try { if (typeof promos === 'string') promos = JSON.parse(promos); } catch (e) { promos = null; }
+    if (!Array.isArray(promos)) return null;
+    var hoy = new Date().toISOString().slice(0, 10), mejor = null;
+    promos.forEach(function (p) {
+      var d = Math.round(Number(p && p.descuento) || 0);
+      if (!p || !p.active || d <= 0 || d >= 100 || !p.desde || !p.hasta || p.hasta < hoy) return;
+      if (!mejor || p.desde < mejor.desde) mejor = { desde: p.desde, hasta: p.hasta, descuento: d };
+    });
+    return mejor;
+  }
+  function buildFeed(prods, promos) {
     var map = pageMap(prods);
+    var promo = promoFeed(promos);
     var items = (prods || []).filter(function (p) { return p && p.id && p.activo !== false && map[p.id]; }).map(function (p) {
       var og = ogImage(p);
       var img = og ? SITE + og.path : imgUrl((p.imagenes && p.imagenes[0]) || p.imagen);
@@ -247,6 +261,8 @@
         '      <g:availability>' + (stock === 0 ? 'out_of_stock' : 'in_stock') + '</g:availability>\n' +
         (stock !== null ? '      <g:quantity_to_sell_on_facebook>' + stock + '</g:quantity_to_sell_on_facebook>\n' : '') +
         '      <g:price>' + (Number(p.precio) || 0).toFixed(2) + ' ARS</g:price>\n' +
+        (promo && p.precio ? '      <g:sale_price>' + (Math.round(Number(p.precio) * (1 - promo.descuento / 100) / 100) * 100).toFixed(2) + ' ARS</g:sale_price>\n' +
+          '      <g:sale_price_effective_date>' + promo.desde + 'T00:00-03:00/' + promo.hasta + 'T23:59-03:00</g:sale_price_effective_date>\n' : '') +
         '      <g:condition>new</g:condition>\n' +
         '      <g:brand>Oso Mates</g:brand>\n' +
         '      <g:identifier_exists>no</g:identifier_exists>\n' +
