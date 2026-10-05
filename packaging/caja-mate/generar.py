@@ -98,16 +98,15 @@ def pt(v):
 
 # ---------------------------------------------------------------- fuentes
 FONTS = {
-    "CGL": "CG-Light.ttf", "CGLI": "CG-LightItalic.ttf",
-    "CGM": "CG-Medium.ttf", "CGMI": "CG-MediumItalic.ttf",
-    "MSL": "MS-Light.ttf", "MSR": "MS-Regular.ttf",
-    "MSM": "MS-Medium.ttf", "MSSB": "MS-SemiBold.ttf",
-    "AB": "ArchivoBlack.ttf",
+    # toda la caja en la familia Archivo
+    "MSL": "Archivo-Light.ttf", "MSR": "Archivo-Regular.ttf",
+    "MSM": "Archivo-Medium.ttf", "MSSB": "Archivo-SemiBold.ttf",
+    "AEB": "Archivo-ExtraBold.ttf", "AB": "ArchivoBlack.ttf",
 }
 for name, f in FONTS.items():
     pdfmetrics.registerFont(TTFont(name, os.path.join(HERE, "fonts", f)))
 # tipografía del nombre en el frente ("OSO" vertical) y de "MATES"
-WORD_FONT, MATES_FONT = "AB", "MSR"   # Archivo Black + Montserrat
+WORD_FONT, MATES_FONT = "AB", "MSL"   # Archivo Black + Archivo Light
 
 
 def cap_ratio(font):
@@ -118,7 +117,6 @@ def cap_ratio(font):
 
 pdfmetrics.registerFontFamily("MSR", normal="MSR", bold="MSSB", italic="MSR", boldItalic="MSSB")
 pdfmetrics.registerFontFamily("MSM", normal="MSM", bold="MSSB", italic="MSM", boldItalic="MSSB")
-pdfmetrics.registerFontFamily("CGL", normal="CGL", bold="CGM", italic="CGLI", boldItalic="CGMI")
 
 
 # ---------------------------------------------------------------- geometría del troquel
@@ -383,12 +381,12 @@ def panel_curado(c, x0, material, steps, note_title, note, window=False):
     frame(c, x0, 0, W, H)
     top = H - 20
     tracked(c, "CURADO  ·  ANTES DEL PRIMER USO", cx, top, "MSM", pt(6), track=1.0, color=BROWN)
-    tracked(c, "Cómo curar tu mate", cx, top - 11.5, "CGLI", pt(21), track=0.3)
-    tracked(c, f"de {material}", cx, top - 19.5, "CGLI", pt(21), track=0.3)
+    tracked(c, "Cómo curar tu mate", cx, top - 11.5, "AB", pt(15), track=0.1)
+    tracked(c, f"de {material}", cx, top - 18.5, "AB", pt(15), track=0.1)
     diamond_rule(c, cx, top - 25.5, 12)
     y = top - 31
     for i, (bold, rest) in enumerate(steps, 1):
-        tracked(c, f"{i:02d}", x0 + 13, y - pt(7.6), "CGM", pt(13), color=BROWN, align="left")
+        tracked(c, f"{i:02d}", x0 + 13, y - pt(7.2), "AB", pt(10), color=BROWN, align="left")
         h = para(c, f"<b>{bold}</b> {rest}", x0 + 23, y, W - 23 - 12, size=7, leading=9.4)
         y -= max(h, 4.5) + 3.2
     y -= 2
@@ -430,7 +428,7 @@ def panel_back(c):
     x0, cx = XC, XC + L / 2
     frame(c, x0, 0, L, H)
     logo(c, cx, H - 26, 14 if MINIMAL else 18, parts=("oso",))
-    tracked(c, "Cada mate es único", cx, H - 47, "CGLI", pt(20), track=0.3, color=INK)
+    tracked(c, "Cada mate es único", cx, H - 47, "AB", pt(15), track=0.1, color=INK)
     diamond_rule(c, cx, H - 53, 14)
     para(c, "Cada mate de <b>Oso Mates</b> se hace y se talla a mano, uno por uno, en Mar del Plata. "
             "Por eso no hay dos iguales: las vetas, el color y las pequeñas marcas del tallado "
@@ -457,7 +455,7 @@ def panel_back(c):
                 c.rect(qx + k * cell, qy + qs - (r + 1) * cell, cell + 0.01, cell + 0.01, stroke=0, fill=1)
     c.restoreState()
     tracked(c, "CONOCÉ LA COLECCIÓN", cx, qy + qs + 6, "MSM", pt(5.8), track=1.4, color=BROWN)
-    tracked(c, "osomates.com", cx, 29, "CGM", pt(14), track=0.4, color=INK)
+    tracked(c, "osomates.com", cx, 29, "AEB", pt(12), track=0.3, color=INK)
     tracked(c, "@oso_mates", cx, 23, "MSR", pt(6.5), track=0.8, color=BROWN)
     tracked(c, "HECHO A MANO EN ARGENTINA", cx, 14, "MSR", pt(5.6), track=0.8, color=INK)
 
@@ -470,14 +468,15 @@ def lid_top(c):
     c.rotate(180)
     if MINIMAL:
         logo(c, 0, 28, 24, parts=("oso",))
-        tracked(c, "Llegó lo más esperado", 0, -2, "CGLI", pt(24), track=0.3)
-        diamond_rule(c, 0, -12, 0)
+        tracked(c, "Llegó lo", 0, 2, "AB", pt(18), track=0.1)
+        tracked(c, "más esperado", 0, -6, "AB", pt(18), track=0.1)
+        diamond_rule(c, 0, -13, 0)
         tracked(c, "OSO MATES", 0, -22, "MSM", pt(8), track=2.8)
         c.restoreState()
         return
     logo(c, 0, 30, 46, parts=("oso",))
-    tracked(c, "Llegó lo", 0, -8, "CGLI", pt(34), track=0.3)
-    tracked(c, "más esperado", 0, -21, "CGLI", pt(34), track=0.3)
+    tracked(c, "Llegó lo", 0, -8, "AB", pt(24), track=0.1)
+    tracked(c, "más esperado", 0, -19, "AB", pt(24), track=0.1)
     diamond_rule(c, 0, -31, 20)
     tracked(c, "OSO MATES", 0, -41, "MSM", pt(7), track=2.4, color=BROWN)
     c.restoreState()
