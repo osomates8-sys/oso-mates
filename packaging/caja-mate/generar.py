@@ -105,6 +105,16 @@ FONTS = {
 }
 for name, f in FONTS.items():
     pdfmetrics.registerFont(TTFont(name, os.path.join(HERE, "fonts", f)))
+# tipografía del nombre en el frente ("OSO" vertical) y de "MATES"
+WORD_FONT, MATES_FONT = "MSSB", "MSR"
+
+
+def cap_ratio(font):
+    """Alto de mayúscula / tamaño de fuente."""
+    face = pdfmetrics.getFont(font).face
+    return (getattr(face, "capHeight", 700) or 700) / 1000.0
+
+
 pdfmetrics.registerFontFamily("MSR", normal="MSR", bold="MSSB", italic="MSR", boldItalic="MSSB")
 pdfmetrics.registerFontFamily("MSM", normal="MSM", bold="MSSB", italic="MSM", boldItalic="MSSB")
 pdfmetrics.registerFontFamily("CGL", normal="CGL", bold="CGM", italic="CGLI", boldItalic="CGMI")
@@ -328,15 +338,17 @@ def panel_front(c):
     frame(c, x0, 0, L, H)
     y_start, y_end = WIN_Y0, H - 18.0            # "OSO" ocupa todo el alto disponible
     word_len = y_end - y_start
-    fs = word_len / (pdfmetrics.stringWidth("OSO", "MSSB", 1) + 2 * 0.02)
-    track = 0.02 * fs
-    cap = 0.70 * fs                              # alto de mayúscula de Montserrat
+    cr = cap_ratio(WORD_FONT)
+    sw = pdfmetrics.stringWidth("OSO", WORD_FONT, 1)
+    fs = min(word_len / (sw + 2 * 0.02), 0.34 * L / cr)   # que no se coma el ancho del frente
+    track = min((word_len - sw * fs) / 2, 0.06 * fs)      # si sobra largo, se abre apenas
+    cap = cr * fs
     base_x = x0 + 12 + cap                       # línea de base (las letras crecen hacia la izquierda)
     c.saveState()
     c.translate(base_x, 0)
     c.rotate(90)                                 # x local = arriba, y local = izquierda
     t = c.beginText(y_start, 0)
-    t.setFont("MSSB", fs)
+    t.setFont(WORD_FONT, fs)
     t.setCharSpace(track)
     t.setFillColor(INK)
     t.textOut("OSO")
@@ -344,9 +356,9 @@ def panel_front(c):
     c.drawText(t)
     # "MATES" del otro lado de la base, terminando donde termina "OSO"
     ms = 0.30 * fs
-    mw = pdfmetrics.stringWidth("MATES", "MSR", ms) + 4 * 0.08 * ms
-    t = c.beginText(y_end - mw, -(0.70 * ms + 3))
-    t.setFont("MSR", ms)
+    mw = pdfmetrics.stringWidth("MATES", MATES_FONT, ms) + 4 * 0.08 * ms
+    t = c.beginText(y_end - mw, -(cap_ratio(MATES_FONT) * ms + 3))
+    t.setFont(MATES_FONT, ms)
     t.setCharSpace(0.08 * ms)
     t.setFillColor(INK)
     t.textOut("MATES")
@@ -354,7 +366,7 @@ def panel_front(c):
     c.drawText(t)
     c.restoreState()
     # el oso, centrado arriba de la ventana
-    mates_right = base_x + 3 + 0.70 * ms
+    mates_right = base_x + 3 + cap_ratio(MATES_FONT) * ms
     room_w = (x0 + L - 10) - (mates_right + 4)
     room_h = (H - 22) - (WIN_Y1 + 8)
     bear_h = min(room_h, room_w * 1.05, 0.30 * H)
