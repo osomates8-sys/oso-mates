@@ -208,7 +208,6 @@
     var map = pageMap(prods);
     var urls = [[SITE, '1.0']].concat((prods || []).filter(function (p) { return p.activo !== false && p.id; })
       .map(function (p) { return [SITE + map[p.id], '0.8']; }))
-      .concat([[SITE + 'empresas.html', '0.7']])
       .concat(guides.length ? [[SITE + 'guias.html', '0.6']] : [])
       .concat(guides.map(function (g) { return [SITE + g.archivo, '0.6']; }));
     return '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' +
