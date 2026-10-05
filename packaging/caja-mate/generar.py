@@ -322,12 +322,12 @@ def diamond_rule(c, cx, y, half, color=None):
 
 # ---------------------------------------------------------------- paneles
 def panel_front(c):
-    """Frente: "OSO" grande en vertical (se lee de abajo hacia arriba), "MATES" al lado y el oso al pie."""
+    """Frente: "OSO" grande en vertical a todo el alto (se lee de abajo hacia arriba), "MATES" al lado
+    y el oso arriba de la ventana."""
     x0 = XA
     frame(c, x0, 0, L, H)
-    y_start, y_end = 16.0, H - 18.0              # recorrido vertical del bloque
-    bear_len = 0.17 * H                          # largo del oso a lo largo del texto
-    word_len = y_end - (y_start + bear_len + 4)  # largo disponible para "OSO"
+    y_start, y_end = WIN_Y0, H - 18.0            # "OSO" ocupa todo el alto disponible
+    word_len = y_end - y_start
     fs = word_len / (pdfmetrics.stringWidth("OSO", "MSSB", 1) + 2 * 0.02)
     track = 0.02 * fs
     cap = 0.70 * fs                              # alto de mayúscula de Montserrat
@@ -335,8 +335,7 @@ def panel_front(c):
     c.saveState()
     c.translate(base_x, 0)
     c.rotate(90)                                 # x local = arriba, y local = izquierda
-    u0 = y_start + bear_len + 4
-    t = c.beginText(u0, 0)
+    t = c.beginText(y_start, 0)
     t.setFont("MSSB", fs)
     t.setCharSpace(track)
     t.setFillColor(INK)
@@ -354,8 +353,12 @@ def panel_front(c):
     t.setCharSpace(0)
     c.drawText(t)
     c.restoreState()
-    # el oso, derecho, al pie de la palabra
-    logo(c, base_x - cap / 2, y_start + bear_len / 2, bear_len, parts=("oso",), color=INK)
+    # el oso, centrado arriba de la ventana
+    mates_right = base_x + 3 + 0.70 * ms
+    room_w = (x0 + L - 10) - (mates_right + 4)
+    room_h = (H - 22) - (WIN_Y1 + 8)
+    bear_h = min(room_h, room_w * 1.05, 0.30 * H)
+    logo(c, WIN_X0 + WIN_W / 2, (WIN_Y1 + 8 + H - 22) / 2, bear_h, parts=("oso",), color=INK)
 
 
 def panel_curado(c, x0, material, steps, note_title, note, window=False):

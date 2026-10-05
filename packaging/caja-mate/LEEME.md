@@ -17,7 +17,7 @@
 
 ## Contenido de la caja
 
-- **Frente:** "OSO" grande en vertical con "MATES" al lado y el oso al pie; ventana a la derecha.
+- **Frente:** "OSO" grande en vertical a todo el alto con "MATES" al lado; el oso arriba de la ventana, a la derecha.
 - **Tapa:** el oso + **"Llegó lo más esperado"**.
 - **Lateral derecho:** **curado del mate de calabaza** paso a paso.
 - **Dorso:** "Cada mate es único", QR a osomates.com, @oso_mates.
