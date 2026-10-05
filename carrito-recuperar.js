@@ -74,7 +74,7 @@
     document.head.appendChild(css);
 
     var items = cart.slice(0, 3).map(function (it) {
-      var img = typeof getImg === 'function' ? getImg(it.imagen) : '';
+      var img = typeof getThumb === 'function' ? getThumb(it.imagen) : (typeof getImg === 'function' ? getImg(it.imagen) : '');
       var pos = typeof getImgPos === 'function' ? getImgPos(it.imagen) : 'center';
       return '<div class="om-reminder-it">' + (img ? '<img src="' + esc(img) + '" alt="" style="object-position:' + esc(pos) + '"/>' : '') +
         '<span>' + esc(it.nombre) + (it.qty > 1 ? ' × ' + it.qty : '') + '</span></div>';

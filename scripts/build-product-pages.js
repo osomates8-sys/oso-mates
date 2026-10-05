@@ -30,6 +30,8 @@ for (const p of prods) {
   fs.writeFileSync(path.join(root, map[p.id]), SEO.buildProductPage(tpl, p, prods, sandbox.window.FALLBACK_CONFIG || {}));
   console.log('✓', map[p.id]);
 }
+/* Miniaturas livianas para las fotos chicas (thumbs/) */
+execFileSync('python3', [path.join(__dirname, 'make-thumbs.py')], { stdio: 'inherit' });
 const vigentes = new Set(Object.values(map));
 for (const f of fs.readdirSync(root)) {
   if (/^(mate|bombilla|combo)-.+\.html$/.test(f) && !vigentes.has(f)) {
