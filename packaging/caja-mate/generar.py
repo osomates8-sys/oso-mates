@@ -102,11 +102,12 @@ FONTS = {
     "CGM": "CG-Medium.ttf", "CGMI": "CG-MediumItalic.ttf",
     "MSL": "MS-Light.ttf", "MSR": "MS-Regular.ttf",
     "MSM": "MS-Medium.ttf", "MSSB": "MS-SemiBold.ttf",
+    "AB": "ArchivoBlack.ttf",
 }
 for name, f in FONTS.items():
     pdfmetrics.registerFont(TTFont(name, os.path.join(HERE, "fonts", f)))
 # tipografía del nombre en el frente ("OSO" vertical) y de "MATES"
-WORD_FONT, MATES_FONT = "MSSB", "MSR"
+WORD_FONT, MATES_FONT = "AB", "MSR"   # Archivo Black + Montserrat
 
 
 def cap_ratio(font):

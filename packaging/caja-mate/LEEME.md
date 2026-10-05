@@ -35,7 +35,7 @@
   - *Madera (minimalista):* fondo color kraft liso (C8 M30 Y55 K18) impreso en CMYK, sin marcos; frente con el oso chico + "OSO MATES". Detalles en negro (K100).
   - *Kraft:* mismo diseño, **solo tinta negra** para imprimir sobre cartón kraft real (sin fondo impreso). Es la opción más barata y la que más se parece a una caja de cartón natural.
 - **Troquel:** tintas planas `CutContour` (corte, magenta continuo) y `Crease` (hendido, cian punteado), en sobreimpresión. No se imprimen.
-- **Tipografías:** Cormorant Garamond y Montserrat, incrustadas (las de la web).
+- **Tipografías:** Archivo Black para "OSO" en el frente; Cormorant Garamond y Montserrat (las de la web) para el resto. Todas incrustadas.
 - **Solapa de pegado:** sin tinta, para que el adhesivo agarre bien.
 - **Muesca para el pulgar** en la boca del frente, para abrir la tapa fácil.
 - **Ventana** rectangular en la mitad derecha del frente, abajo (48 mm de ancho × 58 mm de alto, a 12 mm de la base y 10 mm del borde), para ver el mate. Va en el troquel como corte (CutContour).
