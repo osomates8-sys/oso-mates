@@ -88,6 +88,7 @@ FONTS = {
 for name, f in FONTS.items():
     pdfmetrics.registerFont(TTFont(name, os.path.join(HERE, "fonts", f)))
 pdfmetrics.registerFontFamily("MSR", normal="MSR", bold="MSSB", italic="MSR", boldItalic="MSSB")
+pdfmetrics.registerFontFamily("MSM", normal="MSM", bold="MSSB", italic="MSM", boldItalic="MSSB")
 pdfmetrics.registerFontFamily("CGL", normal="CGL", bold="CGM", italic="CGLI", boldItalic="CGMI")
 
 
@@ -154,8 +155,16 @@ def contour_path(c):
 
 
 # ---------------------------------------------------------------- helpers de texto
+def legible(font, size_mm):
+    """En la caja negra el texto va calado: mínimo 7 pt y un peso más, para que el negro no lo coma."""
+    if THEME != "negra":
+        return font, size_mm
+    return {"MSL": "MSR", "MSR": "MSM"}.get(font, font), max(size_mm, pt(7))
+
+
 def tracked(c, text, x, y, font, size, track=0.0, color=None, align="center"):
     color = INK if color is None else color
+    font, size = legible(font, size)
     w = pdfmetrics.stringWidth(text, font, size) + track * (len(text) - 1)
     if align == "center":
         x -= w / 2
@@ -173,6 +182,8 @@ def tracked(c, text, x, y, font, size, track=0.0, color=None, align="center"):
 
 def para(c, html, x, y_top, width, font="MSR", size=7, leading=None, color=None, align=TA_LEFT):
     color = INK if color is None else color
+    font, size_mm = legible(font, pt(size))
+    size = max(size, size_mm / pt(1))
     st = ParagraphStyle("p", fontName=font, fontSize=pt(size), leading=pt(leading or size * 1.45),
                         textColor=color, alignment=align, bulletFontName=font)
     p = Paragraph(html, st)
@@ -339,7 +350,7 @@ def frame(c, x0, y0, w, h, inset=7.0):
     c.setStrokeColor(BROWN)
     c.setLineWidth(0.35)
     c.rect(x0 + inset, y0 + inset, w - 2 * inset, h - 2 * inset, stroke=1, fill=0)
-    c.setLineWidth(0.12)
+    c.setLineWidth(0.25 if THEME == "negra" else 0.12)
     c.rect(x0 + inset + 1.2, y0 + inset + 1.2, w - 2 * inset - 2.4, h - 2 * inset - 2.4, stroke=1, fill=0)
     c.restoreState()
 
@@ -349,7 +360,7 @@ def diamond_rule(c, cx, y, half, color=None):
     c.saveState()
     c.setStrokeColor(color)
     c.setFillColor(color)
-    c.setLineWidth(0.18)
+    c.setLineWidth(0.28 if THEME == "negra" else 0.18)
     c.line(cx - half, y, cx - 2.2, y)
     c.line(cx + 2.2, y, cx + half, y)
     d = c.beginPath()
@@ -393,8 +404,13 @@ def panel_cure(c):
         y -= max(h, 9) + 3.6
     y -= 2
     c.saveState()
-    c.setFillColor(BROWN_SOFT)
-    c.roundRect(x0 + 15, y - 22, W - 30, 22, 2, stroke=0, fill=1)
+    if THEME == "negra":
+        c.setStrokeColor(BROWN)
+        c.setLineWidth(0.3)
+        c.roundRect(x0 + 15, y - 22, W - 30, 22, 2, stroke=1, fill=0)
+    else:
+        c.setFillColor(BROWN_SOFT)
+        c.roundRect(x0 + 15, y - 22, W - 30, 22, 2, stroke=0, fill=1)
     c.restoreState()
     tracked(c, "¿ES DE ALGARROBO?", cx, y - 7, "MSSB", pt(6), track=1.2, color=BROWN)
     para(c, "Untalo con manteca o aceite y dejalo reposar 8 horas antes de empezar. "
