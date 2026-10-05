@@ -143,7 +143,7 @@ def contour():
 
 
 # Ventana: rectángulo que envuelve la esquina frente/lateral derecho, abajo (donde apoya el mate)
-WIN_W, WIN_Y0, WIN_Y1, WIN_R = 30.0, 18.0, 62.0, 3.0   # mm de cada cara, alto desde la base
+WIN_W, WIN_Y0, WIN_Y1, WIN_R = 40.0, 15.0, 75.0, 3.5   # mm de cada cara, alto desde la base
 
 
 CREASES = [
@@ -315,22 +315,25 @@ def diamond_rule(c, cx, y, half, color=None):
 def panel_front(c):
     x0, cx = XA, XA + L / 2
     if MINIMAL:
-        logo(c, cx, 130, 58, parts=("oso",))
-        tracked(c, "OSO MATES", cx, 84, "MSM", pt(24), track=3.6)
-        diamond_rule(c, cx, 76, 0)
-        tracked(c, "MATES Y BOMBILLAS", cx, 67, "MSR", pt(7), track=2.2)
+        logo(c, cx, 140, 58, parts=("oso",))
+        tracked(c, "OSO MATES", cx, 96, "MSM", pt(24), track=3.6)
+        diamond_rule(c, cx, 89, 0)
+        tracked(c, "MATES Y BOMBILLAS", cx, 81, "MSR", pt(7), track=2.2)
         tracked(c, "MAR DEL PLATA", cx, 18, "MSR", pt(6.5), track=2.2)
         return
     frame(c, x0, 0, L, H)
-    logo(c, cx, 108, 112)
-    tracked(c, "MATES Y BOMBILLAS", cx, 44, "MSM", pt(8.5), track=2.2)
-    diamond_rule(c, cx, 33, 18)
-    tracked(c, "TALLADO A MANO  ·  MAR DEL PLATA", cx, 22, "MSR", pt(5.8), track=1.1, color=BROWN)
+    logo(c, cx, 124, 96)
+    tracked(c, "MATES Y BOMBILLAS", cx, 58, "MSM", pt(8.5), track=1.2)
+    diamond_rule(c, cx, 47, 18)
+    tracked(c, "TALLADO A MANO · MAR DEL PLATA", cx, 22, "MSR", pt(5.8), track=0.5, color=BROWN)
 
 
-def panel_curado(c, x0, material, steps, note_title, note):
-    """Lateral con el curado paso a paso de un tipo de mate."""
+def panel_curado(c, x0, material, steps, note_title, note, window=False):
+    """Lateral con el curado paso a paso de un tipo de mate.
+    window=True: el lateral tiene la ventana abajo a la izquierda; la nota y el pie van a su derecha."""
     cx = x0 + W / 2
+    nx0 = x0 + WIN_W + 6 if window else x0 + 15   # zona libre para la nota
+    ncx = (nx0 + x0 + W - 15) / 2
     frame(c, x0, 0, W, H)
     tracked(c, "CURADO  ·  ANTES DEL PRIMER USO", cx, 178, "MSM", pt(6), track=1.3, color=BROWN)
     tracked(c, "Cómo curar tu mate", cx, 165, "CGLI", pt(24), track=0.3)
@@ -346,11 +349,11 @@ def panel_curado(c, x0, material, steps, note_title, note):
     c.setStrokeColor(BROWN)
     c.setLineWidth(0.3)
     if not MINIMAL:
-        c.roundRect(x0 + 15, y - 25, W - 30, 25, 2, stroke=1, fill=0)
+        c.roundRect(nx0, y - 27, x0 + W - 15 - nx0, 27, 2, stroke=1, fill=0)
     c.restoreState()
-    tracked(c, note_title, cx, y - 7, "MSSB", pt(6.5), track=1.2, color=BROWN)
-    para(c, note, x0 + 20, y - 10.5, W - 40, size=7.5, leading=10.4, align=TA_CENTER)
-    tracked(c, "Guía completa en osomates.com/guias", cx, 18.5, "MSR", pt(5.6), track=0.4)
+    tracked(c, note_title, ncx, y - 7, "MSSB", pt(6.5), track=1.2, color=BROWN)
+    para(c, note, nx0 + 4, y - 10.5, x0 + W - 15 - nx0 - 8, size=7.5, leading=10.4, align=TA_CENTER)
+    tracked(c, "Guía completa en osomates.com/guias", ncx if window else cx, 18.5, "MSR", pt(5.6), track=0.2)
 
 
 def panel_cure(c):
@@ -361,7 +364,7 @@ def panel_cure(c):
         ("Enjuagalo con agua", "(sin detergente) y repetí durante 2 o 3 días."),
         ("Dejalo secar", "en un lugar ventilado, sin tapar, antes de estrenarlo."),
     ], "OJO CON EL AGUA", "Usala caliente, nunca hirviendo: entre 70 y 80 °C. "
-                         "El agua hirviendo puede rajar la calabaza.")
+                         "El agua hirviendo puede rajar la calabaza.", window=True)
 
 
 def panel_cure_algarrobo(c):
@@ -622,9 +625,9 @@ def build_print(path):
                     (H, Y_TOP_LID, "150"), (Y_TOP_LID, Y_MAX, "15")]:
         dim(c, a, b, X_MAX + 7, t, horizontal=False)
     dim(c, H, H + DUST, XB - 4, "56", horizontal=False)
-    dim(c, XB - WIN_W, XB + WIN_W, WIN_Y1 + 4, "ventana 60 (30 + 30)")
-    dim(c, WIN_Y0, WIN_Y1, XB + WIN_W + 4, "44", horizontal=False)
-    dim(c, 0, WIN_Y0, XB + WIN_W + 4, "18", horizontal=False)
+    dim(c, XB - WIN_W, XB + WIN_W, WIN_Y1 + 4, f"ventana {2 * WIN_W:g} ({WIN_W:g} + {WIN_W:g})")
+    dim(c, WIN_Y0, WIN_Y1, XB + WIN_W + 4, f"{WIN_Y1 - WIN_Y0:g}", horizontal=False)
+    dim(c, 0, WIN_Y0, XB + WIN_W + 4, f"{WIN_Y0:g}", horizontal=False)
     c.restoreState()
     c.showPage()
     c.save()
