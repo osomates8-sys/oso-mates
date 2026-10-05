@@ -147,7 +147,7 @@
   }
   var FOOT = '\n</main>\n<footer>\n  <div class="footer-logo">Oso Mates</div>\n' +
     '  <div class="footer-copy">&#169; 2026 &#8212; Mates artesanales desde Mar del Plata</div>\n' +
-    '  <div class="footer-copy" style="margin-top:.6rem"><a href="guias.html">Guías</a> · <a href="index.html#catalogo">Catálogo</a> · <a href="legales.html">Política de privacidad y términos</a></div>\n' +
+    '  <div class="footer-copy" style="margin-top:.6rem"><a href="guias.html">Guías</a> · <a href="index.html#catalogo">Catálogo</a> · <a href="empresas.html">Empresas</a> · <a href="legales.html">Política de privacidad y términos</a></div>\n' +
     '</footer>\n<script src="guias.js"></script>\n</body>\n</html>\n';
 
   function crumbs(items) {
