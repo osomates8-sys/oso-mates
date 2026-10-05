@@ -57,21 +57,24 @@ THEMES = {
     "blanca": dict(BG=CMYKColor(0, 0, 0, 0), INK=CMYKColor(0, 0, 0, 0.9),
                    BROWN=CMYKColor(0.20, 0.55, 0.85, 0.30), BROWN_SOFT=CMYKColor(0.04, 0.12, 0.22, 0.02),
                    LOGO=CMYKColor(0, 0, 0, 1)),
-    # caja madera: fondo madera clara con veta suave, todos los detalles en negro
-    "madera": dict(BG=CMYKColor(0.07, 0.27, 0.48, 0.03), INK=CMYKColor(0, 0, 0, 1),
-                   BROWN=CMYKColor(0, 0, 0, 1), BROWN_SOFT=CMYKColor(0.12, 0.38, 0.62, 0.10),
-                   LOGO=CMYKColor(0, 0, 0, 1), GRAIN=CMYKColor(0.09, 0.31, 0.53, 0.05),
-                   GRAIN_DARK=CMYKColor(0.12, 0.38, 0.62, 0.10), MINIMAL=True),
+    # caja kraft (color madera/cartón, liso como la referencia), minimalista, detalles en negro
+    "madera": dict(BG=CMYKColor(0.08, 0.30, 0.55, 0.18), INK=CMYKColor(0, 0, 0, 1),
+                   BROWN=CMYKColor(0, 0, 0, 1), BROWN_SOFT=CMYKColor(0.10, 0.34, 0.60, 0.25),
+                   LOGO=CMYKColor(0, 0, 0, 1), MINIMAL=True),
+    # mismo diseño para imprimir SOLO EN NEGRO sobre cartón kraft real (sin fondo impreso)
+    "kraft": dict(BG=None, PAPER=CMYKColor(0.08, 0.30, 0.55, 0.18), INK=CMYKColor(0, 0, 0, 1),
+                  BROWN=CMYKColor(0, 0, 0, 1), BROWN_SOFT=CMYKColor(0, 0, 0, 0.3),
+                  LOGO=CMYKColor(0, 0, 0, 1), MINIMAL=True),
 }
 THEME = "negra"
-BG = INK = BROWN = BROWN_SOFT = LOGO = GRAIN = GRAIN_DARK = None
+BG = INK = BROWN = BROWN_SOFT = LOGO = GRAIN = GRAIN_DARK = PAPER = None
 MINIMAL = False
 
 
 def set_theme(name):
     global THEME
     THEME = name
-    globals().update({"GRAIN": None, "GRAIN_DARK": None, "MINIMAL": False, **THEMES[name]})
+    globals().update({"GRAIN": None, "GRAIN_DARK": None, "MINIMAL": False, "PAPER": None, **THEMES[name]})
 
 
 set_theme(THEME)
@@ -378,8 +381,9 @@ def panel_back(c):
     qs = 27.0
     qx, qy = cx - qs / 2, 50
     c.saveState()
-    c.setFillColor(CMYKColor(0, 0, 0, 0) if GRAIN is None else BG)
-    c.rect(qx - 2, qy - 2, qs + 4, qs + 4, stroke=0, fill=1)  # en madera tapa la veta detrás del QR
+    if THEME == "negra":  # el QR necesita fondo claro
+        c.setFillColor(CMYKColor(0, 0, 0, 0))
+        c.rect(qx - 2, qy - 2, qs + 4, qs + 4, stroke=0, fill=1)
     c.restoreState()
     qr = qrcode.QRCode(error_correction=qrcode.constants.ERROR_CORRECT_M, border=0)
     qr.add_data("https://osomates.com")
@@ -459,12 +463,15 @@ def wood_grain(c, x0, y0, x1, y1):
     c.restoreState()
 
 
-def artwork(c):
-    c.saveState()
-    c.setFillColor(BG)
-    # fondo con 3 mm de sangrado; la solapa de pegado queda sin tinta para que pegue bien
-    c.rect(XA - BLEED, Y_MIN - BLEED, (X_MAX - XA) + 2 * BLEED, (Y_MAX - Y_MIN) + 2 * BLEED, stroke=0, fill=1)
-    c.restoreState()
+def artwork(c, preview=False):
+    # en "kraft" no se imprime fondo (va directo sobre el cartón); en la vista previa se simula el color
+    fill = PAPER if (preview and PAPER is not None) else BG
+    if fill is not None:
+        c.saveState()
+        c.setFillColor(fill)
+        # fondo con 3 mm de sangrado; la solapa de pegado queda sin tinta para que pegue bien
+        c.rect(XA - BLEED, Y_MIN - BLEED, (X_MAX - XA) + 2 * BLEED, (Y_MAX - Y_MIN) + 2 * BLEED, stroke=0, fill=1)
+        c.restoreState()
     if GRAIN is not None:
         wood_grain(c, XA - BLEED, Y_MIN - BLEED, X_MAX + BLEED, Y_MAX + BLEED)
     panel_front(c)
@@ -619,7 +626,7 @@ def build_preview(path):
     c.scale(mm, mm)
     c.saveState()
     c.clipPath(contour_path(c), stroke=0, fill=0)
-    artwork(c)
+    artwork(c, preview=True)
     c.restoreState()
     c.saveState()
     c.setLineWidth(0.25)
