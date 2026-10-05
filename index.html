@@ -20,7 +20,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧉</text></svg>"/>
 <title>Oso Mates — Mates artesanales tallados a mano | Mar del Plata</title>
-<link rel="preload" as="image" href="IMG_5272.webp" fetchpriority="high"/>
+<link rel="preload" as="image" href="IMG_5272.webp" media="(max-width: 900px)" fetchpriority="high"/>
+<link rel="preload" as="image" href="DSC08987.webp" media="(min-width: 901px)" fetchpriority="high"/>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
 <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Montserrat:wght@300;400;500;600&display=swap"/>
@@ -640,7 +641,8 @@ fbq('track', 'PageView');
 /* ===== Mejoras visuales (oct 2026) ===== */
 /* Portada con foto */
 .hero-right{background:#1b1714;display:block;}
-.hero-photo{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 62%;display:block;}
+.hero-photo{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 72%;display:block;}
+@media(max-width:900px){.hero-photo{object-position:50% 62%;}}
 .hero-desc{color:rgba(248,248,246,.78);}
 @media(max-width:900px){
   #hero{position:relative;padding:64px 0 0!important;}
@@ -728,7 +730,10 @@ fbq('track', 'PageView');
     </div>
   </div>
   <div class="hero-right">
-    <img class="hero-photo" src="IMG_5272.webp" alt="Mate artesanal de algarrobo con virola de alpaca y bombilla" fetchpriority="high" decoding="async" width="933" height="1400"/>
+    <picture>
+      <source media="(min-width: 901px)" srcset="DSC08987.webp" width="788" height="1400"/>
+      <img class="hero-photo" src="IMG_5272.webp" alt="Mate artesanal Oso Mates" fetchpriority="high" decoding="async" width="933" height="1400"/>
+    </picture>
   </div>
 </section>
 <div class="marquee-strip"><div class="marquee-inner"><span>Tallado a mano</span><span class="dot">—</span><span>Madera noble</span><span class="dot">—</span><span>Guía de curado incluida</span><span class="dot">—</span><span>Envíos a todo el país</span><span class="dot">—</span><span>Piezas únicas</span><span class="dot">—</span><span>@oso_mates</span><span class="dot">—</span><span>Bombillas</span><span class="dot">—</span><span>Tallado a mano</span><span class="dot">—</span><span>Madera noble</span><span class="dot">—</span><span>Guía de curado incluida</span><span class="dot">—</span><span>Envíos a todo el país</span><span class="dot">—</span><span>Piezas únicas</span><span class="dot">—</span><span>@oso_mates</span><span class="dot">—</span></div></div>
