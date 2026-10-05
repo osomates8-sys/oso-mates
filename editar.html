@@ -179,20 +179,10 @@
   <div id="guias"></div>
   <button class="btn-ghost" id="add-guia">+ Agregar guía</button>
 
-  <h2>Campaña Día de la Madre</h2>
+  <h2>Campañas de temporada</h2>
   <div class="card">
-    <label class="chk" style="margin-top:0"><input type="checkbox" id="camp-activo"/> Mostrar la campaña (cartel de arriba, sección en el inicio y aviso "llega antes" en cada mate)</label>
-    <div class="row">
-      <div><label for="camp-fecha">Fecha del Día de la Madre (después se apaga sola)</label><input type="date" id="camp-fecha"/></div>
-      <div><label for="camp-premio">Premio del sorteo (vacío = sin sorteo)</label><input type="text" id="camp-premio" placeholder="un combo mate + bombilla + yerba"/></div>
-    </div>
-    <div class="row">
-      <div><label for="camp-shasta">Se participa hasta</label><input type="date" id="camp-shasta"/></div>
-      <div><label for="camp-sdia">Día del sorteo</label><input type="date" id="camp-sdia"/></div>
-    </div>
-    <label for="camp-link">Link al posteo del sorteo en Instagram</label>
-    <input type="url" id="camp-link" placeholder="https://www.instagram.com/p/..."/>
-    <p class="hint">Si dejás el link vacío, el botón "Participar" lleva a tu perfil @oso_mates. Las bases están en sorteo-dia-de-la-madre.html.</p>
+    <p class="hint" style="margin-top:0">Se muestra la primera campaña activa cuya fecha todavía no pasó (si tiene "Mostrar desde", recién a partir de ese día): cartel de arriba con la fecha límite para que llegue a tiempo, sección de regalos en el inicio y aviso "llega antes" en cada mate. Después de la fecha se apaga sola. El sorteo es opcional: si dejás el premio vacío, no aparece.</p>
+    <div id="campanas-list"></div>
   </div>
 
   <h2>Promos por fecha</h2>
@@ -842,25 +832,51 @@ function collectPromos(){
   return JSON.stringify(n.map((x,i)=>({active:a[i].checked, nombre:x.value.trim(), desde:de[i].value, hasta:h[i].value, descuento:Math.max(0,Math.min(90,parseInt(d[i].value,10)||0))}))
     .filter(p=>p.nombre||p.desde));
 }
+function leerCampanas(){
+  let l=null; try{ l=JSON.parse(config.campanas||'null'); }catch(e){}
+  if(!Array.isArray(l)){ l=[]; try{ const m=JSON.parse(config.campana_madre||'null'); if(m) l.push(m); }catch(e){} }
+  return l;
+}
 function loadCampanaForm(){
-  let c={}; try{ c=JSON.parse(config.campana_madre||'{}')||{}; }catch(e){}
-  document.getElementById('camp-activo').checked=!!c.active;
-  document.getElementById('camp-fecha').value=c.fecha||'';
-  document.getElementById('camp-premio').value=c.sorteo_premio||'';
-  document.getElementById('camp-shasta').value=c.sorteo_hasta||'';
-  document.getElementById('camp-sdia').value=c.sorteo_dia||'';
-  document.getElementById('camp-link').value=c.sorteo_link||'';
+  const esc=v=>String(v==null?'':v).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;');
+  document.getElementById('campanas-list').innerHTML=leerCampanas().map((c,i)=>`
+    <div class="camp" style="border-top:1px solid #e3dccf;padding-top:1rem;margin-top:${i?'1.4rem':'0'}">
+      <label class="chk" style="margin-top:0"><input type="checkbox" class="cp-activo"${c.active?' checked':''}/> <strong>${esc((c.emoji||'')+' '+(c.titulo||'Campaña'))}</strong> activa</label>
+      <div class="row">
+        <div><label>Nombre</label><input type="text" class="cp-titulo" value="${esc(c.titulo)}"/></div>
+        <div><label>Emoji</label><input type="text" class="cp-emoji" value="${esc(c.emoji)}" maxlength="4"/></div>
+      </div>
+      <div class="row">
+        <div><label>Fecha (el día festivo; después se apaga sola)</label><input type="date" class="cp-fecha" value="${esc(c.fecha)}"/></div>
+        <div><label>Mostrar desde (vacío = ya)</label><input type="date" class="cp-desde" value="${esc(c.desde)}"/></div>
+      </div>
+      <div class="row">
+        <div><label>Título de la sección (podés usar &lt;em&gt;)</label><input type="text" class="cp-seccion" value="${esc(c.seccion)}"/></div>
+        <div><label>Texto "llega…"</label><input type="text" class="cp-antes" value="${esc(c.antes_de)}" placeholder="antes de Navidad"/></div>
+      </div>
+      <div class="row">
+        <div><label>Premio del sorteo (vacío = sin sorteo)</label><input type="text" class="cp-premio" value="${esc(c.sorteo_premio)}"/></div>
+        <div><label>Link al posteo del sorteo</label><input type="url" class="cp-link" value="${esc(c.sorteo_link)}" placeholder="https://www.instagram.com/p/..."/></div>
+      </div>
+      <div class="row">
+        <div><label>Se participa hasta</label><input type="date" class="cp-shasta" value="${esc(c.sorteo_hasta)}"/></div>
+        <div><label>Día del sorteo</label><input type="date" class="cp-sdia" value="${esc(c.sorteo_dia)}"/></div>
+      </div>
+      <input type="hidden" class="cp-bases" value="${esc(c.sorteo_bases)}"/>
+    </div>`).join('');
 }
 function collectCampana(){
-  let c={}; try{ c=JSON.parse(config.campana_madre||'{}')||{}; }catch(e){}
-  c.active=document.getElementById('camp-activo').checked;
-  c.titulo=c.titulo||'Día de la Madre';
-  c.fecha=document.getElementById('camp-fecha').value;
-  c.sorteo_premio=document.getElementById('camp-premio').value.trim();
-  c.sorteo_hasta=document.getElementById('camp-shasta').value;
-  c.sorteo_dia=document.getElementById('camp-sdia').value;
-  c.sorteo_link=document.getElementById('camp-link').value.trim();
-  return JSON.stringify(c);
+  const q=c=>[...document.querySelectorAll('#campanas-list .'+c)];
+  const v=c=>q(c).map(x=>x.value.trim());
+  const act=q('cp-activo').map(x=>x.checked), tit=v('cp-titulo'), emo=v('cp-emoji'), fec=v('cp-fecha'), des=v('cp-desde'),
+    sec=v('cp-seccion'), ant=v('cp-antes'), pre=v('cp-premio'), lnk=v('cp-link'), sh=v('cp-shasta'), sd=v('cp-sdia'), bas=v('cp-bases');
+  return JSON.stringify(tit.map((t,i)=>{
+    const c={active:act[i], titulo:t, emoji:emo[i], fecha:fec[i]};
+    if(des[i]) c.desde=des[i]; if(sec[i]) c.seccion=sec[i]; if(ant[i]) c.antes_de=ant[i];
+    if(pre[i]){ c.sorteo_premio=pre[i]; c.sorteo_hasta=sh[i]; c.sorteo_dia=sd[i]; c.sorteo_link=lnk[i]; }
+    if(bas[i]) c.sorteo_bases=bas[i];
+    return c;
+  }));
 }
 function loadTarjetaForm(){
   let t={active:false,cuotas:0,proveedor:''};
@@ -938,7 +954,8 @@ function collectConfig(){
   c.oso_config = collectOso();
   const gActivo=document.getElementById('grab-activo').checked;
   const gPrecio=parseInt(document.getElementById('grab-precio').value,10)||0;
-  c.campana_madre = collectCampana();
+  c.campanas = collectCampana();
+  delete c.campana_madre;
   c.promos = collectPromos();
   c.pago_tarjeta = JSON.stringify({active:document.getElementById('tarj-activo').checked, cuotas:Math.max(0,parseInt(document.getElementById('tarj-cuotas').value,10)||0), proveedor:document.getElementById('tarj-prov').value.trim()});
   c.bombilla_extra = JSON.stringify({active:document.getElementById('bomb-activo').checked, nombre:document.getElementById('bomb-nombre').value.trim()||'Bombilla', price:parseInt(document.getElementById('bomb-precio').value,10)||0});
