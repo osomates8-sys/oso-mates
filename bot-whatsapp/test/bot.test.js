@@ -285,3 +285,10 @@ test("fichas demo de gimnasio y estética: pedidos con sus precios", () => {
   assert.equal(r3.total, 150000);
   assert.match(armarPrompt(est), /Láser soprano - axilas \(sesión\): \$14\.000/);
 });
+
+test("ficha demo de concesionaria: carga y muestra el stock en dólares", () => {
+  const auto = clientes.get("demo-concesionaria");
+  const prompt = armarPrompt(auto);
+  assert.match(prompt, /\[corolla-2020\] Toyota Corolla 2\.0 XEI CVT 2020: USD 22\.000/);
+  assert.match(prompt, /Financiamos hasta el 50%/);
+});

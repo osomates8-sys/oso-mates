@@ -1,0 +1,74 @@
+{
+  "id": "demo-concesionaria",
+  "nombre": "Automotores Demo MdP",
+  "rubro": "Concesionaria de autos usados: venta, permuta y financiación (negocio de ejemplo para demos)",
+  "descripcion": "Agencia de autos y camionetas usados en Mar del Plata. Toma usados en parte de pago, financia y hace la gestoría de la transferencia. Datos de ejemplo: usala para mostrarle el bot a una concesionaria y reemplazá las unidades por su stock.",
+  "nombre_asistente": "Nico",
+  "tono": "Cercano, claro y confiable (voseo), como un buen vendedor de autos que no presiona: pregunta, escucha y ofrece opciones concretas. Mensajes cortos.",
+  "ubicacion": "Av. Independencia 3100, Mar del Plata (dirección de ejemplo). Las unidades se ven en la agencia.",
+  "horario_atencion": "Lunes a viernes de 9 a 19 h y sábados de 9 a 14 h.",
+  "web": "",
+  "moneda": "USD",
+  "plan": "vendedor",
+
+  "whatsapp": {
+    "phone_number_id": "",
+    "waba_id": "",
+    "token_env": "WHATSAPP_TOKEN"
+  },
+  "notificar_a": "",
+
+  "catalogo": [
+    { "id": "gol-trend-2018", "nombre": "Volkswagen Gol Trend 1.6 Trendline 2018", "precio": 9500, "descripcion": "5 puertas, 92.000 km, nafta, aire y dirección. Único dueño, service al día.", "disponible": true },
+    { "id": "sandero-2017", "nombre": "Renault Sandero 1.6 Expression 2017", "precio": 9000, "descripcion": "5 puertas, 105.000 km, nafta, aire. Ideal primer auto.", "disponible": true },
+    { "id": "onix-2021", "nombre": "Chevrolet Onix 1.2 LT 2021", "precio": 13500, "descripcion": "5 puertas, 48.000 km, nafta, pantalla con Android Auto y CarPlay.", "disponible": true },
+    { "id": "208-2021", "nombre": "Peugeot 208 1.6 Active 2021", "precio": 15000, "descripcion": "5 puertas, 41.000 km, nafta, cámara de retroceso.", "disponible": true },
+    { "id": "cronos-2022", "nombre": "Fiat Cronos 1.3 Drive 2022", "precio": 15500, "descripcion": "Sedán, 35.000 km, nafta, baúl grande. Muy económico.", "disponible": true },
+    { "id": "renegade-2020", "nombre": "Jeep Renegade 1.8 Sport 2020", "precio": 19000, "descripcion": "SUV, 60.000 km, nafta, caja manual.", "disponible": true },
+    { "id": "corolla-2020", "nombre": "Toyota Corolla 2.0 XEI CVT 2020", "precio": 22000, "descripcion": "Sedán automático, 70.000 km, nafta. Service oficial.", "disponible": true },
+    { "id": "ranger-2020", "nombre": "Ford Ranger 3.2 XLT 4x4 2020", "precio": 29000, "descripcion": "Pick-up doble cabina, 95.000 km, diésel, manual.", "disponible": true },
+    { "id": "hilux-2019", "nombre": "Toyota Hilux 2.8 SRV 4x4 2019", "precio": 30000, "descripcion": "Pick-up doble cabina, 110.000 km, diésel, automática.", "disponible": true },
+    { "id": "amarok-2018", "nombre": "Volkswagen Amarok 3.0 V6 Highline 2018", "precio": 32000, "descripcion": "Pick-up doble cabina, 98.000 km, diésel, automática, cuero.", "disponible": true }
+  ],
+
+  "adicionales": [],
+
+  "entrega": {
+    "opciones": [
+      { "id": "visita", "nombre": "Ver la unidad en la agencia", "costo": 0, "detalle": "De lunes a sábado en el horario de atención." },
+      { "id": "prueba-de-manejo", "nombre": "Prueba de manejo", "costo": 0, "detalle": "Con DNI y licencia vigente. Se coordina con un vendedor." },
+      { "id": "tasacion-usado", "nombre": "Tasación de tu usado", "costo": 0, "detalle": "Se hace en la agencia, en el momento y sin cargo." }
+    ],
+    "envio_gratis_desde": null
+  },
+
+  "pagos": {
+    "otros": "Contado en dólares o en pesos al cambio del día. Tomamos tu usado como parte de pago. Financiamos hasta el 50% del valor en hasta 36 cuotas en pesos, sujeto a aprobación. La reserva de una unidad se hace con seña en la agencia."
+  },
+
+  "preguntas_frecuentes": [
+    { "q": "¿Toman mi auto como parte de pago?", "a": "Sí, tomamos autos y camionetas desde 2012. Lo tasamos en la agencia en el momento y sin cargo. Para darte un valor de referencia necesitamos marca, modelo, versión, año, kilómetros y estado general." },
+    { "q": "¿Financian?", "a": "Sí, hasta el 50% del valor en hasta 36 cuotas en pesos, sujeto a aprobación. Se pide DNI y recibo de sueldo o constancia de monotributo. La cuota exacta la calcula un vendedor según el auto y el plazo." },
+    { "q": "¿Qué papeles se entregan?", "a": "Título, cédula, VTV al día e informe de dominio sin deudas ni embargos. La gestoría de la transferencia la hacemos nosotros; los costos de transferencia están a cargo del comprador." },
+    { "q": "¿Tienen garantía?", "a": "Sí, todas las unidades tienen 3 meses de garantía de motor y caja." },
+    { "q": "¿Puedo probar el auto?", "a": "Sí, la prueba de manejo se coordina con un vendedor. Traé DNI y licencia vigente." },
+    { "q": "¿Me mandan fotos o video?", "a": "Sí, un vendedor te manda fotos y un video de la unidad por este chat." },
+    { "q": "¿El precio es final?", "a": "Es el precio publicado de contado. Cualquier propuesta la ve un vendedor." }
+  ],
+
+  "promociones": [
+    "Este mes: transferencia bonificada al 50% en todas las unidades 2020 en adelante.",
+    "Tasación de tu usado en el momento y sin cargo."
+  ],
+
+  "reglas": [
+    "Tu objetivo es que la persona venga a la agencia: a ver la unidad, a hacer la prueba de manejo o a tasar su usado. Cuando hay interés, pedí nombre, qué unidad le interesa y qué día y horario le queda cómodo, y usá registrar_interesado.",
+    "Antes de recomendar, preguntá para qué lo quiere (ciudad, ruta, trabajo, familia), qué presupuesto tiene y cómo pensaría pagar: contado, con su usado como parte de pago, financiado o combinado.",
+    "Si tiene un usado para entregar, pedí marca, modelo, versión, año y kilómetros, y registralo en las notas de registrar_interesado. Nunca le digas cuánto vale su auto: la tasación se hace en la agencia.",
+    "No prometas aprobación de crédito ni valores de cuota: decí cómo funciona la financiación y que un vendedor le calcula la cuota.",
+    "No negocies precios ni hagas descuentos. Si alguien hace una oferta, usá derivar_a_humano para que la vea un vendedor.",
+    "No uses crear_pedido: los autos se reservan con seña en la agencia.",
+    "Si te piden fotos o video, decí que un vendedor se los manda y registrá a la persona como interesada.",
+    "Si alguien pregunta por un auto que no está en el stock, decí que no lo tenés ahora, ofrecé la alternativa más parecida y registralo para avisarle si entra uno."
+  ]
+}
