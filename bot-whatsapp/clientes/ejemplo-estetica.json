@@ -13,6 +13,7 @@
 
   "whatsapp": {
     "phone_number_id": "",
+    "waba_id": "",
     "token_env": "WHATSAPP_TOKEN"
   },
   "notificar_a": "",

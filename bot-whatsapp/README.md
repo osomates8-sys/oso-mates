@@ -51,7 +51,20 @@ El número que pongas en `notificar_a` recibe los avisos y puede mandarle comand
 - `#pausa 5492231234567`: el bot deja de contestarle a ese cliente (lo atiende una persona).
 - `#bot 5492231234567`: el bot vuelve a atender esa charla (por ejemplo después de una derivación).
 
-> WhatsApp solo deja mandar mensajes libres a quien te escribió en las últimas 24 h. Para que los avisos lleguen siempre, el dueño tiene que haberle escrito al número del negocio en el último día (o hay que pasar los avisos a una plantilla aprobada).
+### Plantilla de Meta para los avisos
+
+WhatsApp solo deja mandar texto libre a quien escribió en las últimas 24 h. Para que los avisos lleguen siempre, el bot usa una plantilla aprobada por Meta:
+
+- Si el dueño escribió al número del negocio en las últimas 24 h, el aviso le llega completo como texto.
+- Si no, le llega la plantilla con un resumen de una línea, por ejemplo: *"Hola, tenés una novedad en el WhatsApp de tu negocio: nuevo pedido de Ana por $64.800. Tocá Ver detalle o respondé este mensaje para recibir el detalle completo."* El detalle queda guardado y le llega apenas toca el botón o responde cualquier cosa.
+
+Para registrarla (una vez por cada cuenta de WhatsApp Business):
+
+1. Copiá el **ID de la cuenta de WhatsApp Business** (WhatsApp Manager → Configuración de la cuenta) en la ficha: `whatsapp.waba_id`.
+2. `npm run plantilla -- oso-mates` la manda a revisión (categoría Utilidad, idioma español de Argentina).
+3. `npm run plantilla -- oso-mates --estado` muestra si ya está aprobada. Meta suele aprobarla en minutos.
+
+Las plantillas de utilidad tienen un costo por mensaje que cobra Meta; con este sistema solo se usan cuando el dueño no escribió en el último día.
 
 ## 3. Sumar un negocio nuevo (un cliente nuevo)
 
@@ -69,6 +82,7 @@ El número que pongas en `notificar_a` recibe los avisos y puede mandarle comand
 | `preguntas_frecuentes`, `promociones`, `reglas` | Lo que el bot tiene que saber y respetar de ese negocio. |
 | `plan` | `inicial`, `vendedor` o `temporada` (definidos en `planes.json`). |
 | `whatsapp.phone_number_id` | El número de WhatsApp de ese negocio. Si tiene varias sucursales, una lista: `["111", "222"]`; cada cliente recibe la respuesta desde el número al que escribió. |
+| `whatsapp.waba_id` | ID de la cuenta de WhatsApp Business, para registrar la plantilla de avisos. |
 | `whatsapp.token_env` | Variable de `.env` con el token (si el número está en otra cuenta de Meta, usá una variable distinta). |
 | `notificar_a` | WhatsApp del dueño para los avisos (formato `549223...`). |
 
@@ -113,6 +127,8 @@ src/prompt.js      arma las instrucciones de venta a partir de la ficha
 src/herramientas.js crear_pedido, registrar_interesado, derivar_a_humano
 src/pagos.js       links de Mercado Pago
 src/uso.js         conteo de conversaciones por plan y avisos de límite
+src/avisos.js      avisos al dueño: texto o plantilla de Meta según la ventana de 24 h
+src/plantilla.js   registra la plantilla de avisos en Meta (npm run plantilla)
 src/informe.js     informe mensual (también se usa desde la terminal)
 planes.json        planes y precios
 src/memoria.js     conversaciones, pedidos e interesados (archivos en data/)

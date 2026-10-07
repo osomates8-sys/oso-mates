@@ -151,6 +151,7 @@ async function crearPedido(input, { cliente, conv, notificar }) {
     `🛒 Nuevo pedido ${pedido.id}\n${input.nombre_cliente} (wa.me/${conv.telefono})\n${calc.resumen}\nPago: ${input.forma_pago}` +
       (input.direccion ? `\nDirección: ${input.direccion}` : "") +
       (input.notas ? `\nNotas: ${input.notas}` : ""),
+    `nuevo pedido de ${input.nombre_cliente} por ${precio(calc.total, cliente.moneda)}`,
   );
 
   return `Pedido ${pedido.id} registrado.\n${calc.resumen}\nCómo pagar: ${comoPagar}`;
@@ -162,6 +163,7 @@ async function registrarInteresado(input, { cliente, conv, notificar }) {
     `⭐ Nuevo interesado: ${input.nombre || "sin nombre"} (wa.me/${conv.telefono})\nQuiere: ${input.interes}` +
       (input.preferencia ? `\nPrefiere: ${input.preferencia}` : "") +
       (input.notas ? `\nNotas: ${input.notas}` : ""),
+    `${input.nombre || "una persona"} quiere ${input.interes}`,
   );
   return "Interesado registrado. El equipo lo va a contactar; avisale y confirmale lo que pidió.";
 }
@@ -172,6 +174,7 @@ async function derivarAHumano(input, { cliente, conv, notificar }) {
   await notificar(
     `🙋 Te necesitan en wa.me/${conv.telefono}\nMotivo: ${input.motivo}\nResumen: ${input.resumen}\n` +
       `El bot quedó pausado en esa charla. Para reactivarlo mandá: #bot ${conv.telefono}`,
+    `un cliente necesita que lo atiendas (${input.motivo})`,
   );
   return `Listo, se avisó al equipo y el bot queda en pausa en esta charla. Decile que una persona le escribe en el horario de atención (${cliente.horario_atencion || "lo antes posible"}).`;
 }

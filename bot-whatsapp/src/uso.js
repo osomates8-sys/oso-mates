@@ -84,6 +84,7 @@ export async function registrarConversacion(cliente, conv, notificar, ahora = Da
       aviso < 1
         ? `${base} Si seguís a este ritmo, consultá si te conviene el plan siguiente.`
         : `${base} El bot sigue atendiendo: cada conversación extra se cobra ${precio(PLANES.precio_conversacion_extra, PLANES.moneda)}.`,
+      `usaste ${uso.conversaciones} de ${plan.conversaciones} conversaciones de tu plan este mes`,
     );
   }
   return true;

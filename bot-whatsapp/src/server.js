@@ -10,6 +10,7 @@ import { responder } from "./agente.js";
 import { obtenerConversacion, estaPausada, pausar, reactivar, leerLineas } from "./memoria.js";
 import { enviarTexto, marcarLeido, firmaValida, extraerMensajes } from "./whatsapp.js";
 import { encolar } from "./cola.js";
+import { avisarDueno, mensajeDelDueno, PLANTILLA } from "./avisos.js";
 import { registrarConversacion, resumenUso, planDe, mesDe, PLANES } from "./uso.js";
 import { generarInforme, mesAnterior } from "./informe.js";
 import { precio } from "./prompt.js";
@@ -26,13 +27,11 @@ function soloDigitos(s) {
   return String(s || "").replace(/\D/g, "");
 }
 
+// Avisos al dueño: texto libre si escribió en las últimas 24 h, si no la plantilla de Meta.
 function notificadorDe(cliente) {
-  return async (texto) => {
-    console.log(`[${cliente.id}] aviso al dueño: ${texto.split("\n")[0]}`);
-    if (!cliente.notificar_a) return;
-    await enviarTexto(cliente, cliente.notificar_a, texto).catch((e) =>
-      console.warn(`[${cliente.id}] no se pudo avisar al dueño: ${e.message}`),
-    );
+  return async (texto, resumen) => {
+    const via = await avisarDueno(cliente, texto, resumen);
+    console.log(`[${cliente.id}] aviso al dueño (${via || "no enviado"}): ${texto.split("\n")[0]}`);
   };
 }
 
@@ -59,7 +58,11 @@ async function atender(msg) {
   marcarLeido(cliente, msg.id, msg.phoneNumberId);
 
   if (cliente.notificar_a && soloDigitos(msg.de) === soloDigitos(cliente.notificar_a)) {
+    // El dueño escribió: se abre su ventana de 24 h y le llegan los avisos que quedaron pendientes.
+    const enviados = await mensajeDelDueno(cliente);
     if (await comandoDelDueno(cliente, msg.texto)) return;
+    // Respondió a la plantilla para ver el detalle: no es una consulta de cliente.
+    if (enviados || msg.texto?.trim() === PLANTILLA.boton) return;
   }
 
   const clave = `${cliente.id}:${msg.de}`;
@@ -177,7 +180,7 @@ async function informesAutomaticos() {
     try {
       const { texto } = await generarInforme(c, mes);
       console.log(`[${c.id}] informe de ${mes} generado`);
-      if (c.notificar_a) await enviarTexto(c, c.notificar_a, texto);
+      await avisarDueno(c, texto, `ya está tu informe de ${mes}`);
     } catch (e) {
       console.error(`[${c.id}] no se pudo generar el informe de ${mes}:`, e.message);
     }

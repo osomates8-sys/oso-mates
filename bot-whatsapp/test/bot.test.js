@@ -156,3 +156,62 @@ test("el informe mensual junta uso, pedidos y lo más pedido", async () => {
   assert.match(texto, /plan Temporada/);
   assert.equal(mesAnterior(new Date("2026-01-15T15:00:00Z")), "2025-12");
 });
+
+const { avisarDueno, mensajeDelDueno, limpiarResumen } = await import("../src/avisos.js");
+
+// Simula la API de WhatsApp: guarda lo que se manda y puede responder con error de ventana cerrada.
+function whatsappFalso({ ventanaCerrada = false } = {}) {
+  const enviados = [];
+  const original = globalThis.fetch;
+  globalThis.fetch = async (url, opts) => {
+    const cuerpo = JSON.parse(opts.body);
+    if (ventanaCerrada && cuerpo.type === "text") {
+      return new Response(JSON.stringify({ error: { code: 131047, message: "Re-engagement message" } }), { status: 400 });
+    }
+    enviados.push(cuerpo);
+    return new Response(JSON.stringify({ messages: [{ id: "wamid.x" }] }), { status: 200 });
+  };
+  return { enviados, restaurar: () => (globalThis.fetch = original) };
+}
+
+test("si el dueño no escribió en 24 h, va la plantilla y el detalle queda pendiente", async () => {
+  process.env.WHATSAPP_TOKEN = "t";
+  const c = { ...oso, id: "avisos-1", whatsapp: { phone_number_id: "123" }, notificar_a: "5492230000001" };
+  const wa = whatsappFalso();
+  try {
+    assert.equal(await avisarDueno(c, "🛒 Nuevo pedido\nAna\nTotal: $64.800", "nuevo pedido de Ana por $64.800"), "plantilla");
+    assert.equal(wa.enviados[0].type, "template");
+    assert.equal(wa.enviados[0].template.name, "aviso_dueno");
+    assert.equal(wa.enviados[0].template.components[0].parameters[0].text, "nuevo pedido de Ana por $64.800");
+
+    // El dueño responde: le llega el detalle y desde ahí los avisos van como texto.
+    assert.equal(await mensajeDelDueno(c), 1);
+    assert.equal(wa.enviados[1].type, "text");
+    assert.match(wa.enviados[1].text.body, /Total: \$64\.800/);
+    assert.equal(await avisarDueno(c, "otro aviso"), "texto");
+    assert.equal(wa.enviados[2].type, "text");
+  } finally {
+    wa.restaurar();
+  }
+});
+
+test("si Meta dice que la ventana se cerró, reintenta con la plantilla", async () => {
+  process.env.WHATSAPP_TOKEN = "t";
+  const c = { ...oso, id: "avisos-2", whatsapp: { phone_number_id: "123" }, notificar_a: "5492230000002" };
+  let wa = whatsappFalso();
+  await mensajeDelDueno(c); // ventana abierta según nuestros registros
+  wa.restaurar();
+  wa = whatsappFalso({ ventanaCerrada: true });
+  try {
+    assert.equal(await avisarDueno(c, "aviso", "resumen"), "plantilla");
+    assert.equal(wa.enviados.at(-1).type, "template");
+  } finally {
+    wa.restaurar();
+  }
+});
+
+test("el resumen de la plantilla cumple las reglas de Meta", () => {
+  assert.equal(limpiarResumen("línea 1\nlínea 2\t  fin"), "línea 1 línea 2 fin");
+  assert.equal(limpiarResumen("x".repeat(400)).length, 300);
+  assert.equal(limpiarResumen(""), "hay un aviso nuevo");
+});

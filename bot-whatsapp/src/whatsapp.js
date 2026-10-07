@@ -20,8 +20,35 @@ async function llamar(cliente, cuerpo, desde) {
     headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
     body: JSON.stringify({ messaging_product: "whatsapp", ...cuerpo }),
   });
-  if (!res.ok) throw new Error(`WhatsApp ${res.status}: ${await res.text()}`);
+  if (!res.ok) {
+    const cuerpoError = await res.text();
+    const e = new Error(`WhatsApp ${res.status}: ${cuerpoError}`);
+    try {
+      e.codigo = JSON.parse(cuerpoError).error?.code;
+    } catch {}
+    throw e;
+  }
   return res.json();
+}
+
+// Código de Meta cuando se intenta mandar texto libre a alguien que no escribió en las últimas 24 h.
+export const FUERA_DE_VENTANA = 131047;
+
+// Manda una plantilla aprobada por Meta (las únicas que se pueden mandar fuera de la ventana de 24 h).
+export async function enviarPlantilla(cliente, para, nombre, idioma, parametros = [], desde) {
+  await llamar(
+    cliente,
+    {
+      to: para,
+      type: "template",
+      template: {
+        name: nombre,
+        language: { code: idioma },
+        components: parametros.length ? [{ type: "body", parameters: parametros.map((text) => ({ type: "text", text })) }] : [],
+      },
+    },
+    desde,
+  );
 }
 
 export function partirTexto(texto) {

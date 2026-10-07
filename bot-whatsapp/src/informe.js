@@ -132,8 +132,8 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
   console.log(`${texto}\n\n(guardado en ${archivo})`);
   if (resto.includes("--enviar")) {
     if (!cliente.notificar_a) throw new Error("El negocio no tiene notificar_a configurado.");
-    const { enviarTexto } = await import("./whatsapp.js");
-    await enviarTexto(cliente, cliente.notificar_a, texto);
-    console.log(`Enviado a ${cliente.notificar_a}.`);
+    const { avisarDueno } = await import("./avisos.js");
+    const via = await avisarDueno(cliente, texto, `ya está tu informe de ${mes}`);
+    console.log(via ? `Enviado a ${cliente.notificar_a} (${via === "plantilla" ? "plantilla; el detalle le llega cuando responda" : "texto"}).` : "No se pudo enviar.");
   }
 }
