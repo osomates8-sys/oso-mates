@@ -1,0 +1,144 @@
+{
+  "id": "oso-mates",
+  "nombre": "Oso Mates",
+  "rubro": "Tienda online de mates artesanales tallados a mano",
+  "descripcion": "Emprendimiento de Mar del Plata. Mates de calabaza y de algarrobo trabajados a mano, cada pieza es única (la veta, el color y la forma cambian). Envíos a todo el país.",
+  "nombre_asistente": "Oso",
+  "tono": "Cálido, cercano y argentino (voseo). Como alguien que ama el mate y te ayuda a elegir. Frases cortas, algún emoji con moderación (🧉).",
+  "ubicacion": "Mar del Plata. No hay local a la calle: se puede coordinar retiro en mano en MDP.",
+  "horario_atencion": "Lunes a viernes de 9 a 19 h. El bot atiende 24/7; lo que necesite una persona se responde en ese horario.",
+  "web": "https://osomates.com",
+  "moneda": "ARS",
+
+  "whatsapp": {
+    "phone_number_id": "",
+    "token_env": "WHATSAPP_TOKEN"
+  },
+  "notificar_a": "5492233061168",
+
+  "catalogo": [
+    {
+      "id": "imperial",
+      "nombre": "Mate Imperial (calabaza)",
+      "descripcion": "La tradición en su forma más pura. Calabaza con virola, un sabor único en cada cebada.",
+      "precio": 56000,
+      "precio_transferencia": 50400,
+      "link": "https://osomates.com/mate-imperial.html",
+      "disponible": true
+    },
+    {
+      "id": "imperial-algarrobo",
+      "nombre": "Mate Imperial Algarrobo (madera)",
+      "descripcion": "Porte elegante y tamaño generoso. El preferido de los entendidos. Es el más vendido.",
+      "precio": 55000,
+      "precio_transferencia": 49500,
+      "link": "https://osomates.com/mate-imperial-algarrobo.html",
+      "disponible": true
+    },
+    {
+      "id": "ranchero",
+      "nombre": "Mate Ranchero (madera, premium)",
+      "descripcion": "Para los que van en serio. Grande, noble y con mucha personalidad.",
+      "precio": 62000,
+      "precio_transferencia": 55800,
+      "link": "https://osomates.com/mate-ranchero.html",
+      "disponible": true
+    },
+    {
+      "id": "galleta",
+      "nombre": "Mate Galleta (calabaza)",
+      "descripcion": "Forma redondeada y clásica, perfecta para cebar.",
+      "precio": 35000,
+      "precio_transferencia": 31500,
+      "link": "https://osomates.com/mate-galleta.html",
+      "disponible": true
+    },
+    {
+      "id": "camionero",
+      "nombre": "Mate Camionero (madera de algarrobo)",
+      "descripcion": "El clásico resistente. Forma robusta y cómoda, ideal para el día a día.",
+      "precio": 34000,
+      "precio_transferencia": 30600,
+      "link": "https://osomates.com/mate-camionero.html",
+      "disponible": true
+    },
+    {
+      "id": "criollo",
+      "nombre": "Mate Criollo (calabaza)",
+      "descripcion": "Fiel a sus raíces. El mate de toda la vida hecho con el cuidado de siempre. El más económico.",
+      "precio": 33000,
+      "precio_transferencia": 29700,
+      "link": "https://osomates.com/mate-criollo.html",
+      "disponible": true
+    }
+  ],
+
+  "adicionales": [
+    {
+      "id": "grabado",
+      "nombre": "Grabado personalizado",
+      "precio": 9000,
+      "detalle": "Nombres, fechas o diseños, hasta 20 caracteres. Suma 2 a 3 días hábiles. El diseño se coordina por WhatsApp después del pago."
+    }
+  ],
+
+  "entrega": {
+    "opciones": [
+      {
+        "id": "envio-mdp",
+        "nombre": "Envío en Mar del Plata",
+        "costo": null,
+        "detalle": "Se entrega en el día si se paga antes de las 14 h (con grabado, el día que se termina). Costo a confirmar según zona."
+      },
+      {
+        "id": "retiro-mdp",
+        "nombre": "Retiro en mano en Mar del Plata",
+        "costo": 0,
+        "detalle": "Se coordina día y lugar por WhatsApp."
+      },
+      {
+        "id": "envio-pais",
+        "nombre": "Envío al resto del país",
+        "costo": null,
+        "detalle": "Despacho en 48 h hábiles desde el pago. CABA y GBA 2-3 días, interior 3-7 días hábiles. Se manda número de seguimiento. El costo se confirma según código postal."
+      }
+    ],
+    "envio_gratis_desde": 100000
+  },
+
+  "pagos": {
+    "transferencia": {
+      "descuento_porcentaje": 10,
+      "alias": "",
+      "titular": "",
+      "detalle": "Banco Francés. Si el alias no está cargado, el equipo pasa los datos al confirmar el pedido."
+    },
+    "mercadopago": {
+      "access_token_env": "MP_ACCESS_TOKEN_OSO_MATES"
+    },
+    "otros": "Tarjeta en hasta 3 cuotas con Naranja X."
+  },
+
+  "preguntas_frecuentes": [
+    { "q": "¿Los mates vienen curados?", "a": "No, se entregan sin curar. Con cada mate va una guía con el paso a paso para curarlo fácil. También está en https://osomates.com/guia-como-curar-un-mate.html" },
+    { "q": "¿Cuánto tarda el envío?", "a": "Despachamos en 48 h hábiles desde el pago. CABA y GBA 2-3 días, interior 3-7 días hábiles. En Mar del Plata, en el día." },
+    { "q": "¿Tienen local?", "a": "Somos online, de Mar del Plata. Se puede coordinar retiro en mano en MDP." },
+    { "q": "¿Cada mate es igual a la foto?", "a": "Cada pieza es única: la veta, el color y la forma varían un poco. Esa es la gracia de lo artesanal." },
+    { "q": "¿Calabaza o algarrobo?", "a": "La calabaza es la más tradicional y le da un sabor especial a la yerba. El algarrobo es más resistente y fácil de cuidar. Guía: https://osomates.com/guia-mate-calabaza-vs-algarrobo.html" },
+    { "q": "¿Sirve para regalar?", "a": "¡Sí! Con grabado de nombre o fecha queda un regalo único. Guía: https://osomates.com/guia-que-mate-regalar.html" }
+  ],
+
+  "promociones": [
+    "10% OFF pagando por transferencia (ya está aplicado en el precio de transferencia de cada mate).",
+    "Envío gratis en compras de $100.000 o más.",
+    "Cupón OSO10: 10% de descuento en la web.",
+    "Cyber Oso: 15% OFF del 2 al 4 de noviembre. Black Oso: 15% OFF del 27 al 30 de noviembre.",
+    "Día de la Madre (18 de octubre): sorteo de un combo matero + tatuaje con @gasparsuarez.art. Bases en https://osomates.com/sorteo-dia-de-la-madre.html"
+  ],
+
+  "reglas": [
+    "Si preguntan por bombillas, yerba u otros productos que no están en el catálogo, decí que por ahora te consultás con el equipo y ofrecé derivar.",
+    "No prometas fechas exactas de entrega fuera de lo que dicen las preguntas frecuentes.",
+    "Si el cliente es de Mar del Plata, destacá que la entrega es en el día."
+  ]
+}

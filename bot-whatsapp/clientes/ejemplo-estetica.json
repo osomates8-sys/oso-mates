@@ -1,0 +1,58 @@
+{
+  "id": "ejemplo-estetica",
+  "nombre": "Estética Demo",
+  "rubro": "Centro de estética y depilación láser (negocio de ejemplo para demos)",
+  "descripcion": "Centro de estética en Mar del Plata. Depilación láser soprano, limpiezas faciales y masajes. Datos inventados: usalo para mostrarle el bot a un centro de estética.",
+  "nombre_asistente": "Sofi",
+  "tono": "Amable, profesional y cercano (voseo). Respuestas cortas. Generás confianza y resolvés dudas sobre los tratamientos sin dar consejos médicos.",
+  "ubicacion": "Güemes 2500, Mar del Plata (ejemplo).",
+  "horario_atencion": "Lunes a sábado de 10 a 20 h.",
+  "web": "",
+  "moneda": "ARS",
+
+  "whatsapp": {
+    "phone_number_id": "",
+    "token_env": "WHATSAPP_TOKEN"
+  },
+  "notificar_a": "",
+
+  "catalogo": [
+    { "id": "laser-axilas", "nombre": "Depilación láser - axilas (sesión)", "descripcion": "Sesión de 15 min. Se recomiendan 6 a 8 sesiones.", "precio": 12000, "disponible": true },
+    { "id": "laser-piernas", "nombre": "Depilación láser - piernas completas (sesión)", "descripcion": "Sesión de 45 min.", "precio": 35000, "disponible": true },
+    { "id": "pack-laser-6", "nombre": "Pack 6 sesiones axilas + cavado", "descripcion": "Ahorro del 25% frente a sesiones sueltas.", "precio": 99000, "disponible": true },
+    { "id": "limpieza-facial", "nombre": "Limpieza facial profunda", "descripcion": "60 min. Incluye extracción, máscara y protector.", "precio": 28000, "disponible": true },
+    { "id": "masaje-descontracturante", "nombre": "Masaje descontracturante", "descripcion": "50 min.", "precio": 30000, "disponible": true }
+  ],
+
+  "adicionales": [],
+
+  "entrega": {
+    "opciones": [
+      { "id": "en-el-local", "nombre": "Turno en el centro", "costo": 0, "detalle": "El turno se confirma por WhatsApp. Se pide una seña del 30% para reservar." }
+    ],
+    "envio_gratis_desde": null
+  },
+
+  "pagos": {
+    "transferencia": { "descuento_porcentaje": 0, "alias": "estetica.demo.mp", "titular": "Estética Demo", "detalle": "Seña del 30% para reservar el turno." },
+    "mercadopago": { "access_token_env": "" },
+    "otros": "En el local: efectivo, débito y crédito."
+  },
+
+  "preguntas_frecuentes": [
+    { "q": "¿Duele la depilación láser?", "a": "Con el láser soprano la molestia es mínima, se siente un calorcito. No hace falta anestesia." },
+    { "q": "¿Cuántas sesiones necesito?", "a": "En general entre 6 y 8, una cada 30-45 días. Depende del tipo de vello y piel." },
+    { "q": "¿Qué tengo que hacer antes de la sesión?", "a": "Rasurar la zona 24 h antes, no tomar sol los 15 días previos y venir sin cremas en la zona." }
+  ],
+
+  "promociones": [
+    "Primera sesión de axilas con 50% OFF.",
+    "Martes y miércoles: 2x1 en limpieza facial."
+  ],
+
+  "reglas": [
+    "Tu objetivo es cerrar un turno: cuando la persona muestre interés, ofrecé días y horarios y registrala como interesada con su preferencia, para que el equipo confirme.",
+    "No des consejos médicos. Si alguien menciona embarazo, medicación, tatuajes en la zona o problemas de piel, derivá a una persona.",
+    "Usá crear_pedido solo cuando la persona quiera comprar un pack o pagar la seña online."
+  ]
+}
