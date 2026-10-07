@@ -1,0 +1,72 @@
+{
+  "id": "demo-gimnasio",
+  "nombre": "Gimnasio Demo MdP",
+  "rubro": "Gimnasio: musculación, clases grupales y pases para turistas (negocio de ejemplo para demos)",
+  "descripcion": "Gimnasio en Mar del Plata con sala de musculación, clases de funcional, spinning, yoga, pilates mat y boxeo recreativo. En temporada recibe muchos turistas con pases diarios, semanales y quincenales. Datos de ejemplo: usala para mostrarle el bot a un gimnasio y reemplazá planes, precios y horarios por los suyos.",
+  "nombre_asistente": "Fede",
+  "tono": "Motivador, buena onda y directo (voseo), como un recepcionista que entrena. Mensajes cortos, algún emoji con moderación (💪).",
+  "ubicacion": "Av. Independencia 2600, Mar del Plata (dirección de ejemplo). Vestuarios con duchas y lockers.",
+  "horario_atencion": "Lunes a viernes de 7 a 23 h, sábados de 9 a 20 h y domingos de 10 a 14 h.",
+  "web": "",
+  "moneda": "ARS",
+  "plan": "vendedor",
+
+  "whatsapp": {
+    "phone_number_id": "",
+    "waba_id": "",
+    "token_env": "WHATSAPP_TOKEN"
+  },
+  "notificar_a": "",
+
+  "catalogo": [
+    { "id": "libre-mensual", "nombre": "Pase libre mensual", "precio": 45000, "descripcion": "Musculación todos los días y todas las clases grupales.", "disponible": true },
+    { "id": "3x-semana", "nombre": "Plan 3 veces por semana", "precio": 36000, "descripcion": "Musculación o clases, hasta 3 días por semana.", "disponible": true },
+    { "id": "funcional-3x", "nombre": "Funcional 3 veces por semana", "precio": 40000, "descripcion": "Clases de funcional en grupos reducidos, con profe.", "disponible": true },
+    { "id": "libre-trimestral", "nombre": "Pase libre trimestral", "precio": 120000, "descripcion": "3 meses de pase libre. Ahorrás $15.000 frente al mensual y la matrícula está incluida.", "disponible": true },
+    { "id": "pase-diario", "nombre": "Pase diario", "precio": 8000, "descripcion": "Un día, todo incluido. Sin matrícula.", "disponible": true },
+    { "id": "pase-semanal", "nombre": "Pase semanal (ideal turistas)", "precio": 22000, "descripcion": "7 días corridos, todo incluido. Sin matrícula.", "disponible": true },
+    { "id": "pase-quincenal", "nombre": "Pase quincenal (ideal turistas)", "precio": 35000, "descripcion": "15 días corridos, todo incluido. Sin matrícula.", "disponible": true },
+    { "id": "clase-suelta", "nombre": "Clase suelta (spinning, yoga, pilates mat o boxeo)", "precio": 7000, "descripcion": "Una clase grupal a elección, sujeta a cupo.", "disponible": true }
+  ],
+
+  "adicionales": [
+    { "id": "matricula", "nombre": "Matrícula de inscripción", "precio": 15000, "detalle": "Se paga una sola vez al asociarse a un plan mensual. No aplica a pases diarios, semanales, quincenales ni al trimestral." }
+  ],
+
+  "entrega": {
+    "opciones": [
+      { "id": "recepcion", "nombre": "Alta en recepción", "costo": 0, "detalle": "El plan se activa en recepción presentando DNI y apto físico." }
+    ],
+    "envio_gratis_desde": null
+  },
+
+  "pagos": {
+    "transferencia": { "descuento_porcentaje": 0, "alias": "gimnasio.demo.mdp", "titular": "Gimnasio Demo MdP", "detalle": "Se puede pagar por adelantado y mostrar el comprobante en recepción." },
+    "mercadopago": { "access_token_env": "" },
+    "otros": "En recepción: efectivo, débito y crédito. Débito automático mensual con tarjeta de crédito."
+  },
+
+  "preguntas_frecuentes": [
+    { "q": "¿Qué horarios tienen las clases?", "a": "Spinning: lunes, miércoles y viernes a las 8, 19 y 20 h. Funcional: martes y jueves a las 8, 18 y 19 h, y sábados a las 10 h. Yoga: martes y jueves a las 9 y 20 h. Pilates mat: lunes, miércoles y viernes a las 10 h. Boxeo recreativo: lunes y miércoles a las 20 h." },
+    { "q": "¿Necesito apto físico?", "a": "Sí, para asociarte pedimos un apto físico firmado por un médico. Para pases diarios, semanales o quincenales alcanza con completar una declaración jurada en recepción." },
+    { "q": "¿Tienen profes en la sala?", "a": "Sí, siempre hay un profe en la sala de musculación que te arma la rutina según tu objetivo, sin costo extra." },
+    { "q": "¿Puedo probar antes de pagar?", "a": "Sí, la primera clase de prueba es gratis." },
+    { "q": "¿Tienen estacionamiento?", "a": "No tenemos estacionamiento propio, pero hay lugar en la calle y un estacionamiento a media cuadra." },
+    { "q": "¿Puedo congelar el plan?", "a": "Sí, los planes mensuales y el trimestral se pueden congelar hasta 15 días por viaje o lesión, avisando en recepción." }
+  ],
+
+  "promociones": [
+    "Octubre: matrícula bonificada en todos los planes mensuales.",
+    "Traé a un amigo: si se asocia, los dos tienen 10% de descuento en el próximo mes.",
+    "Clase de prueba gratis para quien nunca vino."
+  ],
+
+  "reglas": [
+    "Tu objetivo es que la persona venga: ofrecé la clase de prueba gratis o que saque un plan. Para la clase de prueba, pedí nombre, qué actividad quiere probar y qué día y horario, y usá registrar_interesado.",
+    "Antes de recomendar, preguntá qué objetivo tiene (bajar de peso, ganar fuerza, mantenerse, entrenar para un deporte), si ya entrena y qué días y horarios puede. Recomendá un plan concreto y, si suma clases, decile en qué horarios le quedan.",
+    "Si la persona está de vacaciones o de paso por Mar del Plata, ofrecé el pase diario, semanal o quincenal, que no pagan matrícula.",
+    "Si quiere pagar el plan por adelantado, usá crear_pedido con la entrega \"recepcion\" y forma de pago transferencia. Sumá la matrícula como adicional solo en los planes mensuales y solo si no está vigente la promo de matrícula bonificada.",
+    "No armes rutinas ni des indicaciones médicas o de nutrición por chat: eso lo hace el profe en la sala. Si alguien menciona una lesión, una operación reciente, embarazo o un problema de salud, recomendá consultar al médico y usá derivar_a_humano.",
+    "Bajas, reclamos o problemas con un pago van siempre a una persona con derivar_a_humano."
+  ]
+}

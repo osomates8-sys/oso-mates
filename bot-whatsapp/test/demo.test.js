@@ -70,7 +70,7 @@ test("alguien sin demo asignada recibe la presentación", async () => {
 });
 
 test("#demo asigna una ficha y el comerciante chatea con su bot", async () => {
-  await webhook("5492230009999", "#demo ejemplo-estetica 5492231234567");
+  await webhook("5492230009999", "#demo demo-estetica 5492231234567");
   await esperar(() => enviados.some((m) => m.para === "5492230009999" && /Estética Demo/.test(m.texto)));
 
   await webhook("5492231234567", "hola, quiero un turno de láser");
@@ -86,7 +86,7 @@ test("#demo asigna una ficha y el comerciante chatea con su bot", async () => {
 test("#demos lista y #fin termina la demo", async () => {
   await webhook("5492230009999", "#demos");
   await esperar(() => enviados.some((m) => /Demos activas/.test(m.texto)));
-  assert.match(enviados.at(-1).texto, /5492231234567: ejemplo-estetica/);
+  assert.match(enviados.at(-1).texto, /5492231234567: demo-estetica/);
 
   await webhook("5492230009999", "#fin 5492231234567");
   await esperar(() => enviados.some((m) => /terminó la demo/.test(m.texto)));
@@ -100,7 +100,7 @@ test("#demos lista y #fin termina la demo", async () => {
 test("una ficha inexistente da un error claro y solo el admin puede usar comandos", async () => {
   await webhook("5492230009999", "#demo no-existe");
   await esperar(() => enviados.some((m) => /No existe la ficha "no-existe"/.test(m.texto)));
-  await webhook("5491100000002", "#demo ejemplo-estetica");
+  await webhook("5491100000002", "#demo demo-estetica");
   await esperar(() => enviados.some((m) => m.para === "5491100000002"));
   assert.match(enviados.filter((m) => m.para === "5491100000002").at(-1).texto, /número de demostración/);
 });

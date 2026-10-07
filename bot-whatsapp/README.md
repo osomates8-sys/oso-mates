@@ -23,7 +23,9 @@ cd bot-whatsapp
 npm install
 cp .env.example .env        # y pegá tu ANTHROPIC_API_KEY
 npm run chat -- oso-mates          # demo con la tienda Oso Mates
-npm run chat -- ejemplo-estetica   # demo con un centro de estética
+npm run chat -- demo-estetica      # demo para centros de estética
+npm run chat -- demo-gimnasio      # demo para gimnasios
+npm run chat -- demo-inmobiliaria  # demo para inmobiliarias
 ```
 
 Escribís como si fueras un cliente y el bot responde igual que lo haría por WhatsApp. Los avisos al dueño aparecen en amarillo. Esta es la demo para mostrarle a un posible cliente: armale su ficha (ver punto 3) y que chatee con su propio bot antes de pagar.
@@ -84,7 +86,7 @@ En la demo el bot muestra todas las funciones (incluidos los audios), y después
 
 ## 3. Sumar un negocio nuevo (un cliente nuevo)
 
-1. Copiá `clientes/oso-mates.json` (venta de productos) o `clientes/ejemplo-estetica.json` (servicios y turnos) con el nombre del negocio, por ejemplo `clientes/inmobiliaria-perez.json`.
+1. Copiá `clientes/oso-mates.json` (venta de productos) o `clientes/demo-estetica.json` (servicios y turnos) con el nombre del negocio, por ejemplo `clientes/inmobiliaria-perez.json`.
 2. Completá:
 
 | Campo | Qué va |

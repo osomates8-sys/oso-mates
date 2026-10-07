@@ -18,7 +18,7 @@ const oso = clientes.get("oso-mates");
 
 test("carga los negocios de ejemplo", () => {
   assert.ok(oso);
-  assert.ok(clientes.get("ejemplo-estetica"));
+  assert.ok(clientes.get("demo-estetica"));
 });
 
 test("el prompt no cambia entre llamadas (para aprovechar la caché)", () => {
@@ -271,4 +271,17 @@ test("ficha demo de inmobiliaria: precios en dólares y en texto", async () => {
   );
   assert.equal(r.error, true);
   assert.match(r.contenido, /registrar_interesado/);
+});
+
+test("fichas demo de gimnasio y estética: pedidos con sus precios", () => {
+  const gym = clientes.get("demo-gimnasio");
+  const r1 = calcularPedido(gym, { items: [{ producto_id: "libre-mensual", cantidad: 1, adicionales: ["matricula"] }], entrega_id: "recepcion", forma_pago: "transferencia" });
+  assert.equal(r1.total, 60000);
+  const r2 = calcularPedido(gym, { items: [{ producto_id: "pase-quincenal", cantidad: 2 }], entrega_id: "recepcion", forma_pago: "transferencia" });
+  assert.equal(r2.total, 70000);
+
+  const est = clientes.get("demo-estetica");
+  const r3 = calcularPedido(est, { items: [{ producto_id: "pack-axilas-cavado", cantidad: 1 }], entrega_id: "turno", forma_pago: "transferencia" });
+  assert.equal(r3.total, 150000);
+  assert.match(armarPrompt(est), /Láser soprano - axilas \(sesión\): \$14\.000/);
 });

@@ -1,0 +1,77 @@
+{
+  "id": "demo-estetica",
+  "nombre": "Estética Demo MdP",
+  "rubro": "Centro de estética: depilación láser, tratamientos faciales y corporales, cejas y pestañas (negocio de ejemplo para demos)",
+  "descripcion": "Centro de estética en Mar del Plata con depilación láser soprano, tratamientos faciales, masajes y servicios de cejas y pestañas. Atiende mujeres y hombres. Datos de ejemplo: usala para mostrarle el bot a un centro de estética y reemplazá los servicios y precios por los suyos.",
+  "nombre_asistente": "Sofi",
+  "tono": "Amable, cercana y profesional (voseo). Genera confianza, explica sin tecnicismos y nunca da consejos médicos. Mensajes cortos, algún emoji con moderación (✨).",
+  "ubicacion": "Güemes 2500, Mar del Plata (dirección de ejemplo).",
+  "horario_atencion": "Lunes a viernes de 9 a 20 h y sábados de 9 a 14 h.",
+  "web": "",
+  "moneda": "ARS",
+  "plan": "vendedor",
+
+  "whatsapp": {
+    "phone_number_id": "",
+    "waba_id": "",
+    "token_env": "WHATSAPP_TOKEN"
+  },
+  "notificar_a": "",
+
+  "catalogo": [
+    { "id": "laser-bozo", "nombre": "Láser soprano - bozo (sesión)", "precio": 9000, "descripcion": "10 min.", "disponible": true },
+    { "id": "laser-axilas", "nombre": "Láser soprano - axilas (sesión)", "precio": 14000, "descripcion": "15 min. Se recomiendan entre 6 y 8 sesiones.", "disponible": true },
+    { "id": "laser-cavado", "nombre": "Láser soprano - cavado completo (sesión)", "precio": 20000, "descripcion": "20 min.", "disponible": true },
+    { "id": "laser-piernas", "nombre": "Láser soprano - piernas completas (sesión)", "precio": 42000, "descripcion": "45 min.", "disponible": true },
+    { "id": "laser-espalda", "nombre": "Láser soprano - espalda completa, hombres (sesión)", "precio": 38000, "descripcion": "40 min.", "disponible": true },
+    { "id": "pack-axilas-cavado", "nombre": "Pack 6 sesiones axilas + cavado", "precio": 150000, "descripcion": "Ahorrás más del 25% frente a sesiones sueltas. Hasta 3 cuotas sin interés con tarjeta en el local.", "disponible": true },
+    { "id": "pack-cuerpo-completo", "nombre": "Pack 6 sesiones cuerpo completo", "precio": 390000, "descripcion": "Piernas, axilas, cavado, bozo y brazos. El pack con más ahorro.", "disponible": true },
+    { "id": "limpieza-facial", "nombre": "Limpieza facial profunda", "precio": 32000, "descripcion": "60 min. Extracción, máscara según tipo de piel y protector solar.", "disponible": true },
+    { "id": "dermaplaning", "nombre": "Dermaplaning", "precio": 30000, "descripcion": "45 min. Exfoliación que deja la piel lisa y luminosa.", "disponible": true },
+    { "id": "peeling", "nombre": "Peeling químico suave", "precio": 35000, "descripcion": "40 min. Para manchas y marcas leves. Requiere evaluación previa sin cargo.", "disponible": true },
+    { "id": "masaje-descontracturante", "nombre": "Masaje descontracturante", "precio": 34000, "descripcion": "50 min.", "disponible": true },
+    { "id": "drenaje-linfatico", "nombre": "Drenaje linfático manual", "precio": 32000, "descripcion": "50 min.", "disponible": true },
+    { "id": "pack-drenaje-10", "nombre": "Pack 10 sesiones de drenaje linfático", "precio": 280000, "descripcion": "Ideal para retención de líquidos. 2 sesiones por semana.", "disponible": true },
+    { "id": "lifting-pestanas", "nombre": "Lifting de pestañas con tinte", "precio": 25000, "descripcion": "60 min. Dura entre 6 y 8 semanas.", "disponible": true },
+    { "id": "perfilado-cejas", "nombre": "Perfilado de cejas", "precio": 12000, "descripcion": "30 min. Con tinte: $16.000.", "disponible": true }
+  ],
+
+  "adicionales": [],
+
+  "entrega": {
+    "opciones": [
+      { "id": "turno", "nombre": "Turno en el centro", "costo": 0, "detalle": "Se reserva con una seña del 30% por transferencia. El turno lo confirma el equipo por este chat." }
+    ],
+    "envio_gratis_desde": null
+  },
+
+  "pagos": {
+    "transferencia": { "descuento_porcentaje": 0, "alias": "estetica.demo.mdp", "titular": "Estética Demo MdP", "detalle": "Seña del 30% para reservar el turno. Los packs se pueden pagar completos por transferencia." },
+    "mercadopago": { "access_token_env": "" },
+    "otros": "En el local: efectivo, débito y crédito. Packs en hasta 3 cuotas sin interés."
+  },
+
+  "preguntas_frecuentes": [
+    { "q": "¿Duele la depilación láser?", "a": "Con el soprano la molestia es mínima: se siente un calorcito. No hace falta anestesia." },
+    { "q": "¿Cuántas sesiones necesito?", "a": "En general entre 6 y 8, una cada 30 a 45 días. Depende del tipo de vello y de piel." },
+    { "q": "¿Qué tengo que hacer antes de la sesión de láser?", "a": "Rasurar la zona 24 h antes, no tomar sol ni usar autobronceante los 15 días previos y venir sin cremas en la zona." },
+    { "q": "¿Sirve en verano?", "a": "Sí, el soprano se puede usar todo el año, siempre que no tomes sol en la zona los días previos y uses protector después." },
+    { "q": "¿Atienden hombres?", "a": "Sí, tenemos láser y tratamientos para hombres." },
+    { "q": "¿Qué pasa si no puedo ir al turno?", "a": "Avisá con 24 h de anticipación y la seña queda para el próximo turno. Sin aviso, la seña se pierde." },
+    { "q": "¿Hacen evaluación antes del tratamiento?", "a": "Sí, la primera evaluación de piel es sin cargo." }
+  ],
+
+  "promociones": [
+    "Primera sesión de láser en axilas con 50% de descuento.",
+    "Martes y miércoles: 2x1 en limpieza facial (para vos y una amiga).",
+    "Gift cards de cualquier servicio para regalar, con 10% de descuento."
+  ],
+
+  "reglas": [
+    "Tu objetivo es reservar un turno. Cuando la persona elige un servicio, pedí su nombre y qué días y horarios le quedan cómodos, y usá registrar_interesado con el servicio y la preferencia. Decile que el equipo confirma el turno y le pasa los datos de la seña.",
+    "Si quiere comprar un pack o pagar la seña en el momento, usá crear_pedido con la entrega \"turno\" y forma de pago transferencia.",
+    "Preguntá antes de recomendar: qué zona o qué quiere mejorar, si ya se hizo láser antes y si busca algo puntual o un tratamiento completo. Si va a hacer varias sesiones, mostrale cuánto ahorra con el pack.",
+    "No des consejos médicos ni diagnósticos. Si alguien menciona embarazo, lactancia, medicación (por ejemplo isotretinoína o anticoagulantes), tatuajes o lunares en la zona, problemas de piel o una enfermedad, usá derivar_a_humano para que lo evalúe una profesional.",
+    "No confirmes horarios disponibles: los confirma el equipo."
+  ]
+}
