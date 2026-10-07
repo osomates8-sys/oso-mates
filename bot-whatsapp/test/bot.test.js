@@ -306,3 +306,64 @@ test("ficha demo de delivery: envío por zona, adicionales y envío gratis", () 
   assert.equal(r2.costoEntrega, 0);
   assert.equal(r2.total, 59000);
 });
+
+const { enviarEvento } = await import("../src/integraciones.js");
+
+test("integraciones: manda pedidos, interesados y derivaciones al webhook del negocio", async () => {
+  const llegaron = [];
+  const original = globalThis.fetch;
+  globalThis.fetch = async (url, opts) => {
+    llegaron.push({ url: String(url), headers: opts.headers, cuerpo: JSON.parse(opts.body) });
+    return new Response("ok");
+  };
+  process.env.CLAVE_TEST = "secreta";
+  try {
+    const c = { ...oso, id: "integra", integraciones: { webhook_url: "https://n8n.ejemplo.test/webhook/abc", clave_env: "CLAVE_TEST" } };
+    const conv = obtenerConversacion("integra", "5496666666666");
+    await ejecutarHerramienta(
+      "crear_pedido",
+      { items: [{ producto_id: "criollo", cantidad: 1 }], nombre_cliente: "Ana", entrega_id: "retiro-mdp", forma_pago: "transferencia" },
+      { cliente: c, conv, notificar: async () => {} },
+    );
+    await ejecutarHerramienta("registrar_interesado", { nombre: "Juan", interes: "mate imperial" }, { cliente: c, conv, notificar: async () => {} });
+    await new Promise((r) => setTimeout(r, 20));
+    assert.equal(llegaron.length, 2);
+    assert.equal(llegaron[0].url, "https://n8n.ejemplo.test/webhook/abc");
+    assert.equal(llegaron[0].headers["X-Mostrador-Clave"], "secreta");
+    assert.equal(llegaron[0].cuerpo.evento, "pedido");
+    assert.equal(llegaron[0].cuerpo.negocio.id, "integra");
+    assert.equal(llegaron[0].cuerpo.datos.total, 29700);
+    assert.equal(llegaron[1].cuerpo.evento, "interesado");
+    assert.equal(llegaron[1].cuerpo.datos.interes, "mate imperial");
+
+    // Solo los eventos elegidos, y sin webhook no se manda nada.
+    llegaron.length = 0;
+    assert.equal(await enviarEvento({ ...c, integraciones: { ...c.integraciones, eventos: ["pedido"] } }, "interesado", {}), false);
+    assert.equal(await enviarEvento(oso, "pedido", {}), false);
+    assert.equal(llegaron.length, 0);
+  } finally {
+    globalThis.fetch = original;
+  }
+});
+
+test("integraciones: si el webhook falla, reintenta una vez y no rompe nada", async () => {
+  let llamadas = 0;
+  const original = globalThis.fetch;
+  globalThis.fetch = async () => {
+    llamadas++;
+    return new Response("error", { status: 500 });
+  };
+  try {
+    const c = { ...oso, integraciones: { webhook_url: "https://n8n.ejemplo.test/webhook/abc" } };
+    assert.equal(await enviarEvento(c, "pedido", { total: 1 }), false);
+    assert.equal(llamadas, 2);
+  } finally {
+    globalThis.fetch = original;
+  }
+});
+
+test("la demo nunca manda datos a la integración real del negocio", async () => {
+  const { clienteDemo } = await import("../src/demo.js");
+  const c = clienteDemo({ ...oso, integraciones: { webhook_url: "https://n8n.ejemplo.test/webhook/abc" } });
+  assert.equal(c.integraciones, undefined);
+});

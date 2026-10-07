@@ -3,6 +3,7 @@
 import crypto from "node:crypto";
 import { agregarLinea, pausar } from "./memoria.js";
 import { linkMercadoPago } from "./pagos.js";
+import { enviarEvento } from "./integraciones.js";
 import { precio } from "./prompt.js";
 
 export const HERRAMIENTAS = [
@@ -150,6 +151,7 @@ async function crearPedido(input, { cliente, conv, notificar }) {
   }
 
   agregarLinea(cliente.id, "pedidos.jsonl", pedido);
+  enviarEvento(cliente, "pedido", { ...pedido, entrega_id: input.entrega_id }); // sin esperar: no demora la respuesta
   await notificar(
     `🛒 Nuevo pedido ${pedido.id}\n${input.nombre_cliente} (wa.me/${conv.telefono})\n${calc.resumen}\nPago: ${input.forma_pago}` +
       (input.direccion ? `\nDirección: ${input.direccion}` : "") +
@@ -161,7 +163,9 @@ async function crearPedido(input, { cliente, conv, notificar }) {
 }
 
 async function registrarInteresado(input, { cliente, conv, notificar }) {
-  agregarLinea(cliente.id, "interesados.jsonl", { fecha: new Date().toISOString(), telefono: conv.telefono, ...input });
+  const interesado = { fecha: new Date().toISOString(), telefono: conv.telefono, ...input };
+  agregarLinea(cliente.id, "interesados.jsonl", interesado);
+  enviarEvento(cliente, "interesado", interesado);
   await notificar(
     `⭐ Nuevo interesado: ${input.nombre || "sin nombre"} (wa.me/${conv.telefono})\nQuiere: ${input.interes}` +
       (input.preferencia ? `\nPrefiere: ${input.preferencia}` : "") +
@@ -173,7 +177,9 @@ async function registrarInteresado(input, { cliente, conv, notificar }) {
 
 async function derivarAHumano(input, { cliente, conv, notificar }) {
   pausar(conv, Number(process.env.HORAS_PAUSA_HUMANO || 12));
-  agregarLinea(cliente.id, "derivaciones.jsonl", { fecha: new Date().toISOString(), telefono: conv.telefono, ...input });
+  const derivacion = { fecha: new Date().toISOString(), telefono: conv.telefono, ...input };
+  agregarLinea(cliente.id, "derivaciones.jsonl", derivacion);
+  enviarEvento(cliente, "derivacion", derivacion);
   await notificar(
     `🙋 Te necesitan en wa.me/${conv.telefono}\nMotivo: ${input.motivo}\nResumen: ${input.resumen}\n` +
       `El bot quedó pausado en esa charla. Para reactivarlo mandá: #bot ${conv.telefono}`,

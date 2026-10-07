@@ -57,6 +57,7 @@ export function clienteDemo(ficha) {
     plan: "temporada",
     whatsapp: { phone_number_id: DEMO.numero, token_env: DEMO.tokenEnv },
     notificar_a: "",
+    integraciones: undefined, // la demo nunca escribe en la planilla o agenda real del negocio
   };
 }
 

@@ -105,6 +105,7 @@ En la demo el bot muestra todas las funciones (incluidos los audios), y después
 | `whatsapp.waba_id` | ID de la cuenta de WhatsApp Business, para registrar la plantilla de avisos. |
 | `whatsapp.token_env` | Variable de `.env` con el token (si el número está en otra cuenta de Meta, usá una variable distinta). |
 | `notificar_a` | WhatsApp del dueño para los avisos (formato `549223...`). |
+| `integraciones` | Opcional: webhook de n8n u otro sistema que recibe pedidos, interesados y derivaciones (ver más abajo). |
 
 3. Probalo con `npm run chat -- <id>` y ajustá la ficha hasta que responda como el dueño quiere.
 4. Reiniciá el servidor.
@@ -122,6 +123,25 @@ Los planes y precios están en `planes.json` (los mismos de la página de venta)
 - **Informe mensual**: resume el uso, los pedidos, lo más pedido, interesados y derivaciones, y le pide a Claude un análisis de las charlas (qué preguntan, por qué se caen ventas, qué no supo responder y sugerencias).
   - Plan Temporada: se genera solo el día 1 y le llega al dueño por WhatsApp.
   - A mano, para cualquier negocio: `npm run informe -- oso-mates 2026-10` (agregá `--enviar` para mandarlo al dueño), o desde el panel: `/admin/informe?clave=TU_CLAVE&cliente=oso-mates&mes=2026-10`.
+
+### Conectar con la planilla, la agenda u otro sistema del negocio (n8n)
+
+El bot puede mandar cada **pedido**, **interesado** y **derivación** a un webhook, por ejemplo de [n8n](https://n8n.io), y desde ahí llevarlo a Google Sheets, Google Calendar, Gmail, Trello o el sistema que use el negocio, sin programar. Está apagado salvo que la ficha lo active:
+
+```json
+"integraciones": {
+  "webhook_url": "https://tu-n8n.com/webhook/pedidos-oso",
+  "clave_env": "N8N_CLAVE_OSO_MATES",
+  "eventos": ["pedido", "interesado", "derivacion"]
+}
+```
+
+- `eventos` es opcional (por defecto, los tres).
+- `clave_env` es opcional: el nombre de una variable de `.env` cuyo valor el bot manda en el encabezado `X-Mostrador-Clave`. En n8n se valida con una credencial **Header Auth** con ese nombre de encabezado, para que nadie más pueda mandarle datos.
+- Lo que llega al webhook (JSON): `evento`, `negocio` (`id` y `nombre`), `fecha` y `datos`. En un pedido, `datos` trae el id del pedido, el cliente, el teléfono, los productos (`lineas`), el `total`, la entrega, la dirección, la forma de pago y las notas. En un interesado, el nombre, qué quiere y su preferencia de horario.
+- Si el webhook no responde, el bot reintenta una vez y sigue atendiendo igual. Las demos con `#demo` nunca lo usan.
+
+Ejemplo en n8n para que los pedidos caigan en una planilla: nodo **Webhook** (método POST, autenticación Header Auth) → nodo **IF** (`evento` es igual a `pedido`) → nodo **Google Sheets** (agregar fila con `datos.id`, `datos.nombre_cliente`, `datos.telefono`, `datos.total`, `datos.entrega`, `datos.direccion`). Para turnos: un **IF** con `evento` = `interesado` → **Google Calendar** o una planilla de turnos.
 
 ## 5. Ponerlo online
 
@@ -152,6 +172,7 @@ src/avisos.js      avisos al dueño: texto o plantilla de Meta según la ventana
 src/plantilla.js   registra la plantilla de avisos en Meta (npm run plantilla)
 src/audio.js       descarga y transcripción de audios (planes que los incluyen)
 src/demo.js        número de demostración y comandos #demo, #demos, #fin
+src/integraciones.js  envío de pedidos, interesados y derivaciones a n8n u otro webhook
 src/informe.js     informe mensual (también se usa desde la terminal)
 planes.json        planes y precios
 src/memoria.js     conversaciones, pedidos e interesados (archivos en data/)
