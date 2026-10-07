@@ -16,7 +16,7 @@ Un solo servidor atiende a **varios negocios**: cada cliente al que le vendés e
 
 ## 1. Probarlo en 2 minutos (sin WhatsApp)
 
-Necesitás Node.js 20.6 o más nuevo y una API key de Claude ([console.anthropic.com](https://console.anthropic.com)).
+Necesitás Node.js 22.9 o más nuevo (la versión LTS de nodejs.org sirve) y una API key de Claude ([console.anthropic.com](https://console.anthropic.com)).
 
 ```bash
 cd bot-whatsapp
