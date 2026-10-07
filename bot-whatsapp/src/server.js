@@ -6,7 +6,7 @@ import path from "node:path";
 import crypto from "node:crypto";
 import Anthropic from "@anthropic-ai/sdk";
 import { cargarClientes, clientePorNumero, numerosDe, MODELO, DIR_DATOS } from "./config.js";
-import { responder } from "./agente.js";
+import { responder, limpiarCachePrompts } from "./agente.js";
 import { obtenerConversacion, estaPausada, pausar, reactivar, leerLineas } from "./memoria.js";
 import { enviarTexto, marcarLeido, firmaValida, extraerMensajes } from "./whatsapp.js";
 import { encolar } from "./cola.js";
@@ -15,6 +15,7 @@ import { puedeTranscribir, audioATexto } from "./audio.js";
 import { sumarAudio } from "./uso.js";
 import { registrarConversacion, resumenUso, planDe, mesDe, PLANES } from "./uso.js";
 import { generarInforme, mesAnterior } from "./informe.js";
+import { DEMO, esNumeroDemo, esAdmin, fichaAsignada, clienteDemo, comandoDemo } from "./demo.js";
 import { precio } from "./prompt.js";
 
 const PUERTO = Number(process.env.PORT || 3000);
@@ -22,7 +23,7 @@ const VERIFY_TOKEN = process.env.WHATSAPP_VERIFY_TOKEN;
 const APP_SECRET = process.env.WHATSAPP_APP_SECRET;
 const ADMIN_CLAVE = process.env.ADMIN_CLAVE;
 
-const clientes = cargarClientes();
+let clientes = cargarClientes();
 const yaVistos = new Set(); // Meta a veces reenvía el mismo mensaje
 
 function soloDigitos(s) {
@@ -52,6 +53,7 @@ async function comandoDelDueno(cliente, texto) {
 }
 
 async function atender(msg) {
+  if (esNumeroDemo(msg.phoneNumberId)) return atenderDemo(msg);
   const cliente = clientePorNumero(clientes, msg.phoneNumberId);
   if (!cliente) {
     console.warn(`Mensaje para un número sin negocio configurado: ${msg.phoneNumberId}`);
@@ -67,15 +69,7 @@ async function atender(msg) {
     if (enviados || msg.texto?.trim() === PLANTILLA.boton) return;
   }
 
-  // Audios: en los planes que los incluyen se pasan a texto; si no, el bot pide que lo escriban.
-  let entrada = msg.texto;
-  if (msg.audioId && puedeTranscribir(cliente)) {
-    const transcripto = await audioATexto(cliente, msg.audioId);
-    if (transcripto) {
-      entrada = transcripto;
-      sumarAudio(cliente.id);
-    }
-  }
+  const entrada = await textoDeEntrada(cliente, msg);
 
   const clave = `${cliente.id}:${msg.de}`;
   encolar(clave, entrada, async (texto) => {
@@ -85,20 +79,81 @@ async function atender(msg) {
       return;
     }
     await registrarConversacion(cliente, conv, notificadorDe(cliente));
-    let respuesta;
-    try {
-      respuesta = await responder({ cliente, conv, texto, notificar: notificadorDe(cliente) });
-    } catch (e) {
-      if (e instanceof Anthropic.RateLimitError || e instanceof Anthropic.InternalServerError) {
-        console.error(`[${cliente.id}] Claude no disponible:`, e.message);
-      } else if (e instanceof Anthropic.APIError) {
-        console.error(`[${cliente.id}] error de Claude ${e.status}:`, e.message);
-      } else {
-        console.error(`[${cliente.id}] error:`, e);
-      }
-      respuesta = "Perdón, tuve un problema para responderte. ¿Me lo repetís en un ratito? 🙏";
-    }
+    const respuesta = await responderSeguro(cliente, conv, texto, notificadorDe(cliente));
     await enviarTexto(cliente, msg.de, respuesta, msg.phoneNumberId);
+  });
+}
+
+// Le pide la respuesta al vendedor; si Claude falla, devuelve un mensaje amable.
+async function responderSeguro(cliente, conv, texto, notificar) {
+  try {
+    return await responder({ cliente, conv, texto, notificar });
+  } catch (e) {
+    if (e instanceof Anthropic.RateLimitError || e instanceof Anthropic.InternalServerError) {
+      console.error(`[${cliente.id}] Claude no disponible:`, e.message);
+    } else if (e instanceof Anthropic.APIError) {
+      console.error(`[${cliente.id}] error de Claude ${e.status}:`, e.message);
+    } else {
+      console.error(`[${cliente.id}] error:`, e);
+    }
+    return "Perdón, tuve un problema para responderte. ¿Me lo repetís en un ratito? 🙏";
+  }
+}
+
+// Audios: en los planes que los incluyen se pasan a texto; si no, queda el aviso para que el bot pida que lo escriban.
+async function textoDeEntrada(cliente, msg, contar = true) {
+  if (!msg.audioId || !puedeTranscribir(cliente)) return msg.texto;
+  const transcripto = await audioATexto(cliente, msg.audioId);
+  if (!transcripto) return msg.texto;
+  if (contar) sumarAudio(cliente.id);
+  return transcripto;
+}
+
+// --- Número de demostración (#demo) ---
+
+async function atenderDemo(msg) {
+  const remitente = { id: "_demo", whatsapp: { phone_number_id: DEMO.numero, token_env: DEMO.tokenEnv } };
+  marcarLeido(remitente, msg.id, msg.phoneNumberId);
+
+  if (esAdmin(msg.de) && msg.texto?.trim().startsWith("#")) {
+    // Se recargan las fichas: una ficha nueva sirve para demo sin reiniciar el servidor.
+    clientes = cargarClientes();
+    limpiarCachePrompts();
+    const respuesta = comandoDemo(msg.texto, clientes);
+    const m = /^#demo\s+(\S+)\s*(.*)$/i.exec(msg.texto.trim());
+    if (m && clientes.has(m[1])) {
+      // Cada demo arranca con la charla vacía.
+      const conv = obtenerConversacion(`_demo/${m[1]}`, soloDigitos(m[2]) || DEMO.admin);
+      conv.mensajes = [];
+      reactivar(conv);
+    }
+    await enviarTexto(remitente, msg.de, respuesta, msg.phoneNumberId);
+    return;
+  }
+
+  const ficha = clientes.get(fichaAsignada(msg.de));
+  if (!ficha) {
+    await enviarTexto(
+      remitente,
+      msg.de,
+      "¡Hola! Este es el número de demostración de Mostrador, el vendedor con IA para WhatsApp. Para probar un bot armado con los productos de tu negocio, pedí tu demo y te lo activamos. 🙌",
+      msg.phoneNumberId,
+    );
+    return;
+  }
+
+  const cliente = clienteDemo(ficha);
+  const entrada = await textoDeEntrada(cliente, msg, false);
+  encolar(`${cliente.id}:${msg.de}`, entrada, async (texto) => {
+    const conv = obtenerConversacion(cliente.id, msg.de);
+    reactivar(conv); // en la demo el bot sigue respondiendo aunque haya derivado a una persona
+    // En la demo, el comerciante ve también los avisos que le llegarían como dueño.
+    const avisos = [];
+    const respuesta = await responderSeguro(cliente, conv, texto, async (aviso) => avisos.push(aviso));
+    await enviarTexto(cliente, msg.de, respuesta, msg.phoneNumberId);
+    for (const aviso of avisos) {
+      await enviarTexto(cliente, msg.de, `📲 *Así te llegaría este aviso a vos, como dueño:*\n\n${aviso}`, msg.phoneNumberId);
+    }
   });
 }
 
@@ -267,6 +322,7 @@ servidor.listen(PUERTO, () => {
     else if (nums.length > plan.numeros) console.warn(`    ${c.id}: tiene ${nums.length} números y su plan incluye ${plan.numeros}.`);
   }
   if (!ADMIN_CLAVE) console.warn("Sin ADMIN_CLAVE: el panel /admin está desactivado.");
+  if (DEMO.numero) console.log(`Número de demo: ${DEMO.numero} (comandos desde ${DEMO.admin || "FALTA ADMIN_WHATSAPP"})`);
   if (process.env.INFORMES_AUTOMATICOS !== "0") {
     informesAutomaticos();
     setInterval(informesAutomaticos, 3600_000).unref();
@@ -274,3 +330,4 @@ servidor.listen(PUERTO, () => {
   if (!VERIFY_TOKEN) console.warn("Falta WHATSAPP_VERIFY_TOKEN: Meta no va a poder verificar el webhook.");
   if (!APP_SECRET) console.warn("Falta WHATSAPP_APP_SECRET: se rechazan todos los mensajes (para pruebas locales, PERMITIR_SIN_FIRMA=1).");
 });
+export { servidor };

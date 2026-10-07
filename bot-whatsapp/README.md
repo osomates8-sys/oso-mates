@@ -67,6 +67,21 @@ Para registrarla (una vez por cada cuenta de WhatsApp Business):
 
 Las plantillas de utilidad tienen un costo por mensaje que cobra Meta; con este sistema solo se usan cuando el dueño no escribió en el último día.
 
+### Número de demostración (`#demo`)
+
+Un número aparte para que cada comerciante pruebe su bot desde su celular antes de pagar. Sirve el número de prueba gratuito de Meta.
+
+1. En `.env`: `DEMO_PHONE_NUMBER_ID` (el Phone number ID de ese número) y `ADMIN_WHATSAPP` (tu WhatsApp).
+2. Armá la ficha del comerciante en `clientes/` (punto 3). No hace falta reiniciar: las fichas se recargan con cada comando.
+3. Desde tu WhatsApp, escribile al número de demo:
+   - `#demo estetica-sofi 5492231234567`: ese teléfono prueba el bot de esa ficha durante 7 días.
+   - `#demo estetica-sofi`: lo probás vos primero.
+   - `#demos`: lista las demos activas.
+   - `#fin 5492231234567`: termina una demo.
+4. Pedile al comerciante que le escriba "hola" al número de demo. Si es el número de prueba de Meta, antes agregá su teléfono como destinatario de prueba (Meta deja hasta 5).
+
+En la demo el bot muestra todas las funciones (incluidos los audios), y después de cada respuesta el comerciante ve el aviso que le llegaría como dueño. Las charlas de demo se guardan aparte y no cuentan para ningún plan. Quien escriba sin demo asignada recibe una presentación corta.
+
 ## 3. Sumar un negocio nuevo (un cliente nuevo)
 
 1. Copiá `clientes/oso-mates.json` (venta de productos) o `clientes/ejemplo-estetica.json` (servicios y turnos) con el nombre del negocio, por ejemplo `clientes/inmobiliaria-perez.json`.
@@ -132,6 +147,7 @@ src/uso.js         conteo de conversaciones por plan y avisos de límite
 src/avisos.js      avisos al dueño: texto o plantilla de Meta según la ventana de 24 h
 src/plantilla.js   registra la plantilla de avisos en Meta (npm run plantilla)
 src/audio.js       descarga y transcripción de audios (planes que los incluyen)
+src/demo.js        número de demostración y comandos #demo, #demos, #fin
 src/informe.js     informe mensual (también se usa desde la terminal)
 planes.json        planes y precios
 src/memoria.js     conversaciones, pedidos e interesados (archivos en data/)
