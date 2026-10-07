@@ -104,7 +104,8 @@ export function extraerMensajes(aviso) {
         } else {
           texto = `(mandó un mensaje de tipo ${m.type} que no se puede leer)`;
         }
-        salida.push({ phoneNumberId, de: m.from, id: m.id, texto, nombre: v.contacts?.[0]?.profile?.name });
+        const audioId = m.type === "audio" ? m.audio?.id : undefined;
+        salida.push({ phoneNumberId, de: m.from, id: m.id, texto, audioId, nombre: v.contacts?.[0]?.profile?.name });
       }
     }
   }

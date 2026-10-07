@@ -8,6 +8,7 @@ Un vendedor con IA que atiende el WhatsApp de un negocio las 24 horas:
 - **Junta interesados**: si alguien quiere un turno, una visita o que lo llamen, lo registra para que el equipo lo contacte.
 - **Deriva a una persona** ante reclamos o preguntas que no puede resolver, y se queda callado en esa charla.
 - **Avisa al dueño por WhatsApp** de cada pedido, interesado o derivación.
+- **Entiende audios** (plan Temporada): los pasa a texto y responde como si fueran escritos.
 
 Un solo servidor atiende a **varios negocios**: cada cliente al que le vendés el bot es un archivo en `clientes/`.
 
@@ -98,6 +99,7 @@ Los planes y precios están en `planes.json` (los mismos de la página de venta)
 - **Conteo de conversaciones**: una conversación son todos los mensajes con un mismo cliente dentro de 24 horas. Se cuentan por mes en `data/<negocio>/uso/AAAA-MM.json`. Las pruebas con `npm run chat` no cuentan.
 - **Avisos al dueño**: cuando llega al 80% y al 100% de su plan le llega un WhatsApp. El bot nunca se corta: lo que pasa del límite se cobra como conversación extra.
 - **Panel para vos**: con `ADMIN_CLAVE` en `.env`, entrá a `https://TU-SERVIDOR/admin?clave=TU_CLAVE` y vas a ver, por negocio, conversaciones usadas, extras, abono, total a cobrar y pedidos que cerró el bot. Para otro mes agregá `&mes=2026-10`.
+- **Audios**: solo en los planes con `"audios": true` (hoy, Temporada). El bot descarga el audio de WhatsApp, lo transcribe y responde. Hace falta `TRANSCRIPCION_API_KEY` (por defecto OpenAI Whisper; con `TRANSCRIPCION_URL` y `TRANSCRIPCION_MODELO` podés usar Groq u otro servicio compatible, que suele ser más barato). En los otros planes, o si la transcripción falla, el bot pide que lo escriban. Los audios del mes aparecen en el panel y en el informe. Para probar: en `npm run chat` escribí `/audio ruta/al/audio.ogg`.
 - **Informe mensual**: resume el uso, los pedidos, lo más pedido, interesados y derivaciones, y le pide a Claude un análisis de las charlas (qué preguntan, por qué se caen ventas, qué no supo responder y sugerencias).
   - Plan Temporada: se genera solo el día 1 y le llega al dueño por WhatsApp.
   - A mano, para cualquier negocio: `npm run informe -- oso-mates 2026-10` (agregá `--enviar` para mandarlo al dueño), o desde el panel: `/admin/informe?clave=TU_CLAVE&cliente=oso-mates&mes=2026-10`.
@@ -129,6 +131,7 @@ src/pagos.js       links de Mercado Pago
 src/uso.js         conteo de conversaciones por plan y avisos de límite
 src/avisos.js      avisos al dueño: texto o plantilla de Meta según la ventana de 24 h
 src/plantilla.js   registra la plantilla de avisos en Meta (npm run plantilla)
+src/audio.js       descarga y transcripción de audios (planes que los incluyen)
 src/informe.js     informe mensual (también se usa desde la terminal)
 planes.json        planes y precios
 src/memoria.js     conversaciones, pedidos e interesados (archivos en data/)

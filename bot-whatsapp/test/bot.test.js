@@ -215,3 +215,45 @@ test("el resumen de la plantilla cumple las reglas de Meta", () => {
   assert.equal(limpiarResumen("x".repeat(400)).length, 300);
   assert.equal(limpiarResumen(""), "hay un aviso nuevo");
 });
+
+const { puedeTranscribir, audioATexto } = await import("../src/audio.js");
+
+test("los audios se transcriben solo en el plan que los incluye", () => {
+  process.env.TRANSCRIPCION_API_KEY = "k";
+  assert.equal(puedeTranscribir({ ...oso, plan: "temporada" }), true);
+  assert.equal(puedeTranscribir({ ...oso, plan: "vendedor" }), false);
+  assert.equal(puedeTranscribir({ ...oso, plan: "inicial" }), false);
+  delete process.env.TRANSCRIPCION_API_KEY;
+  assert.equal(puedeTranscribir({ ...oso, plan: "temporada" }), false);
+});
+
+test("descarga el audio de WhatsApp y lo pasa a texto", async () => {
+  process.env.WHATSAPP_TOKEN = "t";
+  process.env.TRANSCRIPCION_API_KEY = "k";
+  const pedidos = [];
+  const original = globalThis.fetch;
+  globalThis.fetch = async (url, opts = {}) => {
+    pedidos.push(String(url));
+    if (String(url).endsWith("/media123")) return Response.json({ url: "https://lookaside.fbsbx.com/audio", mime_type: "audio/ogg; codecs=opus", file_size: 1000 });
+    if (String(url).includes("lookaside")) return new Response(new Uint8Array([1, 2, 3]));
+    if (String(url).includes("transcriptions")) {
+      assert.ok(opts.body instanceof FormData);
+      assert.equal(opts.body.get("language"), "es");
+      return Response.json({ text: "Hola, ¿tenés el ranchero?" });
+    }
+    return new Response("no", { status: 404 });
+  };
+  try {
+    const texto = await audioATexto({ ...oso, plan: "temporada", whatsapp: { phone_number_id: "1" } }, "media123");
+    assert.equal(texto, "(audio transcripto) Hola, ¿tenés el ranchero?");
+    assert.equal(pedidos.length, 3);
+  } finally {
+    globalThis.fetch = original;
+    delete process.env.TRANSCRIPCION_API_KEY;
+  }
+});
+
+test("el webhook trae el id del audio", () => {
+  const m = extraerMensajes({ entry: [{ changes: [{ value: { metadata: { phone_number_id: "1" }, messages: [{ from: "549", id: "w", type: "audio", audio: { id: "media123", voice: true } }] } }] }] });
+  assert.equal(m[0].audioId, "media123");
+});

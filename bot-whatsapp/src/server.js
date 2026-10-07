@@ -11,6 +11,8 @@ import { obtenerConversacion, estaPausada, pausar, reactivar, leerLineas } from 
 import { enviarTexto, marcarLeido, firmaValida, extraerMensajes } from "./whatsapp.js";
 import { encolar } from "./cola.js";
 import { avisarDueno, mensajeDelDueno, PLANTILLA } from "./avisos.js";
+import { puedeTranscribir, audioATexto } from "./audio.js";
+import { sumarAudio } from "./uso.js";
 import { registrarConversacion, resumenUso, planDe, mesDe, PLANES } from "./uso.js";
 import { generarInforme, mesAnterior } from "./informe.js";
 import { precio } from "./prompt.js";
@@ -65,8 +67,18 @@ async function atender(msg) {
     if (enviados || msg.texto?.trim() === PLANTILLA.boton) return;
   }
 
+  // Audios: en los planes que los incluyen se pasan a texto; si no, el bot pide que lo escriban.
+  let entrada = msg.texto;
+  if (msg.audioId && puedeTranscribir(cliente)) {
+    const transcripto = await audioATexto(cliente, msg.audioId);
+    if (transcripto) {
+      entrada = transcripto;
+      sumarAudio(cliente.id);
+    }
+  }
+
   const clave = `${cliente.id}:${msg.de}`;
-  encolar(clave, msg.texto, async (texto) => {
+  encolar(clave, entrada, async (texto) => {
     const conv = obtenerConversacion(cliente.id, msg.de);
     if (estaPausada(conv)) {
       console.log(`[${cliente.id}] ${msg.de}: charla en pausa, la atiende una persona`);
@@ -127,7 +139,7 @@ function panelHtml(mes) {
     const pct = u.limite ? Math.round((u.conversaciones / u.limite) * 100) : 0;
     return `<tr><td>${esc(c.nombre)}<small>${esc(c.id)}</small></td><td>${esc(u.plan)}</td>
       <td class="n">${u.conversaciones}${u.limite != null ? ` / ${u.limite}` : ""}<small>${pct}%</small></td>
-      <td class="n">${u.extras}</td><td class="n">${precio(u.abono)}</td><td class="n">${precio(u.montoExtras)}</td>
+      <td class="n">${u.extras}</td><td class="n">${u.audios}</td><td class="n">${precio(u.abono)}</td><td class="n">${precio(u.montoExtras)}</td>
       <td class="n"><b>${precio(u.abono + u.montoExtras)}</b></td><td class="n">${pedidos.length}<small>${precio(vendido)}</small></td></tr>`;
   });
   return `<!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
@@ -137,7 +149,7 @@ th,td{padding:10px 12px;border-bottom:1px solid #d3dddb;text-align:left;vertical
 .n{text-align:right;font-variant-numeric:tabular-nums}small{display:block;color:#4e6168;font-size:12px}.wrap{overflow-x:auto}</style>
 <h1>Negocios — ${esc(mes)}</h1>
 <p>Conversación extra: ${precio(PLANES.precio_conversacion_extra)}. Cambiá de mes con <code>?mes=AAAA-MM</code>.</p>
-<div class="wrap"><table><tr><th>Negocio</th><th>Plan</th><th class="n">Conversaciones</th><th class="n">Extras</th><th class="n">Abono</th><th class="n">Extras $</th><th class="n">A cobrar</th><th class="n">Pedidos del bot</th></tr>
+<div class="wrap"><table><tr><th>Negocio</th><th>Plan</th><th class="n">Conversaciones</th><th class="n">Extras</th><th class="n">Audios</th><th class="n">Abono</th><th class="n">Extras $</th><th class="n">A cobrar</th><th class="n">Pedidos del bot</th></tr>
 ${filas.join("")}</table></div>`;
 }
 

@@ -97,6 +97,7 @@ export async function generarInforme(cliente, mes = mesAnterior(), { analizarCha
     `*Uso del plan ${u.plan}*`,
     `- Conversaciones: ${u.conversaciones}${u.limite != null ? ` de ${u.limite}` : ""}`,
     ...(u.extras ? [`- Conversaciones extra: ${u.extras} (${precio(u.montoExtras, m)})`] : []),
+    ...(u.audios ? [`- Audios que el bot escuchó y respondió: ${u.audios}`] : []),
     `- Clientes distintos que escribieron: ${est.clientesUnicos}`,
     "",
     "*Resultados*",

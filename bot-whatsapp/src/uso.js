@@ -40,9 +40,16 @@ function guardarUso(clienteId, mes, uso) {
   fs.writeFileSync(archivo, JSON.stringify(uso));
 }
 
+// Lleva la cuenta de audios transcriptos del mes (tienen un costo aparte de transcripción).
+export function sumarAudio(clienteId, mes = mesDe()) {
+  const uso = leerUso(clienteId, mes);
+  uso.audios = (uso.audios || 0) + 1;
+  guardarUso(clienteId, mes, uso);
+}
+
 export function resumenUso(cliente, mes = mesDe()) {
   const plan = planDe(cliente);
-  const { conversaciones } = leerUso(cliente.id, mes);
+  const { conversaciones, audios = 0 } = leerUso(cliente.id, mes);
   const limite = plan?.conversaciones ?? null;
   const extras = limite == null ? 0 : Math.max(0, conversaciones - limite);
   return {
@@ -51,6 +58,7 @@ export function resumenUso(cliente, mes = mesDe()) {
     abono: plan?.precio ?? 0,
     limite,
     conversaciones,
+    audios,
     extras,
     montoExtras: extras * PLANES.precio_conversacion_extra,
   };

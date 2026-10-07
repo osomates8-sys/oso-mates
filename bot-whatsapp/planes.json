@@ -3,8 +3,8 @@
   "precio_alta": 180000,
   "precio_conversacion_extra": 300,
   "planes": {
-    "inicial": { "nombre": "Inicial", "precio": 79000, "conversaciones": 150, "numeros": 1, "informe": false },
-    "vendedor": { "nombre": "Vendedor", "precio": 139000, "conversaciones": 400, "numeros": 1, "informe": false },
-    "temporada": { "nombre": "Temporada", "precio": 219000, "conversaciones": 1000, "numeros": 3, "informe": true }
+    "inicial": { "nombre": "Inicial", "precio": 79000, "conversaciones": 150, "numeros": 1, "informe": false, "audios": false },
+    "vendedor": { "nombre": "Vendedor", "precio": 139000, "conversaciones": 400, "numeros": 1, "informe": false, "audios": false },
+    "temporada": { "nombre": "Temporada", "precio": 219000, "conversaciones": 1000, "numeros": 3, "informe": true, "audios": true }
   }
 }

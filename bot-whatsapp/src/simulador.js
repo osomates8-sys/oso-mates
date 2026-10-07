@@ -24,7 +24,7 @@ conv.mensajes = [];
 reactivar(conv);
 
 console.log(`\nChateando con el bot de ${cliente.nombre}. Escribí como un cliente.`);
-console.log("Comandos: /nuevo (empezar de cero), /salir\n");
+console.log("Comandos: /audio archivo.ogg (mandar un audio), /nuevo (empezar de cero), /salir\n");
 
 const rl = readline.createInterface({ input: stdin, output: stdout });
 const notificar = async (texto) => console.log(`\n\x1b[33m📲 Aviso al dueño:\n${texto}\x1b[0m\n`);
@@ -39,13 +39,26 @@ while (true) {
     console.log("(conversación nueva)\n");
     continue;
   }
+  let mensaje = texto;
+  if (texto.startsWith("/audio ")) {
+    const { transcribir } = await import("./audio.js");
+    const fs = await import("node:fs");
+    try {
+      const ruta = texto.slice(7).trim();
+      mensaje = `(audio transcripto) ${await transcribir(fs.readFileSync(ruta), ruta.endsWith(".mp3") ? "audio/mpeg" : "audio/ogg")}`;
+      console.log(`\x1b[2m${mensaje}\x1b[0m`);
+    } catch (e) {
+      console.error("No se pudo transcribir:", e.message, "(¿cargaste TRANSCRIPCION_API_KEY?)\n");
+      continue;
+    }
+  }
   if (estaPausada(conv)) {
     console.log("(el bot está en pausa: lo atendería una persona. /nuevo para reiniciar)\n");
     continue;
   }
   try {
     const inicio = Date.now();
-    const respuesta = await responder({ cliente, conv, texto, notificar });
+    const respuesta = await responder({ cliente, conv, texto: mensaje, notificar });
     console.log(`\x1b[32m${cliente.nombre_asistente || "Bot"}:\x1b[0m ${respuesta}  \x1b[2m(${((Date.now() - inicio) / 1000).toFixed(1)} s)\x1b[0m\n`);
   } catch (e) {
     console.error("Error:", e.message, "\n");
