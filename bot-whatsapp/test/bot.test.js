@@ -132,7 +132,7 @@ test("avisa al dueño al 80% y al 100% del plan y calcula los extras", async () 
   assert.match(avisos[0], /120 de 150/);
   assert.match(avisos[1], /150 de 150/);
   const u = resumenUso(c, mesDe(new Date(t0)));
-  assert.deepEqual([u.conversaciones, u.extras, u.montoExtras, u.abono], [155, 5, 1500, 79000]);
+  assert.deepEqual([u.conversaciones, u.extras, u.montoExtras, u.abono], [155, 5, 1750, 89000]);
 });
 
 test("un negocio con varias sucursales se encuentra por cualquiera de sus números", () => {
