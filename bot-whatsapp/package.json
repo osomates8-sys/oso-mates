@@ -1,0 +1,16 @@
+{
+  "name": "bot-whatsapp",
+  "version": "1.0.0",
+  "description": "Vendedor por WhatsApp con IA: responde, asesora y cierra ventas. Configurable por negocio.",
+  "type": "module",
+  "private": true,
+  "engines": { "node": ">=20.6" },
+  "scripts": {
+    "start": "node --env-file-if-exists=.env src/server.js",
+    "chat": "node --env-file-if-exists=.env src/simulador.js",
+    "test": "node --test"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.131.0"
+  }
+}
