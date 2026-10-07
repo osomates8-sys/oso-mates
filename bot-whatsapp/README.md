@@ -27,6 +27,7 @@ npm run chat -- demo-estetica      # demo para centros de estética
 npm run chat -- demo-gimnasio      # demo para gimnasios
 npm run chat -- demo-inmobiliaria  # demo para inmobiliarias
 npm run chat -- demo-concesionaria # demo para concesionarias de usados
+npm run chat -- demo-delivery      # demo para pizzerías y delivery
 ```
 
 Escribís como si fueras un cliente y el bot responde igual que lo haría por WhatsApp. Los avisos al dueño aparecen en amarillo. Esta es la demo para mostrarle a un posible cliente: armale su ficha (ver punto 3) y que chatee con su propio bot antes de pagar.

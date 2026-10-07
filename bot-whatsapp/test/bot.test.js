@@ -292,3 +292,17 @@ test("ficha demo de concesionaria: carga y muestra el stock en dólares", () => 
   assert.match(prompt, /\[corolla-2020\] Toyota Corolla 2\.0 XEI CVT 2020: USD 22\.000/);
   assert.match(prompt, /Financiamos hasta el 50%/);
 });
+
+test("ficha demo de delivery: envío por zona, adicionales y envío gratis", () => {
+  const pz = clientes.get("demo-delivery");
+  const r1 = calcularPedido(pz, {
+    items: [{ producto_id: "muzza", cantidad: 1, adicionales: ["extra-muzza"] }, { producto_id: "gaseosa", cantidad: 1 }],
+    entrega_id: "delivery-zona-2",
+    forma_pago: "otro",
+  });
+  assert.equal(r1.subtotal, 23000);
+  assert.equal(r1.total, 26500);
+  const r2 = calcularPedido(pz, { items: [{ producto_id: "empanadas-docena", cantidad: 2 }, { producto_id: "especial", cantidad: 1 }], entrega_id: "delivery-zona-1", forma_pago: "transferencia" });
+  assert.equal(r2.costoEntrega, 0);
+  assert.equal(r2.total, 59000);
+});

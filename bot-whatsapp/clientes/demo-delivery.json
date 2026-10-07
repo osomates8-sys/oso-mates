@@ -1,0 +1,83 @@
+{
+  "id": "demo-delivery",
+  "nombre": "Pizzería Demo MdP",
+  "rubro": "Pizzería y hamburguesería con delivery y retiro (negocio de ejemplo para demos)",
+  "descripcion": "Pizzas, empanadas y hamburguesas con delivery por zonas en Mar del Plata y retiro en el local. Datos de ejemplo: usala para mostrarle el bot a un delivery y reemplazá el menú y los precios por los suyos.",
+  "nombre_asistente": "Pepe",
+  "tono": "Rápido, simpático y canchero (voseo). Mensajes muy cortos, como quien toma pedidos un sábado a la noche. Algún emoji con moderación (🍕).",
+  "ubicacion": "Local en Av. Juan B. Justo 2000, Mar del Plata (dirección de ejemplo). Se puede retirar en el local.",
+  "horario_atencion": "Todos los días de 19:30 a 00:30 h; viernes y sábados hasta la 1:30 h.",
+  "web": "",
+  "moneda": "ARS",
+  "plan": "vendedor",
+
+  "whatsapp": {
+    "phone_number_id": "",
+    "waba_id": "",
+    "token_env": "WHATSAPP_TOKEN"
+  },
+  "notificar_a": "",
+
+  "catalogo": [
+    { "id": "muzza", "nombre": "Pizza muzzarella grande (8 porciones)", "precio": 16000, "disponible": true },
+    { "id": "especial", "nombre": "Pizza especial grande (jamón, morrón y huevo)", "precio": 19000, "disponible": true },
+    { "id": "fugazzeta", "nombre": "Pizza fugazzeta grande", "precio": 18500, "disponible": true },
+    { "id": "napolitana", "nombre": "Pizza napolitana grande (tomate, ajo y albahaca)", "precio": 18500, "disponible": true },
+    { "id": "calabresa", "nombre": "Pizza calabresa grande", "precio": 19500, "disponible": true },
+    { "id": "promo-2-muzzas", "nombre": "PROMO 2 pizzas muzzarella grandes (solo martes y miércoles)", "precio": 28000, "disponible": true },
+    { "id": "empanadas-media", "nombre": "Media docena de empanadas", "precio": 11000, "descripcion": "Gustos: carne cortada a cuchillo, pollo, jamón y queso, humita, caprese. Se pueden mezclar.", "disponible": true },
+    { "id": "empanadas-docena", "nombre": "Docena de empanadas", "precio": 20000, "descripcion": "Mismos gustos que la media docena, se pueden mezclar.", "disponible": true },
+    { "id": "burger-clasica", "nombre": "Hamburguesa clásica con papas", "precio": 14500, "descripcion": "Medallón de 180 g, lechuga, tomate y queso.", "disponible": true },
+    { "id": "burger-doble-cheddar", "nombre": "Hamburguesa doble cheddar con papas", "precio": 17500, "descripcion": "Doble medallón, doble cheddar y cebolla caramelizada.", "disponible": true },
+    { "id": "papas", "nombre": "Porción de papas fritas", "precio": 7000, "disponible": true },
+    { "id": "gaseosa", "nombre": "Gaseosa 1,5 L (Coca-Cola, Sprite o Fanta)", "precio": 4500, "disponible": true },
+    { "id": "cerveza", "nombre": "Cerveza en lata 473 ml", "precio": 3500, "descripcion": "Solo para mayores de 18 años.", "disponible": true }
+  ],
+
+  "adicionales": [
+    { "id": "extra-muzza", "nombre": "Extra muzzarella", "precio": 2500, "detalle": "Para cualquier pizza." },
+    { "id": "extra-cheddar", "nombre": "Extra cheddar", "precio": 1500, "detalle": "Para hamburguesas o papas." },
+    { "id": "bacon", "nombre": "Agregado de bacon", "precio": 2000, "detalle": "Para hamburguesas o papas." }
+  ],
+
+  "entrega": {
+    "opciones": [
+      { "id": "delivery-zona-1", "nombre": "Delivery zona 1 (Centro, Güemes, La Perla, Plaza Mitre)", "costo": 2500, "detalle": "Demora estimada de 40 a 60 minutos." },
+      { "id": "delivery-zona-2", "nombre": "Delivery zona 2 (Constitución, Playa Grande, Chauvin, Los Pinares, San José)", "costo": 3500, "detalle": "Demora estimada de 50 a 70 minutos." },
+      { "id": "retiro", "nombre": "Retiro en el local", "costo": 0, "detalle": "Listo en 25 a 30 minutos." }
+    ],
+    "envio_gratis_desde": 45000
+  },
+
+  "pagos": {
+    "transferencia": { "descuento_porcentaje": 0, "alias": "pizzeria.demo.mdp", "titular": "Pizzería Demo MdP", "detalle": "Mandar el comprobante por este chat para que salga el pedido." },
+    "mercadopago": { "access_token_env": "" },
+    "otros": "Efectivo al delivery o en el local (avisar con cuánto pagás para llevar el vuelto)."
+  },
+
+  "preguntas_frecuentes": [
+    { "q": "¿Llegan a mi barrio?", "a": "Llegamos a Centro, Güemes, La Perla, Plaza Mitre (zona 1) y a Constitución, Playa Grande, Chauvin, Los Pinares y San José (zona 2). Si estás en otro barrio podés retirar en el local." },
+    { "q": "¿Cuánto tarda?", "a": "Zona 1: 40 a 60 minutos. Zona 2: 50 a 70 minutos. Los viernes y sábados a la noche puede demorar un poco más. Retiro en el local: 25 a 30 minutos." },
+    { "q": "¿Hay pedido mínimo?", "a": "Para delivery, el pedido mínimo es de $15.000 sin contar el envío. Desde $45.000 el envío es gratis." },
+    { "q": "¿Tienen opciones sin TACC?", "a": "No, en la cocina se trabaja con harina y no podemos garantizar productos libres de gluten." },
+    { "q": "¿Tienen opciones vegetarianas?", "a": "Sí: muzzarella, fugazzeta, napolitana y las empanadas de humita y caprese." },
+    { "q": "¿Puedo pedir para más tarde?", "a": "Sí, podés programar el pedido para un horario dentro de la franja de atención de hoy." }
+  ],
+
+  "promociones": [
+    "Martes y miércoles: 2 pizzas muzzarella grandes por $28.000 (producto promo-2-muzzas).",
+    "Envío gratis en pedidos de $45.000 o más."
+  ],
+
+  "reglas": [
+    "Tu objetivo es cerrar el pedido rápido y sin errores. Cuando la persona dice qué quiere, sugerí un complemento que tenga sentido (bebida, papas o una promo vigente) una sola vez, sin insistir.",
+    "Antes de usar crear_pedido, confirmá todo en un solo mensaje: productos y cantidades, gustos de las empanadas, adicionales, nombre, entrega (dirección completa con calle, altura, entre calles y piso/depto si es delivery) y forma de pago. Si paga en efectivo, preguntá con cuánto paga y ponelo en notas para el vuelto.",
+    "Elegí la zona de delivery según el barrio de la dirección. Si el barrio no está en ninguna zona, ofrecé el retiro en el local o usá derivar_a_humano para consultar.",
+    "Para delivery, el pedido mínimo es de $15.000 sin contar el envío: si no llega, avisá y sugerí agregar algo.",
+    "La promo de 2 muzzas solo se puede pedir martes y miércoles: fijate la fecha del mensaje antes de ofrecerla.",
+    "Si escriben fuera del horario de atención, decí el horario y ofrecé dejar el pedido programado para cuando abra.",
+    "La cerveza es solo para mayores de 18 años: si la piden, aclaralo.",
+    "Después de crear el pedido, pasá el total, los datos de pago y la demora estimada. No prometas un horario exacto de llegada.",
+    "Si alguien reclama por un pedido demorado, frío o equivocado, pedí disculpas y usá derivar_a_humano enseguida."
+  ]
+}
