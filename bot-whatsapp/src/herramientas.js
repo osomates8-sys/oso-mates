@@ -82,6 +82,9 @@ export function calcularPedido(cliente, input) {
     const prod = cliente.catalogo.find((p) => p.id === it.producto_id);
     if (!prod) throw new ErrorHerramienta(`No existe el producto "${it.producto_id}". Usá un id del catálogo.`);
     if (prod.disponible === false) throw new ErrorHerramienta(`${prod.nombre} está sin stock.`);
+    if (typeof prod.precio !== "number") {
+      throw new ErrorHerramienta(`${prod.nombre} no se vende por el chat (${prod.precio_texto}). Usá registrar_interesado para que el equipo lo contacte.`);
+    }
     const cantidad = Number.isInteger(it.cantidad) && it.cantidad > 0 ? it.cantidad : null;
     if (!cantidad) throw new ErrorHerramienta(`Cantidad inválida para ${prod.nombre}.`);
 

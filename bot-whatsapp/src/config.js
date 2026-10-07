@@ -18,8 +18,9 @@ function validar(c, archivo) {
   if (faltan.length) throw new Error(`${archivo}: faltan los campos ${faltan.join(", ")}`);
   const ids = new Set();
   for (const p of c.catalogo) {
-    if (!p.id || !p.nombre || typeof p.precio !== "number") {
-      throw new Error(`${archivo}: cada producto necesita id, nombre y precio numérico`);
+    // precio_texto sirve para precios que no son un número simple ("$650.000 por mes + expensas", "a consultar")
+    if (!p.id || !p.nombre || (typeof p.precio !== "number" && !p.precio_texto)) {
+      throw new Error(`${archivo}: cada producto necesita id, nombre y precio numérico (o precio_texto)`);
     }
     if (ids.has(p.id)) throw new Error(`${archivo}: id de producto repetido "${p.id}"`);
     ids.add(p.id);

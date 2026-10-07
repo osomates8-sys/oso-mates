@@ -5,7 +5,7 @@
 export function precio(n, moneda = "ARS") {
   if (n == null) return "a confirmar";
   const s = Math.round(n).toLocaleString("es-AR");
-  return moneda === "ARS" ? `$${s}` : `${s} ${moneda}`;
+  return moneda === "ARS" ? `$${s}` : `${moneda} ${s}`; // como se publica en Argentina: USD 89.000
 }
 
 function lista(items) {
@@ -16,7 +16,7 @@ export function armarPrompt(c) {
   const m = c.moneda;
   const catalogo = c.catalogo
     .map((p) => {
-      let linea = `- [${p.id}] ${p.nombre}: ${precio(p.precio, m)}`;
+      let linea = `- [${p.id}] ${p.nombre}: ${p.precio_texto || precio(p.precio, m)}`;
       if (p.precio_transferencia != null) linea += ` (${precio(p.precio_transferencia, m)} por transferencia)`;
       if (p.disponible === false) linea += " — SIN STOCK";
       if (p.descripcion) linea += `. ${p.descripcion}`;
@@ -59,7 +59,7 @@ ${c.web ? `Web: ${c.web}` : ""}
 # Tono
 ${c.tono || "Amable, claro y cercano. Español rioplatense (voseo)."}
 
-# Catálogo (precios en ${m}; el id va entre corchetes)
+# Catálogo (precios en ${m} salvo que se indique otra cosa; el id va entre corchetes)
 ${catalogo}
 
 # Adicionales

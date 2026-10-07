@@ -1,0 +1,79 @@
+{
+  "id": "demo-inmobiliaria",
+  "nombre": "Inmobiliaria Demo MdP",
+  "rubro": "Inmobiliaria: venta, alquiler anual y alquiler temporario en Mar del Plata (negocio de ejemplo para demos)",
+  "descripcion": "Inmobiliaria de Mar del Plata con propiedades en venta, alquileres anuales y temporarios para la temporada de verano. Datos de ejemplo: usala para mostrarle el bot a una inmobiliaria y reemplazá las propiedades por las suyas.",
+  "nombre_asistente": "Lucía",
+  "tono": "Profesional, cálido y resolutivo (voseo). Como una buena asesora inmobiliaria: escucha qué busca la persona, sugiere 1 o 2 propiedades que encajan y propone coordinar la visita. Mensajes cortos.",
+  "ubicacion": "Oficina en Güemes 2800, Mar del Plata (dirección de ejemplo).",
+  "horario_atencion": "Lunes a viernes de 9 a 18 h y sábados de 10 a 13 h.",
+  "web": "",
+  "moneda": "USD",
+  "plan": "vendedor",
+
+  "whatsapp": {
+    "phone_number_id": "",
+    "waba_id": "",
+    "token_env": "WHATSAPP_TOKEN"
+  },
+  "notificar_a": "",
+
+  "catalogo": [
+    { "id": "venta-2amb-guemes", "nombre": "VENTA - 2 ambientes en Güemes", "precio": 89000, "descripcion": "48 m², balcón al frente, cocina separada, a 4 cuadras de la calle Güemes. Apto crédito hipotecario. Expensas aprox. $95.000.", "disponible": true },
+    { "id": "venta-mono-plaza-colon", "nombre": "VENTA - Monoambiente con vista al mar, Plaza Colón", "precio": 58000, "descripcion": "30 m², piso 9, vista lateral al mar. Ideal para inversión y renta temporaria. Edificio con portería.", "disponible": true },
+    { "id": "venta-ph-la-perla", "nombre": "VENTA - PH 3 ambientes en La Perla", "precio": 98000, "descripcion": "70 m² con patio y parrilla, sin expensas, a 6 cuadras del mar. Apto crédito.", "disponible": true },
+    { "id": "venta-3amb-playa-grande", "nombre": "VENTA - 3 ambientes con cochera en Playa Grande", "precio": 155000, "descripcion": "85 m², 2 baños, balcón aterrazado, cochera fija. A 3 cuadras de la playa.", "disponible": true },
+    { "id": "venta-chalet-constitucion", "nombre": "VENTA - Chalet 4 ambientes en zona Constitución", "precio": 175000, "descripcion": "Lote de 10 x 30, 3 dormitorios, quincho con parrilla y garage. Cerca de colegios y Av. Constitución.", "disponible": true },
+    { "id": "venta-casa-los-troncos", "nombre": "VENTA - Casa 5 ambientes en Los Troncos", "precio": 320000, "descripcion": "220 m² cubiertos, jardín con pileta, 4 dormitorios, 3 baños, cochera doble.", "disponible": true },
+
+    { "id": "alquiler-2amb-centro", "nombre": "ALQUILER ANUAL - 2 ambientes en el Centro", "precio_texto": "$620.000 por mes + expensas (aprox. $85.000)", "descripcion": "45 m², luminoso, a 2 cuadras de la peatonal San Martín. Contrato a 2 años con ajuste cada 3 meses. No acepta mascotas.", "disponible": true },
+    { "id": "alquiler-mono-la-perla", "nombre": "ALQUILER ANUAL - Monoambiente en La Perla", "precio_texto": "$480.000 por mes + expensas (aprox. $60.000)", "descripcion": "32 m², amoblado, a 3 cuadras del mar. Contrato a 2 años con ajuste cada 3 meses.", "disponible": true },
+    { "id": "alquiler-3amb-chauvin", "nombre": "ALQUILER ANUAL - 3 ambientes en Chauvin", "precio_texto": "$850.000 por mes, sin expensas", "descripcion": "PH con patio, 2 dormitorios. Acepta mascotas. Contrato a 2 años con ajuste cada 3 meses.", "disponible": true },
+    { "id": "alquiler-local-guemes", "nombre": "ALQUILER - Local comercial sobre calle Güemes", "precio_texto": "$1.400.000 por mes", "descripcion": "60 m² con vidriera y baño, en la zona comercial de Güemes. Contrato comercial a 3 años.", "disponible": true },
+
+    { "id": "temporario-2amb-playa-grande", "nombre": "ALQUILER TEMPORARIO - 2 ambientes en Playa Grande (enero 2027)", "precio_texto": "$95.000 por noche, mínimo 7 noches", "descripcion": "Para 4 personas, a 2 cuadras del mar, con wifi y cochera. No incluye ropa de cama ni toallas.", "disponible": true },
+    { "id": "temporario-casa-punta-mogotes", "nombre": "ALQUILER TEMPORARIO - Casa en Punta Mogotes (enero 2027)", "precio_texto": "$160.000 por noche, mínimo 7 noches", "descripcion": "Para 6 personas, jardín con parrilla, a 4 cuadras de la playa. No incluye ropa de cama ni toallas.", "disponible": true }
+  ],
+
+  "adicionales": [],
+
+  "entrega": {
+    "opciones": [
+      { "id": "visita", "nombre": "Visita a la propiedad", "costo": 0, "detalle": "La coordina un asesor por este chat, de lunes a sábado." },
+      { "id": "tasacion", "nombre": "Tasación de tu propiedad", "costo": 0, "detalle": "Sin cargo, con informe de valor de mercado en 48 h." },
+      { "id": "oficina", "nombre": "Atención en la oficina", "costo": 0, "detalle": "Güemes 2800, en el horario de atención." }
+    ],
+    "envio_gratis_desde": null
+  },
+
+  "pagos": {
+    "transferencia": { "descuento_porcentaje": 0, "alias": "", "titular": "", "detalle": "Alquiler temporario: seña del 50% por transferencia para reservar; los datos los pasa un asesor al confirmar la disponibilidad." },
+    "mercadopago": { "access_token_env": "" },
+    "otros": "Compraventa: reserva con seña en la oficina y escritura con escribano. Se aceptan créditos hipotecarios en las propiedades aptas crédito."
+  },
+
+  "preguntas_frecuentes": [
+    { "q": "¿Qué piden para alquilar?", "a": "DNI, comprobante de ingresos (recibos de sueldo o constancia de monotributo) y una garantía: propietaria o seguro de caución. Los papeles se presentan en la oficina, no por chat." },
+    { "q": "¿Aceptan mascotas?", "a": "Depende de cada propietario. De las que tenemos, el 3 ambientes de Chauvin acepta mascotas." },
+    { "q": "¿Cuáles son aptas crédito?", "a": "El 2 ambientes de Güemes y el PH de La Perla. Para las demás lo consultamos con el escribano." },
+    { "q": "¿Cobran la tasación?", "a": "No, la tasación es sin cargo y te damos un informe de valor de mercado en 48 h." },
+    { "q": "¿Cuánto cobran de honorarios?", "a": "Dependen del tipo de operación; te los informa el asesor al coordinar la visita." },
+    { "q": "¿Me mandan fotos o video?", "a": "Sí, un asesor te manda fotos y video por este chat cuando coordinamos la visita." },
+    { "q": "¿Alquilan a grupos de jóvenes en temporada?", "a": "No, los alquileres temporarios son para familias o parejas." }
+  ],
+
+  "promociones": [
+    "Tasación sin cargo con informe de mercado en 48 h.",
+    "Temporada 2027: reservando antes del 30 de noviembre, 10% de descuento en alquileres temporarios de enero."
+  ],
+
+  "reglas": [
+    "Tu objetivo principal es coordinar una visita. Cuando la persona se interesa en una propiedad, pedí su nombre y qué días y horarios le quedan cómodos, y usá registrar_interesado con la propiedad (id y nombre), la preferencia de horario y el tipo de operación. Un asesor confirma la visita.",
+    "Antes de recomendar, preguntá qué busca: compra o alquiler, zona, cantidad de ambientes y presupuesto. Si compra, preguntá si es con crédito, ahorros o vendiendo otra propiedad; si tiene que vender, ofrecé la tasación sin cargo.",
+    "No negocies precios. Si alguien hace una oferta o pide descuento en una venta, usá derivar_a_humano para que la vea un asesor.",
+    "Alquiler temporario: nunca confirmes disponibilidad. Pedí fechas de entrada y salida y cantidad de personas, y usá registrar_interesado para que un asesor confirme y pase los datos de la seña.",
+    "No uses crear_pedido: en una inmobiliaria las operaciones se cierran en persona.",
+    "No pidas documentos ni datos sensibles (DNI, recibos, CBU) por el chat: se presentan en la oficina.",
+    "Si te piden fotos o video, decí que un asesor se los manda y registrá a la persona como interesada."
+  ]
+}

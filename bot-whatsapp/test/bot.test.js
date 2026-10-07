@@ -257,3 +257,18 @@ test("el webhook trae el id del audio", () => {
   const m = extraerMensajes({ entry: [{ changes: [{ value: { metadata: { phone_number_id: "1" }, messages: [{ from: "549", id: "w", type: "audio", audio: { id: "media123", voice: true } }] } }] }] });
   assert.equal(m[0].audioId, "media123");
 });
+
+test("ficha demo de inmobiliaria: precios en dólares y en texto", async () => {
+  const inmo = clientes.get("demo-inmobiliaria");
+  const prompt = armarPrompt(inmo);
+  assert.match(prompt, /\[venta-2amb-guemes\] VENTA - 2 ambientes en Güemes: USD 89\.000/);
+  assert.match(prompt, /\[alquiler-2amb-centro\] .*: \$620\.000 por mes/);
+  const conv = obtenerConversacion("demo-inmobiliaria", "5495555555555");
+  const r = await ejecutarHerramienta(
+    "crear_pedido",
+    { items: [{ producto_id: "alquiler-2amb-centro", cantidad: 1 }], nombre_cliente: "Ana", entrega_id: "visita", forma_pago: "otro" },
+    { cliente: inmo, conv, notificar: async () => {} },
+  );
+  assert.equal(r.error, true);
+  assert.match(r.contenido, /registrar_interesado/);
+});
