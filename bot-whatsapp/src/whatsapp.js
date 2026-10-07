@@ -1,5 +1,6 @@
 // Conexión con la API oficial de WhatsApp Business (Meta Cloud API).
 import crypto from "node:crypto";
+import { numerosDe } from "./config.js";
 
 const VERSION = process.env.WHATSAPP_API_VERSION || "v23.0";
 const LIMITE_TEXTO = 4000; // WhatsApp corta en 4096 caracteres
@@ -8,10 +9,13 @@ function tokenDe(cliente) {
   return process.env[cliente.whatsapp?.token_env || "WHATSAPP_TOKEN"];
 }
 
-async function llamar(cliente, cuerpo) {
+// desde: el número del negocio que envía (si tiene varios, se contesta desde el que recibió el mensaje)
+async function llamar(cliente, cuerpo, desde) {
   const token = tokenDe(cliente);
   if (!token) throw new Error(`${cliente.id}: falta el token de WhatsApp (${cliente.whatsapp?.token_env || "WHATSAPP_TOKEN"})`);
-  const res = await fetch(`https://graph.facebook.com/${VERSION}/${cliente.whatsapp.phone_number_id}/messages`, {
+  const numero = desde || numerosDe(cliente)[0];
+  if (!numero) throw new Error(`${cliente.id}: no tiene número de WhatsApp configurado`);
+  const res = await fetch(`https://graph.facebook.com/${VERSION}/${numero}/messages`, {
     method: "POST",
     headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
     body: JSON.stringify({ messaging_product: "whatsapp", ...cuerpo }),
@@ -33,15 +37,15 @@ export function partirTexto(texto) {
   return partes;
 }
 
-export async function enviarTexto(cliente, para, texto) {
+export async function enviarTexto(cliente, para, texto, desde) {
   for (const parte of partirTexto(texto)) {
-    await llamar(cliente, { to: para, type: "text", text: { body: parte, preview_url: true } });
+    await llamar(cliente, { to: para, type: "text", text: { body: parte, preview_url: true } }, desde);
   }
 }
 
 // Marca el mensaje como leído (los dos tildes azules) y muestra "escribiendo...".
-export async function marcarLeido(cliente, messageId) {
-  await llamar(cliente, { status: "read", message_id: messageId, typing_indicator: { type: "text" } }).catch((e) =>
+export async function marcarLeido(cliente, messageId, desde) {
+  await llamar(cliente, { status: "read", message_id: messageId, typing_indicator: { type: "text" } }, desde).catch((e) =>
     console.warn(`[whatsapp] no se pudo marcar como leído: ${e.message}`),
   );
 }

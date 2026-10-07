@@ -3,9 +3,12 @@
 //   npm run chat -- oso-mates
 import readline from "node:readline/promises";
 import { stdin, stdout } from "node:process";
-import { cargarClientes } from "./config.js";
-import { responder } from "./agente.js";
-import { obtenerConversacion, estaPausada, reactivar } from "./memoria.js";
+
+// Las pruebas no se mezclan con los datos reales (ni cuentan para el plan del negocio).
+process.env.DIR_DATOS = process.env.DIR_DATOS_SIMULADOR || "data-simulador";
+const { cargarClientes } = await import("./config.js");
+const { responder } = await import("./agente.js");
+const { obtenerConversacion, estaPausada, reactivar } = await import("./memoria.js");
 
 const clientes = cargarClientes();
 const id = process.argv[2] || [...clientes.keys()][0];

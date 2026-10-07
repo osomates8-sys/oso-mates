@@ -67,7 +67,8 @@ El número que pongas en `notificar_a` recibe los avisos y puede mandarle comand
 | `entrega.opciones` | Envío, retiro, turno en el local. `costo: null` = "a confirmar". |
 | `pagos` | Alias de transferencia, descuento, variable del token de Mercado Pago, otros medios. |
 | `preguntas_frecuentes`, `promociones`, `reglas` | Lo que el bot tiene que saber y respetar de ese negocio. |
-| `whatsapp.phone_number_id` | El número de WhatsApp de ese negocio. |
+| `plan` | `inicial`, `vendedor` o `temporada` (definidos en `planes.json`). |
+| `whatsapp.phone_number_id` | El número de WhatsApp de ese negocio. Si tiene varias sucursales, una lista: `["111", "222"]`; cada cliente recibe la respuesta desde el número al que escribió. |
 | `whatsapp.token_env` | Variable de `.env` con el token (si el número está en otra cuenta de Meta, usá una variable distinta). |
 | `notificar_a` | WhatsApp del dueño para los avisos (formato `549223...`). |
 
@@ -76,16 +77,27 @@ El número que pongas en `notificar_a` recibe los avisos y puede mandarle comand
 
 Los archivos que empiezan con `_` se ignoran (sirve para borradores). Las fichas no llevan contraseñas: todos los tokens van en `.env`.
 
-## 4. Ponerlo online
+## 4. Planes, cobro e informes
+
+Los planes y precios están en `planes.json` (los mismos de la página de venta). Cada ficha dice su `plan`.
+
+- **Conteo de conversaciones**: una conversación son todos los mensajes con un mismo cliente dentro de 24 horas. Se cuentan por mes en `data/<negocio>/uso/AAAA-MM.json`. Las pruebas con `npm run chat` no cuentan.
+- **Avisos al dueño**: cuando llega al 80% y al 100% de su plan le llega un WhatsApp. El bot nunca se corta: lo que pasa del límite se cobra como conversación extra.
+- **Panel para vos**: con `ADMIN_CLAVE` en `.env`, entrá a `https://TU-SERVIDOR/admin?clave=TU_CLAVE` y vas a ver, por negocio, conversaciones usadas, extras, abono, total a cobrar y pedidos que cerró el bot. Para otro mes agregá `&mes=2026-10`.
+- **Informe mensual**: resume el uso, los pedidos, lo más pedido, interesados y derivaciones, y le pide a Claude un análisis de las charlas (qué preguntan, por qué se caen ventas, qué no supo responder y sugerencias).
+  - Plan Temporada: se genera solo el día 1 y le llega al dueño por WhatsApp.
+  - A mano, para cualquier negocio: `npm run informe -- oso-mates 2026-10` (agregá `--enviar` para mandarlo al dueño), o desde el panel: `/admin/informe?clave=TU_CLAVE&cliente=oso-mates&mes=2026-10`.
+
+## 5. Ponerlo online
 
 Cualquier servicio que corra Node.js con una URL https sirve: Railway, Render, Fly.io o un VPS.
 
 - Comando de inicio: `npm start`
 - Variables de entorno: las de `.env.example`.
-- **Disco persistente** montado en `data/` (o `DIR_DATOS` apuntando a él): ahí quedan las conversaciones, `pedidos.jsonl`, `interesados.jsonl` y `derivaciones.jsonl` de cada negocio. Sin disco persistente se pierden en cada reinicio.
+- **Disco persistente** montado en `data/` (o `DIR_DATOS` apuntando a él): ahí quedan las conversaciones, pedidos, interesados, derivaciones, el uso de cada mes y los informes de cada negocio. Sin disco persistente se pierden en cada reinicio, incluido el conteo para cobrar.
 - `GET /salud` responde si el servidor está vivo (sirve para el monitoreo del hosting).
 
-## 5. Costos de funcionamiento
+## 6. Costos de funcionamiento
 
 - **Claude**: se cobra por uso. La ficha del negocio se guarda en caché entre mensajes, así que cada respuesta sale bastante más barata que la primera. Como referencia, una conversación de venta completa ronda los centavos de dólar; medilo con tus primeros clientes en la consola de Anthropic para fijar tu precio. Para bajar costos podés poner `CLAUDE_EFFORT=low`.
 - **WhatsApp (Meta)**: responder a un cliente que te escribió (dentro de las 24 h) no tiene costo; Meta cobra los mensajes de plantilla que inicia el negocio. Revisá la tabla de precios vigente de Meta para Argentina.
@@ -100,6 +112,9 @@ src/agente.js      el vendedor: habla con Claude y ejecuta las acciones
 src/prompt.js      arma las instrucciones de venta a partir de la ficha
 src/herramientas.js crear_pedido, registrar_interesado, derivar_a_humano
 src/pagos.js       links de Mercado Pago
+src/uso.js         conteo de conversaciones por plan y avisos de límite
+src/informe.js     informe mensual (también se usa desde la terminal)
+planes.json        planes y precios
 src/memoria.js     conversaciones, pedidos e interesados (archivos en data/)
 src/cola.js        junta los mensajes que llegan seguidos y responde una vez
 src/whatsapp.js    envío de mensajes y validación de la firma de Meta

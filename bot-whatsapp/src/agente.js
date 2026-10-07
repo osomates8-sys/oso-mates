@@ -4,7 +4,8 @@ import Anthropic from "@anthropic-ai/sdk";
 import { MODELO, ESFUERZO } from "./config.js";
 import { armarPrompt } from "./prompt.js";
 import { HERRAMIENTAS, ejecutarHerramienta } from "./herramientas.js";
-import { guardarConversacion } from "./memoria.js";
+import { guardarConversacion, agregarLinea } from "./memoria.js";
+import { mesDe } from "./uso.js";
 
 const anthropic = new Anthropic();
 const MAX_VUELTAS = 6;
@@ -59,6 +60,7 @@ export async function responder({ cliente, conv, texto, notificar }) {
       if (r.stop_reason === "refusal") {
         const aviso = "Perdón, con eso no te puedo ayudar por acá. ¿Querés que te contacte una persona del equipo?";
         mensajes.push({ role: "assistant", content: aviso });
+        agregarLinea(cliente.id, `mensajes/${mesDe()}.jsonl`, { fecha: new Date().toISOString(), telefono: conv.telefono, cliente: texto, bot: aviso });
         return aviso;
       }
 
@@ -81,5 +83,8 @@ export async function responder({ cliente, conv, texto, notificar }) {
     guardarConversacion(conv);
   }
 
-  return textos.join("\n\n") || "¿Me contás un poco más así te ayudo mejor?";
+  const respuesta = textos.join("\n\n") || "¿Me contás un poco más así te ayudo mejor?";
+  // Registro simple de cada intercambio: es la base del informe mensual.
+  agregarLinea(cliente.id, `mensajes/${mesDe()}.jsonl`, { fecha: new Date().toISOString(), telefono: conv.telefono, cliente: texto, bot: respuesta });
+  return respuesta;
 }

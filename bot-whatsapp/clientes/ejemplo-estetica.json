@@ -9,6 +9,7 @@
   "horario_atencion": "Lunes a sábado de 10 a 20 h.",
   "web": "",
   "moneda": "ARS",
+  "plan": "inicial",
 
   "whatsapp": {
     "phone_number_id": "",

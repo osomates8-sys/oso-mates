@@ -107,3 +107,52 @@ test("parte los textos largos", () => {
   assert.ok(partes.every((p) => p.length <= 4000));
   assert.equal(partes.join("").length, 9000);
 });
+
+const { registrarConversacion, resumenUso, mesDe, leerUso } = await import("../src/uso.js");
+const { clientePorNumero } = await import("../src/config.js");
+const { generarInforme, mesAnterior } = await import("../src/informe.js");
+const { agregarLinea } = await import("../src/memoria.js");
+
+test("cuenta una conversación por cliente cada 24 horas", async () => {
+  const c = { ...oso, id: "uso-24h", plan: "vendedor" };
+  const conv = { telefono: "5494444444444" };
+  const t0 = Date.UTC(2026, 9, 10, 15);
+  assert.equal(await registrarConversacion(c, conv, async () => {}, t0), true);
+  assert.equal(await registrarConversacion(c, conv, async () => {}, t0 + 3600_000), false);
+  assert.equal(await registrarConversacion(c, conv, async () => {}, t0 + 25 * 3600_000), true);
+  assert.equal(leerUso("uso-24h", mesDe(new Date(t0))).conversaciones, 2);
+});
+
+test("avisa al dueño al 80% y al 100% del plan y calcula los extras", async () => {
+  const c = { ...oso, id: "uso-limite", plan: "inicial" }; // 150 conversaciones
+  const avisos = [];
+  const t0 = Date.UTC(2026, 9, 10, 15);
+  for (let i = 0; i < 155; i++) await registrarConversacion(c, { telefono: `54911${i}` }, async (t) => avisos.push(t), t0);
+  assert.equal(avisos.length, 2);
+  assert.match(avisos[0], /120 de 150/);
+  assert.match(avisos[1], /150 de 150/);
+  const u = resumenUso(c, mesDe(new Date(t0)));
+  assert.deepEqual([u.conversaciones, u.extras, u.montoExtras, u.abono], [155, 5, 1500, 79000]);
+});
+
+test("un negocio con varias sucursales se encuentra por cualquiera de sus números", () => {
+  const m = new Map([["x", { id: "x", whatsapp: { phone_number_id: ["111", "222"] } }], ["y", { id: "y", whatsapp: { phone_number_id: "333" } }]]);
+  assert.equal(clientePorNumero(m, "222").id, "x");
+  assert.equal(clientePorNumero(m, "333").id, "y");
+  assert.equal(clientePorNumero(m, "999"), null);
+});
+
+test("el informe mensual junta uso, pedidos y lo más pedido", async () => {
+  const c = { ...oso, id: "informe-test", plan: "temporada" };
+  const fecha = "2026-09-15T15:00:00.000Z";
+  agregarLinea(c.id, "pedidos.jsonl", { fecha, total: 64800, lineas: [{ nombre: "Mate Ranchero", cantidad: 1 }, { nombre: "Grabado", cantidad: 1 }] });
+  agregarLinea(c.id, "pedidos.jsonl", { fecha, total: 33000, lineas: [{ nombre: "Mate Ranchero", cantidad: 2 }] });
+  agregarLinea(c.id, "pedidos.jsonl", { fecha: "2026-08-01T15:00:00.000Z", total: 1, lineas: [] });
+  agregarLinea(c.id, "interesados.jsonl", { fecha, interes: "turno" });
+  const { texto } = await generarInforme(c, "2026-09", { analizarCharlas: false });
+  assert.match(texto, /Pedidos cerrados por el bot: 2 \(\$97\.800\)/);
+  assert.match(texto, /Interesados para seguimiento: 1/);
+  assert.match(texto, /Mate Ranchero: 3/);
+  assert.match(texto, /plan Temporada/);
+  assert.equal(mesAnterior(new Date("2026-01-15T15:00:00Z")), "2025-12");
+});

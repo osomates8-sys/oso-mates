@@ -44,10 +44,16 @@ export function cargarClientes(dir = DIR_CLIENTES) {
   return clientes;
 }
 
+// Un negocio puede tener uno o varios números (sucursales): phone_number_id acepta un texto o una lista.
+export function numerosDe(cliente) {
+  const n = cliente.whatsapp?.phone_number_id;
+  return (Array.isArray(n) ? n : [n]).filter(Boolean);
+}
+
 // Busca qué negocio es dueño del número de WhatsApp que recibió el mensaje.
 export function clientePorNumero(clientes, phoneNumberId) {
   for (const c of clientes.values()) {
-    if (c.whatsapp?.phone_number_id && c.whatsapp.phone_number_id === phoneNumberId) return c;
+    if (numerosDe(c).includes(phoneNumberId)) return c;
   }
   return null;
 }

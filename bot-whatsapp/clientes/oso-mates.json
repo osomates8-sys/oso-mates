@@ -9,6 +9,7 @@
   "horario_atencion": "Lunes a viernes de 9 a 19 h. El bot atiende 24/7; lo que necesite una persona se responde en ese horario.",
   "web": "https://osomates.com",
   "moneda": "ARS",
+  "plan": "vendedor",
 
   "whatsapp": {
     "phone_number_id": "",
