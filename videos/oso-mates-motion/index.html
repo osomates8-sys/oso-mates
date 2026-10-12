@@ -1,0 +1,400 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1080, height=1920" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400;1,500&family=Montserrat:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <script src="vendor/gsap.min.js"></script>
+    <style>
+      :root {
+        --warm: #c8956c;
+        --warm-deep: #946437;
+        --cream: #f2f0eb;
+        --paper: #f8f8f6;
+        --ink: #15151a;
+        --ink-soft: #2a2a30;
+        --serif: "Cormorant Garamond", Georgia, serif;
+        --sans: "Montserrat", ui-sans-serif, system-ui, sans-serif;
+      }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        width: 1080px;
+        height: 1920px;
+        overflow: hidden;
+        background: var(--ink);
+      }
+      #stage {
+        position: relative;
+        width: 1080px;
+        height: 1920px;
+        overflow: hidden;
+        background: var(--ink);
+      }
+      .scene {
+        position: absolute;
+        inset: 0;
+        overflow: hidden;
+      }
+
+      /* ---------- Scene A: hook ---------- */
+      #scene-a {
+        z-index: 1;
+        background: var(--ink);
+      }
+      #scene-a .photo-wrap {
+        position: absolute;
+        inset: 0;
+        overflow: hidden;
+      }
+      #scene-a .photo-wrap img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        object-position: 60% 50%;
+      }
+      #scene-a .shade {
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(
+          180deg,
+          rgba(21, 21, 26, 0.55) 0%,
+          rgba(21, 21, 26, 0) 28%,
+          rgba(21, 21, 26, 0) 48%,
+          rgba(21, 21, 26, 0.88) 100%
+        );
+      }
+      #scene-a .content {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        padding: 140px 96px 220px;
+      }
+      .kicker {
+        display: flex;
+        flex-direction: column;
+        gap: 22px;
+        font-family: var(--sans);
+        font-weight: 500;
+        font-size: 28px;
+        letter-spacing: 0.32em;
+        color: var(--paper);
+        text-transform: uppercase;
+      }
+      .kicker .rule {
+        width: 180px;
+        height: 3px;
+        background: var(--warm);
+        transform-origin: left center;
+      }
+      .headline {
+        font-family: var(--serif);
+        font-style: italic;
+        font-weight: 500;
+        color: var(--paper);
+        line-height: 0.92;
+      }
+      .headline .line {
+        display: block;
+        overflow: hidden;
+        padding-bottom: 12px;
+      }
+      .headline .w {
+        display: inline-block;
+      }
+      #a-w1 {
+        font-size: 210px;
+      }
+      #a-w2 {
+        font-size: 170px;
+        color: var(--warm);
+      }
+
+      /* ---------- Scene B: cards ---------- */
+      #scene-b {
+        z-index: 2;
+        background: var(--cream);
+      }
+      #b-glow {
+        position: absolute;
+        left: -300px;
+        top: 760px;
+        width: 1500px;
+        height: 1300px;
+        border-radius: 50%;
+        background: radial-gradient(closest-side, rgba(200, 149, 108, 0.32), rgba(200, 149, 108, 0));
+      }
+      #scene-b .content {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+        padding: 150px 96px 120px;
+        gap: 18px;
+      }
+      #b-label {
+        font-family: var(--sans);
+        font-weight: 500;
+        font-size: 26px;
+        letter-spacing: 0.3em;
+        text-transform: uppercase;
+        color: var(--warm-deep);
+      }
+      #b-title {
+        font-family: var(--serif);
+        font-weight: 500;
+        font-size: 150px;
+        line-height: 0.95;
+        color: var(--ink);
+      }
+      #b-title em {
+        color: var(--warm-deep);
+      }
+      .deck {
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 600px;
+        height: 1240px;
+      }
+      .card {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        width: 700px;
+        height: 960px;
+        margin-left: -350px;
+        margin-top: -480px;
+        background: var(--paper);
+        padding: 20px 20px 80px;
+        box-shadow:
+          0 40px 80px rgba(21, 21, 26, 0.22),
+          0 6px 18px rgba(21, 21, 26, 0.12);
+      }
+      .card img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+      }
+      .card .cap {
+        position: absolute;
+        left: 28px;
+        bottom: 22px;
+        font-family: var(--serif);
+        font-style: italic;
+        font-size: 38px;
+        color: var(--ink-soft);
+      }
+
+      /* ---------- Scene C: brand close ---------- */
+      #scene-c {
+        z-index: 3;
+      }
+      #c-panel {
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(120% 70% at 50% 30%, #23222a 0%, var(--ink) 70%);
+      }
+      #scene-c .content {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 160px 96px 200px;
+        gap: 64px;
+      }
+      #c-arch {
+        width: 640px;
+        height: 860px;
+        border-radius: 320px 320px 24px 24px;
+        overflow: hidden;
+        box-shadow: 0 0 0 2px rgba(200, 149, 108, 0.55);
+      }
+      #c-arch img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        object-position: 55% 60%;
+      }
+      .lockup {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 30px;
+      }
+      #c-word {
+        font-family: var(--sans);
+        font-weight: 600;
+        font-size: 92px;
+        letter-spacing: 0.2em;
+        padding-left: 0.2em;
+        color: var(--paper);
+        white-space: nowrap;
+      }
+      #c-word .ch {
+        display: inline-block;
+      }
+      #c-rule {
+        width: 360px;
+        height: 3px;
+        background: var(--warm);
+        transform-origin: center center;
+      }
+      #c-tag {
+        font-family: var(--serif);
+        font-style: italic;
+        font-size: 50px;
+        color: var(--warm);
+      }
+    </style>
+  </head>
+  <body>
+    <div
+      id="stage"
+      data-composition-id="main"
+      data-start="0"
+      data-duration="8"
+      data-fps="30"
+      data-width="1080"
+      data-height="1920"
+    >
+      <!-- Scene A: hook -->
+      <section id="scene-a" class="scene clip" data-start="0" data-duration="2.6" data-track-index="0">
+        <div class="photo-wrap"><img id="a-photo" src="assets/IMG_5277.webp" alt="" /></div>
+        <div class="shade"></div>
+        <div class="content">
+          <div class="kicker">
+            <span id="a-kicker">Oso Mates · Mar del Plata</span>
+            <span id="a-rule" class="rule"></span>
+          </div>
+          <h1 class="headline">
+            <span class="line"><span id="a-w1" class="w">Tallados</span></span>
+            <span class="line"><span id="a-w2" class="w">a mano.</span></span>
+          </h1>
+        </div>
+      </section>
+
+      <!-- Scene B: cards (hard cut) -->
+      <section id="scene-b" class="scene clip" data-start="2.6" data-duration="3.15" data-track-index="1">
+        <div id="b-glow" data-layout-allow-overflow="true"></div>
+        <div class="content">
+          <span id="b-label">Piezas artesanales</span>
+          <h2 id="b-title">Cada uno,<br /><em>único.</em></h2>
+        </div>
+        <div class="deck">
+          <div id="b-card1" class="card"><img src="assets/IMG_5139.webp" alt="" /></div>
+          <div id="b-card2" class="card"><img src="assets/IMG_5190-Edit.webp" alt="" /></div>
+          <div id="b-card3" class="card"><img src="assets/IMG_5233.webp" alt="" /></div>
+        </div>
+      </section>
+
+      <!-- Scene C: brand close -->
+      <section id="scene-c" class="scene clip" data-start="5.2" data-duration="2.8" data-track-index="2">
+        <div id="c-panel"></div>
+        <div class="content">
+          <div id="c-arch"><img id="c-photo" src="assets/IMG_5272.webp" alt="" /></div>
+          <div class="lockup">
+            <div id="c-word">
+              <span class="ch">O</span><span class="ch">S</span><span class="ch">O</span
+              ><span class="ch">&nbsp;</span><span class="ch">M</span><span class="ch">A</span
+              ><span class="ch">T</span><span class="ch">E</span><span class="ch">S</span>
+            </div>
+            <div id="c-rule"></div>
+            <div id="c-tag">Mates artesanales</div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <script>
+      const tl = gsap.timeline({ paused: true });
+
+      // ---------- Scene A (0 – 2.6s): slow push-in, words wipe up ----------
+      tl.fromTo("#a-photo", { scale: 1.0 }, { scale: 1.1, duration: 2.6, ease: "none" }, 0);
+      tl.fromTo(
+        "#a-kicker",
+        { autoAlpha: 0, x: 60 },
+        { autoAlpha: 1, x: 0, duration: 0.9, ease: "power3.out" },
+        0.2,
+      );
+      tl.fromTo("#a-rule", { scaleX: 0 }, { scaleX: 1, duration: 0.7, ease: "expo.out" }, 0.45);
+      tl.fromTo("#a-w1", { yPercent: 110 }, { yPercent: 0, duration: 0.75, ease: "expo.out" }, 0.35);
+      tl.fromTo(
+        "#a-w2",
+        { yPercent: 110, rotation: 3 },
+        { yPercent: 0, rotation: 0, duration: 0.9, ease: "power4.out" },
+        0.62,
+      );
+
+      // ---------- Scene B (2.6 – 5.8s): cards land from alternating sides ----------
+      const B = 2.6;
+      tl.fromTo("#b-glow", { x: 0 }, { x: 260, duration: 3.15, ease: "none" }, B);
+      tl.fromTo("#b-label", { autoAlpha: 0, x: -40 }, { autoAlpha: 1, x: 0, duration: 0.4, ease: "power2.out" }, B + 0.05);
+      tl.fromTo(
+        "#b-title",
+        { autoAlpha: 0, clipPath: "inset(0% 100% 0% 0%)" },
+        { autoAlpha: 1, clipPath: "inset(0% 0% 0% 0%)", duration: 0.6, ease: "circ.out" },
+        B + 0.12,
+      );
+      tl.fromTo(
+        "#b-card1",
+        { autoAlpha: 0, x: -900, rotation: -22 },
+        { autoAlpha: 1, x: -40, rotation: -7, duration: 0.55, ease: "back.out(1.4)" },
+        B + 0.3,
+      );
+      tl.fromTo(
+        "#b-card2",
+        { autoAlpha: 0, x: 900, rotation: 20 },
+        { autoAlpha: 1, x: 50, rotation: 5, duration: 0.5, ease: "expo.out" },
+        B + 0.85,
+      );
+      tl.fromTo(
+        "#b-card3",
+        { autoAlpha: 0, y: 1000, rotation: 8 },
+        { autoAlpha: 1, y: 30, rotation: -1.5, duration: 0.65, ease: "power4.out" },
+        B + 1.4,
+      );
+
+      // ---------- Scene C (5.2 – 8s): panel wipe, arch reveal, wordmark cascade ----------
+      const C = 5.2;
+      tl.fromTo(
+        "#c-panel",
+        { clipPath: "inset(100% 0% 0% 0%)" },
+        { clipPath: "inset(0% 0% 0% 0%)", duration: 0.55, ease: "expo.inOut" },
+        C,
+      );
+      tl.fromTo(
+        "#c-arch",
+        { autoAlpha: 0, clipPath: "inset(100% 0% 0% 0%)" },
+        { autoAlpha: 1, clipPath: "inset(0% 0% 0% 0%)", duration: 0.8, ease: "circ.out" },
+        C + 0.35,
+      );
+      tl.fromTo("#c-photo", { scale: 1.18 }, { scale: 1.02, duration: 2.4, ease: "sine.out" }, C + 0.35);
+      tl.fromTo(
+        "#c-word .ch",
+        { autoAlpha: 0, y: 60 },
+        { autoAlpha: 1, y: 0, duration: 0.45, ease: "power3.out", stagger: 0.045 },
+        C + 0.75,
+      );
+      tl.fromTo("#c-rule", { scaleX: 0 }, { scaleX: 1, duration: 0.6, ease: "power2.inOut" }, C + 1.2);
+      tl.fromTo("#c-tag", { autoAlpha: 0, y: 16 }, { autoAlpha: 1, y: 0, duration: 0.7, ease: "sine.out" }, C + 1.45);
+
+      window.__timelines = window.__timelines || {};
+      window.__timelines["main"] = tl;
+      tl.seek(0);
+    </script>
+  </body>
+</html>

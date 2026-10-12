@@ -1,0 +1,21 @@
+{
+  "category": "kinetic-type",
+  "duration_s": 8,
+  "fps": 30,
+  "canvas": { "width": 1080, "height": 1920 },
+  "style": "warm artisanal editorial",
+  "palette": ["#c8956c", "#946437", "#f2f0eb", "#f8f8f6", "#15151a"],
+  "font": { "display": "Cormorant Garamond", "ui": "Montserrat" },
+  "export": "mp4",
+  "asset_needs": [],
+  "brief": "Hook: full-bleed photo of a mate with yerba, slow push-in, 'Tallados a mano.' wipes in word by word. Hard cut to a cream frame where three product photos land as tilted cards from alternating sides under 'Cada uno, único.' A dark panel wipes up into the brand close: the photo reveals inside an arch, OSO MATES cascades in letter by letter, a warm rule draws, and the tagline settles. One dominant motif: wipe reveals.",
+  "beats": [
+    { "t": 0.0, "scene": "hook", "tag": "Hook" },
+    { "t": 2.6, "scene": "cards", "tag": "Build / pattern interrupt (hard cut)" },
+    { "t": 5.2, "scene": "close", "tag": "Resolve (panel wipe)" }
+  ],
+  "content": {
+    "block": null,
+    "customize": "Hand-authored: catalog search returned transitions and lockups, but none combining photo cards with this brand's type; motion follows hyperframes-animation principles."
+  }
+}
