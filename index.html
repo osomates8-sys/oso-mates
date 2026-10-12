@@ -662,13 +662,14 @@ fbq('track', 'PageView');
   .catalog-grid .p-body{padding:.85rem .7rem 1rem;}
   .catalog-grid .p-num{display:none;}
   .catalog-grid .p-name{font-size:1.12rem;}
-  .catalog-grid .p-mat{font-size:.5rem;letter-spacing:.1em;}
+  .catalog-grid .p-mat{font-size:.56rem;letter-spacing:.1em;}
   .catalog-grid .p-footer{flex-direction:column;align-items:stretch;gap:.55rem;}
   .catalog-grid .p-price{font-size:1.25rem;}
   .catalog-grid .p-btns{margin-top:0;}
   .catalog-grid .p-view-btn{display:none;}
-  .catalog-grid .p-add-btn{flex:1;padding:.7rem .4rem!important;font-size:.56rem!important;}
-  .catalog-grid .p-badge,.catalog-grid .free-ship{font-size:.48rem;}
+  .catalog-grid .p-add-btn{flex:1;padding:.75rem .4rem!important;font-size:.64rem!important;}
+  .catalog-grid .p-badge,.catalog-grid .free-ship{font-size:.54rem;}
+  .catalog-grid .p-price-transf{font-size:.66rem;}
 }
 /* Galería: sin huecos cuando hay pocas fotos */
 .gallery-grid:has(> .gallery-item:nth-child(3):last-child){grid-template-columns:2fr 1fr;grid-template-rows:1fr 1fr;}
@@ -686,6 +687,32 @@ fbq('track', 'PageView');
 .care-more a{color:var(--black);text-underline-offset:4px;}
 /* Textos grises más legibles */
 .review-author,.care-desc,.como-step-desc{color:var(--mid)!important;}
+
+/* ===== Ajustes de estética (oct 2026, 2ª parte) ===== */
+/* 3. Precio de lista grande y el de transferencia abajo, sin tachado */
+.p-price-transf{font-size:.72rem;color:var(--green);font-weight:600;margin-top:.15rem;}
+.p-price-transf span{font-weight:400;color:var(--mid);}
+[data-theme="dark"] .p-price-transf{color:#7ccf8a;}
+/* 4. Textos de botones y etiquetas más legibles */
+.p-add-btn{font-size:.66rem!important;}
+.p-view-btn{font-size:.64rem!important;padding:.55rem 1rem!important;}
+.p-badge,.free-ship{font-size:.58rem;}
+.p-mat{font-size:.66rem;}
+.section-num{font-size:.74rem;}
+/* 5. Sin numeración N°001 y fondos alternados en solo dos tonos */
+.p-num{display:none!important;}
+:root{--alt-bg:#f2f0eb;}
+[data-theme="dark"]{--alt-bg:#1b1b20;}
+#testimonios,#galeria,#cuidado,#nosotros,#newsletter-section{background:var(--alt-bg)!important;}
+#catalogo,#faq,.como-section,#contacto{background:var(--white)!important;}
+#cuidado{border-top:none!important;}
+.review-card{background:var(--white)!important;}
+.care-item{background:var(--white);}
+/* 2. Esquina de abajo menos recargada en el celular: osito más chico */
+@media(max-width:700px){
+  .oso{width:min(var(--oso-wm,110px),78px)!important;}
+  .oso:not(.izq){right:80px!important;}
+}
 </style>
 </head>
 <body>
@@ -912,8 +939,8 @@ fbq('track', 'PageView');
     </div>
     <div class="como-step reveal">
       <div class="como-step-num">02</div>
-      <div class="como-step-title" data-i18n="como_step2_title">Transferís</div>
-      <div class="como-step-desc" data-i18n="como_step2_desc">Confirmás el pedido y transferís al CBU. Tenés 10% de descuento por pago bancario.</div>
+      <div class="como-step-title" data-i18n="como_step2_title">Pagás</div>
+      <div class="como-step-desc" data-i18n="como_step2_desc">Por transferencia, con 10% de descuento, o con tarjeta en hasta 3 cuotas sin interés con un link de pago seguro.</div>
     </div>
     <div class="como-step reveal">
       <div class="como-step-num">03</div>
@@ -1200,7 +1227,7 @@ const I18N = {
     curado_tip_label:'Consejo:', curado_tip_text:'Si tu mate es de calabaza, repetí el proceso 2-3 veces. Para mates de madera, con una vez alcanza.',
     sec_como_num:'★ Simple', sec_como_title:'¿Cómo comprar?',
     como_step1_title:'Elegís tu mate', como_step1_desc:'Explorá el catálogo, guardá tus favoritos y agregá al carrito lo que te guste.',
-    como_step2_title:'Transferís', como_step2_desc:'Confirmás el pedido y transferís al CBU. Tenés 10% de descuento por pago bancario.',
+    como_step2_title:'Pagás', como_step2_desc:'Por transferencia, con 10% de descuento, o con tarjeta en hasta 3 cuotas sin interés con un link de pago seguro.',
     como_step3_title:'Lo recibís', como_step3_desc:'Despachamos en 48hs hábiles a todo el país. Te avisamos por email con el número de seguimiento.',
     stat_mates:'Mates entregados', stat_years:'Años de oficio', stat_hand:'Artesanal',
     exit_eyebrow:'Antes de irte...', exit_title:'¿Te vas sin tu mate?',
@@ -1254,7 +1281,7 @@ const I18N = {
     curado_tip_label:'Tip:', curado_tip_text:'Calabash mates benefit from 2-3 curing cycles. For wood mates, once is enough.',
     sec_como_num:'★ Simple', sec_como_title:'How to buy?',
     como_step1_title:'Pick your mate', como_step1_desc:'Browse the catalog, save favorites and add to cart.',
-    como_step2_title:'Transfer payment', como_step2_desc:'Confirm your order and transfer to our CBU. Get 10% off with bank transfer.',
+    como_step2_title:'You pay', como_step2_desc:'By bank transfer with 10% off, or by card in up to 3 interest-free installments through a secure payment link.',
     como_step3_title:'Receive it', como_step3_desc:'We ship within 48 business hours nationwide. We send you a tracking number by email.',
     stat_mates:'Mates delivered', stat_years:'Years of craft', stat_hand:'Handmade',
     exit_eyebrow:'Before you go...', exit_title:'Leaving without your mate?',
@@ -1639,7 +1666,7 @@ function renderGrid(listOrFilter){
   g.innerHTML=list.map((p,i)=>{
     const stockBadge=stockBadgeHtml(p);
     const shipBadge=p.precio>=100000?`<span class="free-ship">${t('free_ship')}</span>`:'';
-    return `<div class="product-card"><div class="p-img-wrap" onclick="viewProduct('${p.id}')"><img src="${getImg(p.imagen)}" alt="${p.nombre}" class="p-img" style="object-position:${getImgPos(p.imagen)}" loading="lazy" onload="this.closest('.p-img-wrap').classList.add('loaded')" crossorigin="anonymous"/>${favBtnHtml(p.id)}</div><div class="p-body"><div class="p-num">N\u00b000${i+1}</div>${stockBadge}${shipBadge}${p.badge?`<div class="p-badge">${p.badge}</div>`:''}<a class="p-name" href="${OM_SEO.productHref(p.id)}" style="display:block;text-decoration:none">${p.nombre}</a>${starsHtml(p)}<div class="p-mat">${p.material}</div><div class="p-footer"><div>${hasDescuento(p)?`<div class="p-price-label">${t('transf_label')}</div><div class="p-price-orig">${fmt(p.precio)}</div>`:''}<div class="p-price"><strong>${fmt(getPrecioTransf(p))}</strong></div></div><div class="p-btns"><button class="p-view-btn" onclick="viewProduct('${p.id}')">${t('ver_btn')}</button><button class="p-add-btn" onclick="addToCart('${p.id}')"${stockOf(p)===0?' disabled':''}>${stockOf(p)===0?'Sin stock':t('add_btn')}</button></div></div></div></div>`;
+    return `<div class="product-card"><div class="p-img-wrap" onclick="viewProduct('${p.id}')"><img src="${getImg(p.imagen)}" alt="${p.nombre}" class="p-img" style="object-position:${getImgPos(p.imagen)}" loading="lazy" onload="this.closest('.p-img-wrap').classList.add('loaded')" crossorigin="anonymous"/>${favBtnHtml(p.id)}</div><div class="p-body"><div class="p-num">N\u00b000${i+1}</div>${stockBadge}${shipBadge}${p.badge?`<div class="p-badge">${p.badge}</div>`:''}<a class="p-name" href="${OM_SEO.productHref(p.id)}" style="display:block;text-decoration:none">${p.nombre}</a>${starsHtml(p)}<div class="p-mat">${p.material}</div><div class="p-footer"><div><div class="p-price"><strong>${fmt(p.precio)}</strong></div>${hasDescuento(p)?`<div class="p-price-transf">${fmt(getPrecioTransf(p))} <span>por transferencia</span></div>`:''}</div><div class="p-btns"><button class="p-view-btn" onclick="viewProduct('${p.id}')">${t('ver_btn')}</button><button class="p-add-btn" onclick="addToCart('${p.id}')"${stockOf(p)===0?' disabled':''}>${stockOf(p)===0?'Sin stock':t('add_btn')}</button></div></div></div></div>`;
   }).join('');
 }
 
@@ -2473,14 +2500,15 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape')closeExitPop
     zona=z; var zc=CFG.zonas[z]||{};
     mode=zc.accion||'quieto';
     oso.setAttribute('data-mode',''); void oso.offsetWidth; oso.setAttribute('data-mode',mode);
-    if(oso.classList.contains('in')){ if(zc.frase) say(zc.frase); else bubble.classList.remove('show'); }
+    /* En el celular no habla al bajar por la página (tapaba contenido): solo al entrar y al tocarlo */
+    if(oso.classList.contains('in')&&window.innerWidth>700){ if(zc.frase) say(zc.frase); else bubble.classList.remove('show'); }
   }
 
   // Entrada: se asoma desde abajo
   setTimeout(function(){
     oso.classList.add('in');
     if(!zona) setZona('inicio');
-    setTimeout(function(){ say((CFG.zonas[zona]||{}).frase); },800);
+    setTimeout(function(){ say((CFG.zonas[zona]||{}).frase, window.innerWidth>700?3400:2600); },800);
   },900);
 
   // Cambia según la sección que está en el medio de la pantalla
