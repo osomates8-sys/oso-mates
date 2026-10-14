@@ -4,7 +4,7 @@
 <script>(function(){try{var t=localStorage.getItem('om_theme');if(t==='dark')document.documentElement.setAttribute('data-theme','dark');}catch(e){}})();</script>
 <meta charset="UTF-8"/>
 <!-- SEO -->
-<meta name="description" content="Mates artesanales tallados a mano en algarrobo, calabaza y cuero. Piezas únicas con guía de curado. Envíos a todo el país y 10% OFF por transferencia."/>
+<meta name="description" content="Mates artesanales tallados a mano en algarrobo, calabaza y cuero. Piezas únicas con guía de curado. Envíos a todo el país y 20% OFF por transferencia o efectivo."/>
 <meta name="keywords" content="mates artesanales, mates Mar del Plata, mates de madera, mates algarrobo, mates calabaza, mates tallados, bombillas artesanales"/>
 <meta name="author" content="Oso Mates"/>
 <meta property="og:title" content="Oso Mates — Mates artesanales tallados a mano | Mar del Plata"/>
@@ -742,7 +742,7 @@ footer .footer-copy{font-size:.6rem;color:rgba(248,248,246,.45);}
 <body>
 <!-- BANNER PROMO -->
 <div class="promo-banner" id="promo-banner">
-  <span id="promo-banner-text">Envío gratis en compras mayores a $100.000 | 10% OFF pagando por transferencia</span>
+  <span id="promo-banner-text">Envío gratis en compras mayores a $100.000 | 20% OFF pagando por transferencia o efectivo</span>
   <button class="promo-close" onclick="document.getElementById('promo-banner').style.display='none'">&#x2715;</button>
 </div>
 <div class="cursor" id="cur"></div>
@@ -964,7 +964,7 @@ footer .footer-copy{font-size:.6rem;color:rgba(248,248,246,.45);}
     <div class="como-step reveal">
       <div class="como-step-num">02</div>
       <div class="como-step-title" data-i18n="como_step2_title">Pagás</div>
-      <div class="como-step-desc" data-i18n="como_step2_desc">Por transferencia, con 10% de descuento, o con tarjeta en hasta 3 cuotas sin interés con un link de pago seguro.</div>
+      <div class="como-step-desc" data-i18n="como_step2_desc">Por transferencia o efectivo, con 20% de descuento, o con tarjeta en hasta 3 cuotas sin interés con un link de pago seguro.</div>
     </div>
     <div class="como-step reveal">
       <div class="como-step-num">03</div>
@@ -1035,7 +1035,7 @@ footer .footer-copy{font-size:.6rem;color:rgba(248,248,246,.45);}
       <div class="cart-ship-est-result" id="cart-ship-est-result"></div>
     </div>
     <div class="cart-subtotal"><span class="cart-subtotal-label" data-i18n="cart_total">Total</span><span class="cart-subtotal-amount" id="cart-total">$0</span></div>
-    <button class="checkout-btn" onclick="openCheckout('transfer')" data-i18n="cart_pay_transfer">Pagar con transferencia (&#x2212;10%)</button>
+    <button class="checkout-btn" onclick="openCheckout('transfer')" data-i18n="cart_pay_transfer">Pagar con transferencia (&#x2212;20%)</button>
     <button class="checkout-btn checkout-btn-alt" id="cart-pay-card" onclick="openCheckout('card')" style="display:none">Pagar con tarjeta</button>
   </div>
 </div>
@@ -1056,7 +1056,7 @@ footer .footer-copy{font-size:.6rem;color:rgba(248,248,246,.45);}
         <div class="coupon-box"><input id="coupon-input" type="text" placeholder="Código de cupón" data-i18n-ph="coupon_ph"/><button class="coupon-btn" onclick="applyCoupon()" data-i18n="coupon_btn">Aplicar</button></div>
         <div class="coupon-msg" id="coupon-msg"></div>
         <div class="pay-choice" id="pay-choice">
-          <button type="button" class="pay-opt active" data-pay="transfer" onclick="selectPay('transfer')"><strong>Transferencia</strong><span>10% de descuento</span></button>
+          <button type="button" class="pay-opt active" data-pay="transfer" onclick="selectPay('transfer')"><strong>Transferencia</strong><span>20% de descuento</span></button>
           <button type="button" class="pay-opt" data-pay="card" onclick="selectPay('card')"><strong>Tarjeta</strong><span id="pay-opt-card-sub">Crédito o débito</span></button>
         </div>
         <div class="card-box" id="card-box"></div>
@@ -1064,7 +1064,7 @@ footer .footer-copy{font-size:.6rem;color:rgba(248,248,246,.45);}
           <div class="transfer-box-title" data-i18n="transfer_title">&#x2713; Datos para transferir</div>
           <div class="trow"><span class="tlabel" data-i18n="transfer_banco">Banco</span><span class="tval" data-i18n="transfer_banco_val">Francés (BBVA)</span></div>
           <div class="trow"><span class="tlabel" data-i18n="transfer_cbu">CBU</span><span class="tval">0170090940000048482721 <button class="copy-btn" onclick="copyCBU()" data-i18n="copy_btn">Copiar</button></span></div>
-          <div class="dcto-banner" data-i18n="dcto_banner">10% DE DESCUENTO APLICADO</div>
+          <div class="dcto-banner" data-i18n="dcto_banner">20% DE DESCUENTO APLICADO</div>
         </div>
         <div id="ord-history-box" style="margin-top:1.2rem;display:none;">
           <div class="co-sec" data-i18n="ord_history_title" style="margin-bottom:.6rem;">Pedidos anteriores</div>
@@ -1255,7 +1255,7 @@ const I18N = {
     curado_tip_label:'Consejo:', curado_tip_text:'Si tu mate es de calabaza, repetí el proceso 2-3 veces. Para mates de madera, con una vez alcanza.',
     sec_como_num:'★ Simple', sec_como_title:'¿Cómo comprar?',
     como_step1_title:'Elegís tu mate', como_step1_desc:'Explorá el catálogo, guardá tus favoritos y agregá al carrito lo que te guste.',
-    como_step2_title:'Pagás', como_step2_desc:'Por transferencia, con 10% de descuento, o con tarjeta en hasta 3 cuotas sin interés con un link de pago seguro.',
+    como_step2_title:'Pagás', como_step2_desc:'Por transferencia o efectivo, con 20% de descuento, o con tarjeta en hasta 3 cuotas sin interés con un link de pago seguro.',
     como_step3_title:'Lo recibís', como_step3_desc:'Despachamos en 48hs hábiles a todo el país. Te avisamos por email con el número de seguimiento.',
     stat_mates:'Mates entregados', stat_years:'Años de oficio', stat_hand:'Artesanal',
     exit_eyebrow:'Antes de irte...', exit_title:'¿Te vas sin tu mate?',
@@ -1278,10 +1278,10 @@ const I18N = {
     wa_label:'WhatsApp directo', wa_btn:'Escribir ahora →',
     newsletter_title:'Sumate a la lista', newsletter_text:'Recibí novedades, descuentos exclusivos y nuevos lanzamientos directo a tu email.', newsletter_text_cup:'Dejá tu email y llevate <strong>{p}% OFF en tu primera compra</strong>. También te avisamos cuando haya mates nuevos.', newsletter_ph:'tu@email.com', newsletter_btn:'Suscribirme',
     footer_copy1:'© 2026 — Hecho en Argentina', footer_copy2:'Todos los derechos reservados', footer_legal:'Política de privacidad y términos',
-    cart_title:'Tu carrito', cart_close:'✕ Cerrar', cart_ship_title:'Calculá tu envío', cart_total:'Total', cart_pay_transfer:'Pagar con transferencia (−10%)', cart_empty:'Tu carrito está vacío',
+    cart_title:'Tu carrito', cart_close:'✕ Cerrar', cart_ship_title:'Calculá tu envío', cart_total:'Total', cart_pay_transfer:'Pagar con transferencia (−20%)', cart_empty:'Tu carrito está vacío',
     co_title:'Resumen de compra', co_close:'✕ Volver', co_productos:'Productos', co_total:'Total', coupon_ph:'Código de cupón', coupon_btn:'Aplicar',
-    pay_tr_label:'Transferencia', pay_tr_desc:'10% de descuento',
-    transfer_title:'✓ Datos para transferir', transfer_banco:'Banco', transfer_banco_val:'Francés (BBVA)', transfer_cbu:'CBU', copy_btn:'Copiar', dcto_banner:'10% DE DESCUENTO APLICADO',
+    pay_tr_label:'Transferencia', pay_tr_desc:'20% de descuento',
+    transfer_title:'✓ Datos para transferir', transfer_banco:'Banco', transfer_banco_val:'Francés (BBVA)', transfer_cbu:'CBU', copy_btn:'Copiar', dcto_banner:'20% DE DESCUENTO APLICADO',
     co_datos:'Tus datos', field_nombre:'Nombre *', field_nombre_ph:'Tu nombre completo', field_email:'Email *', field_email_ph:'tu@email.com', field_note:'Te enviaremos la confirmación a tu email.', confirm_btn:'Confirmar pedido',
     success_title:'¡Pedido confirmado!', success_close:'Cerrar',
     cookie_text:'Usamos cookies para mejorar tu experiencia y analizar el tráfico del sitio. Al continuar navegando aceptás nuestra <a href="legales.html">política de privacidad</a>.', cookie_btn:'Aceptar',
@@ -1309,7 +1309,7 @@ const I18N = {
     curado_tip_label:'Tip:', curado_tip_text:'Calabash mates benefit from 2-3 curing cycles. For wood mates, once is enough.',
     sec_como_num:'★ Simple', sec_como_title:'How to buy?',
     como_step1_title:'Pick your mate', como_step1_desc:'Browse the catalog, save favorites and add to cart.',
-    como_step2_title:'You pay', como_step2_desc:'By bank transfer with 10% off, or by card in up to 3 interest-free installments through a secure payment link.',
+    como_step2_title:'You pay', como_step2_desc:'By bank transfer or cash with 20% off, or by card in up to 3 interest-free installments through a secure payment link.',
     como_step3_title:'Receive it', como_step3_desc:'We ship within 48 business hours nationwide. We send you a tracking number by email.',
     stat_mates:'Mates delivered', stat_years:'Years of craft', stat_hand:'Handmade',
     exit_eyebrow:'Before you go...', exit_title:'Leaving without your mate?',
@@ -1332,10 +1332,10 @@ const I18N = {
     wa_label:'Direct WhatsApp', wa_btn:'Message us →',
     newsletter_title:'Join our list', newsletter_text:'Get news, exclusive discounts and new releases straight to your inbox.', newsletter_text_cup:'Leave your email and get <strong>{p}% OFF your first order</strong>. We will also let you know about new mates.', newsletter_ph:'you@email.com', newsletter_btn:'Subscribe',
     footer_copy1:'© 2026 — Made in Argentina', footer_copy2:'All rights reserved', footer_legal:'Privacy policy and terms',
-    cart_title:'Your cart', cart_close:'✕ Close', cart_ship_title:'Calculate your shipping', cart_total:'Total', cart_pay_transfer:'Pay by bank transfer (−10%)', cart_empty:'Your cart is empty',
+    cart_title:'Your cart', cart_close:'✕ Close', cart_ship_title:'Calculate your shipping', cart_total:'Total', cart_pay_transfer:'Pay by bank transfer (−20%)', cart_empty:'Your cart is empty',
     co_title:'Order summary', co_close:'✕ Back', co_productos:'Products', co_total:'Total', coupon_ph:'Coupon code', coupon_btn:'Apply',
-    pay_tr_label:'Bank transfer', pay_tr_desc:'10% discount',
-    transfer_title:'✓ Transfer details', transfer_banco:'Bank', transfer_banco_val:'Francés (BBVA)', transfer_cbu:'CBU', copy_btn:'Copy', dcto_banner:'10% DISCOUNT APPLIED',
+    pay_tr_label:'Bank transfer', pay_tr_desc:'20% discount',
+    transfer_title:'✓ Transfer details', transfer_banco:'Bank', transfer_banco_val:'Francés (BBVA)', transfer_cbu:'CBU', copy_btn:'Copy', dcto_banner:'20% DISCOUNT APPLIED',
     co_datos:'Your details', field_nombre:'Name *', field_nombre_ph:'Your full name', field_email:'Email *', field_email_ph:'you@email.com', field_note:'We\'ll send your confirmation by email.', confirm_btn:'Confirm order',
     success_title:'Order confirmed!', success_close:'Close',
     cookie_text:'We use cookies to improve your experience and analyze site traffic. By continuing to browse you accept our <a href="legales.html">privacy policy</a>.', cookie_btn:'Accept',
@@ -1568,7 +1568,7 @@ async function loadNosotros(){
 const DEFAULT_FAQ=[
   {q:'¿Cuánto tarda en llegar el pedido?',a:'Despachamos en 48 horas hábiles desde que confirmamos el pago. El tiempo de entrega depende de tu ubicación: CABA y GBA 2-3 días, interior del país 3-7 días hábiles. Te enviamos el número de seguimiento por email.'},
   {q:'¿Los mates vienen curados?',a:'Los mates se entregan sin curar. Junto a cada mate enviamos una guía práctica con el paso a paso para curarlo fácilmente y empezar a disfrutarlo.'},
-  {q:'¿Cómo funciona el descuento por transferencia?',a:'Al elegir el método de pago "Transferencia" en el checkout, el 10% de descuento se aplica automáticamente. Los datos bancarios (CBU del Banco Francés) aparecen en pantalla y te los enviamos por email.'},
+  {q:'¿Cómo funciona el descuento por transferencia?',a:'Al elegir el método de pago "Transferencia" en el checkout, el 20% de descuento se aplica automáticamente. Los datos bancarios (CBU del Banco Francés) aparecen en pantalla y te los enviamos por email.'},
   {q:'¿Puedo pedir un mate personalizado?',a:'¡Sí! Podés agregar grabado personalizado (nombres, fechas o diseños) marcando la casilla en la página de cada mate; el precio se suma solo. Después de confirmar el pago coordinamos el diseño por WhatsApp. El grabado demora 2 a 3 días hábiles; en Mar del Plata te lo llevamos al terminarlo y al resto del país se despacha y se suma el tiempo de envío.'},
   {q:'¿Qué hago si el producto llega dañado?',a:'Todos nuestros envíos tienen seguro. Si el producto llega dañado, escribinos por WhatsApp con una foto en las primeras 48hs y lo reponemos sin costo.'},
   {q:'¿Tienen local físico?',a:'Somos un emprendimiento online de Mar del Plata. Por el momento no tenemos local físico, pero podés coordinar retiro en mano si estás en MDP escribiéndonos por WhatsApp.'}
@@ -1913,7 +1913,7 @@ function buildCheckout(){
 function buildCheckoutTotal(){
   const isT=payMethod==='transfer';
   const total=getCheckoutTotal();
-  let label=isT?'Total (con 10% dcto.)':'Total con tarjeta';
+  let label=isT?'Total (con 20% dcto.)':'Total con tarjeta';
   if(_couponApplied&&_coupon.percent>0)label+=' (cupón -'+_coupon.percent+'%)';
   document.getElementById('co-total-label').textContent=label;
   document.getElementById('co-total-amount').textContent=fmt(total);
@@ -1925,7 +1925,7 @@ function buildCheckoutTotal(){
   }
 }
 function metodoTxt(isT){
-  if(isT) return 'Transferencia (10% dcto.)';
+  if(isT) return 'Transferencia (20% dcto.)';
   return 'Tarjeta — link de pago'+(PAGO_TARJETA.proveedor?' '+PAGO_TARJETA.proveedor:'')+(PAGO_TARJETA.cuotas>1?' (hasta '+PAGO_TARJETA.cuotas+' cuotas s/i)':'');
 }
 async function confirmOrder(){
