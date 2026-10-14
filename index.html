@@ -713,6 +713,30 @@ fbq('track', 'PageView');
   .oso{width:min(var(--oso-wm,110px),78px)!important;}
   .oso:not(.izq){right:80px!important;}
 }
+
+/* ===== Estética 3ª pasada ===== */
+/* Portada de borde a borde y sin franja vacía abajo */
+@media(min-width:901px){
+  #hero{padding:80px 0 0!important;min-height:0!important;height:min(calc(100vh - 38px),860px);}
+  #hero .hero-left,#hero .hero-right{height:100%;}
+  #hero .hero-left{padding:4rem 5rem!important;}
+}
+/* Nosotros: números como en "Cuidá tu mate" */
+.value-icon{font-family:'Cormorant Garamond',serif;font-size:1.6rem!important;color:var(--warm);line-height:1;margin-bottom:.7rem!important;}
+.values-list{background:var(--light);}
+.value-item{background:var(--white)!important;}
+/* Filtros del catálogo más ordenados */
+#catalogo .search-box{max-width:360px!important;}
+#catalogo .filter-row{margin:1.4rem 0 .4rem!important;border-bottom:1px solid var(--light);}
+#catalogo .price-filter-row{padding:.9rem 0 0!important;border:none!important;background:transparent!important;margin-bottom:2.2rem;align-items:center;}
+#catalogo .pfab-label{font-size:.62rem;letter-spacing:.14em;text-transform:uppercase;color:var(--gray);margin-right:.2rem;}
+/* Pie de página centrado y prolijo */
+footer{flex-direction:column!important;justify-content:center!important;align-items:center!important;text-align:center;gap:1.2rem!important;padding:3.5rem 2rem 3rem!important;}
+.footer-links{display:flex;flex-wrap:wrap;justify-content:center;gap:.6rem 1.8rem;}
+.footer-links a{font-size:.66rem;letter-spacing:.12em;text-transform:uppercase;color:rgba(248,248,246,.72);text-decoration:none;}
+.footer-links a:hover{color:#f8f8f6;}
+footer .footer-copy{font-size:.6rem;color:rgba(248,248,246,.45);}
+@media(max-width:600px){.wa-block .wa-num,.wa-number,.wa-big{white-space:nowrap;font-size:clamp(1.5rem,7.4vw,2.2rem)!important;}}
 </style>
 </head>
 <body>
@@ -990,11 +1014,15 @@ fbq('track', 'PageView');
 </section>
 <footer>
   <div class="footer-logo">Oso Mates</div>
-  <div class="footer-copy" data-i18n="footer_copy1">&#169; 2026 &#8212; Hecho en Argentina</div>
-  <div class="footer-copy" data-i18n="footer_copy2">Todos los derechos reservados</div>
-  <div class="footer-copy" style="margin-top:.6rem"><a href="guias.html" style="color:inherit;text-decoration:underline">Guías del mate</a></div>
-  <div class="footer-copy" style="margin-top:.6rem"><a href="legales.html" style="color:inherit;text-decoration:underline" data-i18n="footer_legal">Política de privacidad y términos</a></div>
-  <div class="footer-copy" style="margin-top:.6rem"><a href="legales.html#arrepentimiento" style="color:inherit;text-decoration:underline">Botón de arrepentimiento</a> · <a href="legales.html#devoluciones" style="color:inherit;text-decoration:underline">Cambios y devoluciones</a></div>
+  <div class="footer-links">
+    <a href="#catalogo">Catálogo</a>
+    <a href="guias.html">Guías del mate</a>
+    <a href="https://www.instagram.com/oso_mates/" target="_blank" rel="noopener">Instagram</a>
+    <a href="legales.html#devoluciones">Cambios y devoluciones</a>
+    <a href="legales.html#arrepentimiento">Botón de arrepentimiento</a>
+    <a href="legales.html" data-i18n="footer_legal">Política de privacidad y términos</a>
+  </div>
+  <div class="footer-copy"><span data-i18n="footer_copy1">&#169; 2026 &#8212; Hecho en Argentina</span> · <span data-i18n="footer_copy2">Todos los derechos reservados</span></div>
 </footer>
 <div class="cart-overlay" id="cart-overlay" onclick="toggleCart()"></div>
 <div class="cart-sidebar" id="cart-sidebar">
@@ -1511,8 +1539,8 @@ async function loadNosotros(){
     '<h2 class="nos-title">'+d.title1+'<br/><em>'+d.title2+'</em></h2>'+
     '<p class="nos-body">'+d.body+'</p>'+
     '<div class="values-list">'+
-    (d.values||[]).map(function(v){
-      return '<div class="value-item"><span class="value-icon">'+v.icon+'</span><div class="value-name">'+v.name+'</div><div class="value-desc">'+v.desc+'</div></div>';
+    (d.values||[]).map(function(v,i){
+      return '<div class="value-item"><span class="value-icon">0'+(i+1)+'</span><div class="value-name">'+v.name+'</div><div class="value-desc">'+v.desc+'</div></div>';
     }).join('')+
     '</div>'+
     '<div class="nos-stats">'+
