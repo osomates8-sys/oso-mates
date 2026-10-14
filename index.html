@@ -692,6 +692,7 @@ fbq('track', 'PageView');
 /* 3. Precio de lista grande y el de transferencia abajo, sin tachado */
 .p-price-transf{font-size:.72rem;color:var(--green);font-weight:600;margin-top:.15rem;}
 .p-price-transf span{font-weight:400;color:var(--mid);}
+.p-price-card{font-size:.66rem;color:var(--gray);margin-top:.1rem;}
 [data-theme="dark"] .p-price-transf{color:#7ccf8a;}
 /* 4. Textos de botones y etiquetas más legibles */
 .p-add-btn{font-size:.66rem!important;}
@@ -1123,7 +1124,7 @@ function loadRecentlyViewed(){
           '<div class="bs-name">'+p.nombre+'</div>'+stockBadgeHtml(p)+
           '<div class="bs-mat">'+p.material+'</div>'+
           '<div class="bs-footer">'+
-            '<div class="bs-price">'+fmt(p.precio)+'</div>'+
+            '<div class="bs-price">'+fmt(getPrecioTransf(p))+'</div>'+
             '<button class="bs-btn" onclick="event.stopPropagation();addToCart(\'' +p.id+ '\')">'+t('add_btn')+'</button>'+
           '</div>'+
         '</div>'+
@@ -1158,7 +1159,7 @@ async function loadCombos(){
         '<div class="bs-name">' + p.nombre + '</div>'+
         '<div class="bs-mat">' + p.material + '</div>'+
         '<div class="bs-footer">'+
-          '<div class="bs-price">' + fmt(p.precio) + '</div>'+
+          '<div class="bs-price">'+fmt(getPrecioTransf(p))+'</div>'+
           '<button class="bs-btn" onclick="event.stopPropagation();addToCart(\'' + p.id + '\')">' + t('add_btn') + '</button>'+
         '</div>'+
       '</div>'+
@@ -1182,7 +1183,7 @@ async function loadBombillas(){
         '<div class="bs-name">' + p.nombre + '</div>'+
         '<div class="bs-mat">' + p.material + '</div>'+
         '<div class="bs-footer">'+
-          '<div class="bs-price">' + fmt(p.precio) + '</div>'+
+          '<div class="bs-price">'+fmt(getPrecioTransf(p))+'</div>'+
           '<button class="bs-btn" onclick="event.stopPropagation();addToCart(\'' + p.id + '\')">' + t('add_btn') + '</button>'+
         '</div>'+
       '</div>'+
@@ -1397,7 +1398,7 @@ async function loadBestsellers() {
         '<div class="bs-name">' + p.nombre + '</div>'+
         '<div class="bs-mat">' + p.material + '</div>'+
         '<div class="bs-footer">'+
-          '<div class="bs-price">' + fmt(p.precio) + '</div>'+
+          '<div class="bs-price">'+fmt(getPrecioTransf(p))+'</div>'+
           '<button class="bs-btn" onclick="event.stopPropagation();addToCart(\'' + p.id + '\')">' + t('add_btn') + '</button>'+
         '</div>'+
       '</div>'+
@@ -1694,7 +1695,7 @@ function renderGrid(listOrFilter){
   g.innerHTML=list.map((p,i)=>{
     const stockBadge=stockBadgeHtml(p);
     const shipBadge=p.precio>=100000?`<span class="free-ship">${t('free_ship')}</span>`:'';
-    return `<div class="product-card"><div class="p-img-wrap" onclick="viewProduct('${p.id}')"><img src="${getImg(p.imagen)}" alt="${p.nombre}" class="p-img" style="object-position:${getImgPos(p.imagen)}" loading="lazy" onload="this.closest('.p-img-wrap').classList.add('loaded')" crossorigin="anonymous"/>${favBtnHtml(p.id)}</div><div class="p-body"><div class="p-num">N\u00b000${i+1}</div>${stockBadge}${shipBadge}${p.badge?`<div class="p-badge">${p.badge}</div>`:''}<a class="p-name" href="${OM_SEO.productHref(p.id)}" style="display:block;text-decoration:none">${p.nombre}</a>${starsHtml(p)}<div class="p-mat">${p.material}</div><div class="p-footer"><div><div class="p-price"><strong>${fmt(p.precio)}</strong></div>${hasDescuento(p)?`<div class="p-price-transf">${fmt(getPrecioTransf(p))} <span>por transferencia</span></div>`:''}</div><div class="p-btns"><button class="p-view-btn" onclick="viewProduct('${p.id}')">${t('ver_btn')}</button><button class="p-add-btn" onclick="addToCart('${p.id}')"${stockOf(p)===0?' disabled':''}>${stockOf(p)===0?'Sin stock':t('add_btn')}</button></div></div></div></div>`;
+    return `<div class="product-card"><div class="p-img-wrap" onclick="viewProduct('${p.id}')"><img src="${getImg(p.imagen)}" alt="${p.nombre}" class="p-img" style="object-position:${getImgPos(p.imagen)}" loading="lazy" onload="this.closest('.p-img-wrap').classList.add('loaded')" crossorigin="anonymous"/>${favBtnHtml(p.id)}</div><div class="p-body"><div class="p-num">N\u00b000${i+1}</div>${stockBadge}${shipBadge}${p.badge?`<div class="p-badge">${p.badge}</div>`:''}<a class="p-name" href="${OM_SEO.productHref(p.id)}" style="display:block;text-decoration:none">${p.nombre}</a>${starsHtml(p)}<div class="p-mat">${p.material}</div><div class="p-footer"><div><div class="p-price"><strong>${fmt(getPrecioTransf(p))}</strong></div>${hasDescuento(p)?`<div class="p-price-transf">&#x2212;20% <span>transferencia o efectivo</span></div><div class="p-price-card">${fmt(p.precio)} con tarjeta</div>`:''}</div><div class="p-btns"><button class="p-view-btn" onclick="viewProduct('${p.id}')">${t('ver_btn')}</button><button class="p-add-btn" onclick="addToCart('${p.id}')"${stockOf(p)===0?' disabled':''}>${stockOf(p)===0?'Sin stock':t('add_btn')}</button></div></div></div></div>`;
   }).join('');
 }
 

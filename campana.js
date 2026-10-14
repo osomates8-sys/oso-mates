@@ -132,7 +132,7 @@
       var href = window.OM_SEO ? OM_SEO.productHref(p.id) : 'producto.html?id=' + encodeURIComponent(p.id);
       var img = typeof getImg === 'function' ? getImg(p.imagen) : p.imagen;
       var pos = typeof getImgPos === 'function' ? getImgPos(p.imagen) : 'center';
-      var precio = typeof fmt === 'function' ? fmt(p.precio) : '$' + p.precio;
+      var precio = typeof fmt === 'function' ? fmt(p.precio_transferencia || p.precio) : '$' + (p.precio_transferencia || p.precio);
       return '<a class="dm-card" href="' + esc(href) + '"><img src="' + esc(img) + '" alt="' + esc(p.nombre) + '" loading="lazy" style="object-position:' + esc(pos) + '"/>' +
         '<div class="dm-name">' + esc(p.nombre) + '</div><div class="dm-price">' + precio + (p.ofrece_grabado !== false ? ' · se puede grabar' : '') + '</div></a>';
     }).join('');
