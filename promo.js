@@ -40,7 +40,7 @@
       if (!p || !p.precio || p.precio_lista) return;
       p.precio_lista = p.precio;
       p.precio = redondear(p.precio);
-      if (p.precio_transferencia) p.precio_transferencia = redondear(p.precio_transferencia);
+      if (p.precio_transferencia) { p.precio_transferencia_lista = p.precio_transferencia; p.precio_transferencia = redondear(p.precio_transferencia); }
       p.badge = activa.nombre + ' −' + activa.descuento + '%';
     });
   }
@@ -85,7 +85,7 @@
     var box = document.getElementById('product-price');
     if (!box || document.getElementById('promo-antes')) return;
     var p = null; try { p = currentProd; } catch (e) {}
-    var antes = p && p.precio_lista;
+    var antes = p && (p.precio_transferencia_lista || p.precio_lista);
     if (!antes) return;
     var fmtp = typeof fmt === 'function' ? fmt : function (n) { return '$' + Math.round(n).toLocaleString('es-AR'); };
     var el = document.createElement('div');
