@@ -1,4 +1,4 @@
-/* Oso Mates - datos de la tienda. Editado desde editar.html el 2026-10-01.
+/* Oso Mates - datos de la tienda. Editado desde editar.html el 2026-10-15.
    La tienda usa SOLO estos datos (no hay base de datos externa). */
 (function () {
   window.FALLBACK_PRODUCTOS = [
@@ -18,7 +18,9 @@
         "IMG_5206-Edit.jpg|54% 45%",
         "IMG_5190-Edit.jpg"
       ],
-      "stock": null
+      "stock": null,
+      "ofrece_bombilla": true,
+      "ofrece_grabado": true
     },
     {
       "id": "6fcc197e-6d1a-4cb0-8763-c57509cd6c8f",
@@ -36,7 +38,9 @@
         "IMG_5161-Edit.jpg|52% 57%",
         "IMG_5218-Edit-2-Edit.jpg|52% 64%"
       ],
-      "stock": null
+      "stock": null,
+      "ofrece_bombilla": true,
+      "ofrece_grabado": true
     },
     {
       "id": "0992d3e8-e059-4d23-81fc-0237c4ee5a23",
@@ -56,7 +60,9 @@
         "imperial-algarrobo-muftpl9nujl.webp|52% 61%",
         "imperial-algarrobo-mugygxq5cvh.webp"
       ],
-      "stock": null
+      "stock": null,
+      "ofrece_bombilla": true,
+      "ofrece_grabado": true
     },
     {
       "id": "742a8678-34c3-420c-bf0e-00fddf5e330e",
@@ -74,7 +80,9 @@
         "camionero-muftpmhoz9y.webp|47% 55%",
         "camionero-muftpnooci1.webp|43% 54%"
       ],
-      "stock": null
+      "stock": null,
+      "ofrece_bombilla": true,
+      "ofrece_grabado": true
     },
     {
       "id": "6d4bd8d7-b783-4294-81a0-f6e3b323b55d",
@@ -93,7 +101,9 @@
         "ranchero-muftppvyy4c.webp|53% 68%",
         "ranchero-muftpqulkny.webp|47% 59%"
       ],
-      "stock": null
+      "stock": null,
+      "ofrece_bombilla": true,
+      "ofrece_grabado": true
     },
     {
       "id": "0c98363c-7285-4b7f-bb83-350d8f88d5e8",
@@ -111,12 +121,13 @@
         "galleta-muftpryxvqj.webp|51% 61%",
         "galleta-muftpszpxpk.webp|60% 28%"
       ],
-      "stock": null
+      "stock": null,
+      "ofrece_bombilla": true,
+      "ofrece_grabado": true
     }
   ];
 
   window.FALLBACK_CONFIG = {
-    "pago_tarjeta": "{\"active\":true,\"cuotas\":3,\"proveedor\":\"Naranja X\"}",
     "galeria_imgs": "[\"IMG_5233.jpg\",\"IMG_5277.jpg\",\"IMG_5272.jpg\"]",
     "faq_items": "[{\"q\":\"¿Cuánto tarda en llegar el pedido?\",\"a\":\"Despachamos en 48 horas hábiles desde que confirmamos el pago. El tiempo de entrega depende de tu ubicación: CABA y GBA 2-3 días, interior del país 3-7 días hábiles. Te enviamos el número de seguimiento por email.\"},{\"q\":\"¿Los mates vienen curados?\",\"a\":\"Los mates se entregan sin curar. Pero no te preocupes: junto a cada mate enviamos una guía práctica con el paso a paso para que puedas curarlo fácilmente y empezar a disfrutarlo.\"},{\"q\":\"¿Cómo funciona el descuento por transferencia?\",\"a\":\"Al elegir el método de pago \\\"Transferencia\\\" en el checkout, el 20% de descuento se aplica automáticamente. Los datos bancarios (CBU del Banco Francés) aparecen en pantalla y te los enviamos por email.\"},{\"q\":\"¿Puedo pedir un mate personalizado?\",\"a\":\"¡Sí! Podés agregar grabado personalizado (nombres, fechas o diseños) marcando la casilla en la página de cada mate; el precio se suma solo. Después de confirmar el pago coordinamos el diseño por WhatsApp. El grabado demora 2 a 3 días hábiles; en Mar del Plata te lo llevamos al terminarlo y al resto del país se despacha y se suma el tiempo de envío.\"},{\"q\":\"¿Tienen local físico?\",\"a\":\"Somos un emprendimiento online de Mar del Plata. Por el momento no tenemos local físico, pero podés coordinar retiro en mano si estás en MDP escribiéndonos por WhatsApp.\"}]",
     "hero_h1": "Oso",
@@ -127,11 +138,13 @@
     "testimonios": "[{\"stars\":5,\"text\":\"Compré el Imperial Algarrobo y es una joya. La madera tiene una textura increíble, se nota que es tallado a mano. Llegó en perfectas condiciones.\",\"author\":\"Martina G.\",\"location\":\"Buenos Aires\"},{\"stars\":5,\"text\":\"Pedí uno para regalar y quedaron fascinados. La calidad es impresionante para el precio. La bombilla artesanal también es hermosa. 100% lo recomiendo.\",\"author\":\"Federico R.\",\"location\":\"Rosario\"},{\"stars\":5,\"text\":\"Un lujo la atención y los productos, los mejores de Mar del plata!!\",\"author\":\"Agustin F.\",\"location\":\"Mar del plata\"}]",
     "coupon": "{\"code\":\"OSO10\",\"percent\":10,\"active\":true}",
     "coupon_newsletter": "{\"code\":\"BIENVENIDA5\",\"percent\":5,\"active\":true}",
+    "pago_tarjeta": "{\"active\":true,\"cuotas\":3,\"proveedor\":\"Naranja X\"}",
     "ga_id": "G-74Q6C5ZQMS",
     "promos": "[{\"active\":true,\"nombre\":\"Cyber Oso\",\"desde\":\"2026-11-02\",\"hasta\":\"2026-11-04\",\"descuento\":15},{\"active\":true,\"nombre\":\"Black Oso\",\"desde\":\"2026-11-27\",\"hasta\":\"2026-11-30\",\"descuento\":15}]",
-    "campanas": "[{\"active\": true, \"titulo\": \"Día de la Madre\", \"fecha\": \"2026-10-18\", \"sorteo_premio\": \"un combo matero (mate Ranchero + bombilla pico de loro + yerba LIBRE) y un tatuaje con @gasparsuarez.art\", \"sorteo_hasta\": \"2026-10-16\", \"sorteo_dia\": \"2026-10-17\", \"sorteo_link\": \"https://www.instagram.com/p/DeIcoE1IPLB/\", \"emoji\": \"🌷\", \"antes_de\": \"antes del Día de la Madre\", \"seccion\": \"Regalale un mate <em>a mamá</em>\", \"sorteo_bases\": \"sorteo-dia-de-la-madre.html\"}, {\"active\": true, \"titulo\": \"Navidad\", \"emoji\": \"🎄\", \"desde\": \"2026-11-27\", \"fecha\": \"2026-12-24\", \"antes_de\": \"antes de Navidad\", \"seccion\": \"Regalá un mate <em>esta Navidad</em>\"}, {\"active\": true, \"titulo\": \"Reyes\", \"emoji\": \"👑\", \"desde\": \"2026-12-26\", \"fecha\": \"2027-01-06\", \"antes_de\": \"antes de Reyes\", \"seccion\": \"Regalos <em>para Reyes</em>\"}]",
+    "campanas": "[{\"active\":true,\"titulo\":\"Día de la Madre\",\"emoji\":\"🌷\",\"fecha\":\"2026-10-18\",\"seccion\":\"Regalale un mate <em>a mamá</em>\",\"antes_de\":\"antes del Día de la Madre\",\"sorteo_premio\":\"un combo matero (mate Ranchero + bombilla pico de loro + yerba LIBRE) y un tatuaje con @gasparsuarez.art\",\"sorteo_hasta\":\"2026-10-16\",\"sorteo_dia\":\"2026-10-17\",\"sorteo_link\":\"https://www.instagram.com/p/DeIcoE1IPLB/\",\"sorteo_bases\":\"sorteo-dia-de-la-madre.html\"},{\"active\":true,\"titulo\":\"Navidad\",\"emoji\":\"🎄\",\"fecha\":\"2026-12-24\",\"desde\":\"2026-11-27\",\"seccion\":\"Regalá un mate <em>esta Navidad</em>\",\"antes_de\":\"antes de Navidad\"},{\"active\":true,\"titulo\":\"Reyes\",\"emoji\":\"👑\",\"fecha\":\"2027-01-06\",\"desde\":\"2026-12-26\",\"seccion\":\"Regalos <em>para Reyes</em>\",\"antes_de\":\"antes de Reyes\"}]",
     "oso_config": "{\"activo\":true,\"lado\":\"der\",\"tamano\":\"mediano\",\"celular\":true,\"zonas\":{\"inicio\":{\"accion\":\"saluda\",\"frase\":\"¡Hola! Encontrá tu próximo mate\"},\"productos\":{\"accion\":\"mate\",\"frase\":\"Un mate y seguimos!\"},\"galeria\":{\"accion\":\"mira\",\"frase\":\"Elegí el tuyo\"},\"info\":{\"accion\":\"quieto\",\"frase\":\"Este es para vos\"},\"contacto\":{\"accion\":\"asiente\",\"frase\":\"¿Te cebo uno? Escribinos.\"}},\"tocar\":[\"¡Cebame uno!\",\"Desde Mar del Plata a todo el país.\",\"¿Ya viste los bombillones?\",\"El ranchero es mi favorito.\"]}",
-    "grabado": "{\"active\":true,\"price\":9000,\"maxChars\":20}"
+    "grabado": "{\"active\":true,\"price\":9000,\"maxChars\":20}",
+    "bombilla_extra": "{\"active\":true,\"nombre\":\"Bombilla\",\"price\":7500}"
   };
 
   window.FALLBACK_CONFIG_ROWS = Object.keys(window.FALLBACK_CONFIG).map(function (k) {
