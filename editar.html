@@ -139,11 +139,11 @@
     <label>Barra superior (banner)</label>
     <input type="text" id="cfg-banner"/>
     <div class="row">
-      <div><label>Título 1 (hero)</label><input type="text" id="cfg-hero_h1"/></div>
-      <div><label>Título 2 (hero)</label><input type="text" id="cfg-hero_h2"/></div>
+      <div><label>Portada — título grande (arriba, ej: "Oso")</label><input type="text" id="cfg-hero_h1" placeholder="Oso"/></div>
+      <div><label>Portada — título en cursiva (abajo, ej: "Mates")</label><input type="text" id="cfg-hero_h2" placeholder="Mates"/></div>
     </div>
-    <label>Bajada del hero (opcional)</label>
-    <input type="text" id="cfg-hero_desc"/>
+    <label>Portada — texto debajo de "Oso Mates"</label>
+    <textarea id="cfg-hero_desc" style="min-height:70px;font-family:'Montserrat',sans-serif;font-size:.9rem"></textarea>
     <div class="row3">
       <div><label>Cupón visitantes nuevos — código</label><input type="text" id="cup-code"/></div>
       <div><label>Cupón — % descuento</label><input type="number" id="cup-percent" min="0" max="100"/></div>
@@ -910,7 +910,7 @@ function loadConfigForm(){
   document.getElementById('cfg-ga_id').value = config.ga_id||'';
   document.getElementById('cfg-hero_h1').value = config.hero_h1||'';
   document.getElementById('cfg-hero_h2').value = config.hero_h2||'';
-  document.getElementById('cfg-hero_desc').value = config.hero_desc||'';
+  document.getElementById('cfg-hero_desc').value = config.hero_desc||'Cada pieza tallada a mano. Sin moldes, sin máquinas. Solo madera, tiempo y oficio.';
   let cup={code:'',percent:0,active:false};
   try{ cup=JSON.parse(config.coupon||'{}'); }catch(e){}
   document.getElementById('cup-code').value = cup.code||'';
