@@ -58,7 +58,10 @@
         "IMG_5139.jpg|48% 61%",
         "IMG_5145.jpg|52% 55%",
         "imperial-algarrobo-muftpl9nujl.webp|52% 61%",
-        "imperial-algarrobo-mugygxq5cvh.webp"
+        "imperial-algarrobo-mugygxq5cvh.webp",
+        "IMG_5233.jpg",
+        "IMG_5277.jpg",
+        "DSC08987.jpg"
       ],
       "stock": null,
       "ofrece_bombilla": true,

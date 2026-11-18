@@ -28,12 +28,12 @@
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet" media="print" onload="this.media='all'"/>
 <noscript><link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet"/></noscript>
 <script defer src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js" onload="emailjs.init('pr1E8ccHpaDtcv1Ml')"></script>
-<script src="fallback-data.js?v=20261014"></script>
-<script src="promo.js?v=20261014"></script>
-<script src="seo-pages.js?v=20261014"></script>
-<script src="entrega.js?v=20261014"></script>
-<script src="campana.js?v=20261014"></script>
-<script src="analytics.js?v=20261014"></script>
+<script src="fallback-data.js?v=20261118"></script>
+<script src="promo.js?v=20261118"></script>
+<script src="seo-pages.js?v=20261118"></script>
+<script src="entrega.js?v=20261118"></script>
+<script src="campana.js?v=20261118"></script>
+<script src="analytics.js?v=20261118"></script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{--black:#0a0a0a;--white:#f8f8f6;--gray:#6f6f6f;--light:#ebebeb;--mid:#444;--blue:#009ee3;--green:#2a9d5c;--warm:#946437;}
@@ -2502,6 +2502,22 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape')closeExitPop
       if(Array.isArray(s.tocar)) CFG.tocar=s.tocar.filter(Boolean);
     }
   }catch(e){}
+  /* Promos por fecha (promo.js): unos días antes avisa que se viene y, mientras dura, la anuncia */
+  try{
+    var PR=window.OM_PROMO||{};
+    var dias=['domingo','lunes','martes','miércoles','jueves','viernes','sábado'];
+    if(PR.activa){
+      var a=PR.activa, ult=new Date(a.hasta).toDateString()===new Date().toDateString();
+      CFG.zonas.inicio.frase='¡Es el '+a.nombre+'! '+a.descuento+'% OFF en todo'+(ult?', y termina hoy.':'.');
+      CFG.zonas.productos.frase='Con el '+a.nombre+' están todos con '+a.descuento+'% OFF.';
+      CFG.tocar=[(ult?'Último día del ':'Aprovechá el ')+a.nombre+': '+a.descuento+'% OFF.'].concat(CFG.tocar);
+    }else if(PR.proxima){
+      var x=PR.proxima, d=x.desde;
+      var cuando=dias[d.getDay()]+' '+d.getDate()+'/'+(d.getMonth()+1);
+      CFG.zonas.inicio.frase='Se viene el '+x.nombre+': '+x.descuento+'% OFF desde el '+cuando+'.';
+      CFG.tocar=['El '+cuando+' arranca el '+x.nombre+'. ¡Agendalo!'].concat(CFG.tocar);
+    }
+  }catch(e){}
   if(CFG.activo===false){ oso.remove(); return; }
   try{ if(sessionStorage.getItem('oso-oculto')==='1'){ oso.remove(); return; } }catch(e){}
 
@@ -2670,6 +2686,6 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape')closeExitPop
   try{ render(); }catch(e){}
 })();
 </script>
-<script src="carrito-recuperar.js?v=20261014"></script>
+<script src="carrito-recuperar.js?v=20261118"></script>
 </body>
 </html>
